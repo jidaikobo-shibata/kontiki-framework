@@ -1,0 +1,9 @@
+/app/Controllers/TestController.php
+/vendor/
+/composer.lock
+/logs/
+/public/
+/phpcs.xml
+/.dev
+/db/production/database.sqlite3
+/db/development/database.sqlite3
