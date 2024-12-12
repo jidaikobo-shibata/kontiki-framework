@@ -1,8 +1,10 @@
 <?php
 /*
 Ussage:
-/usr/bin/php vendor/bin/phinx migrate
-/usr/bin/php vendor/bin/phinx rollback
+php vendor/bin/phinx migrate
+php vendor/bin/phinx rollback
+
+php vendor/bin/phinx seed:run
 */
 
 $env = file_exists(__DIR__ . '/.dev') ? 'development' : 'production';

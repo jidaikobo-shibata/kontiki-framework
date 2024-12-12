@@ -6,16 +6,13 @@ use jidaikobo\kontiki\Controllers\AuthController;
 use jidaikobo\kontiki\Controllers\DashboardController;
 use jidaikobo\kontiki\Controllers\PostController;
 use jidaikobo\kontiki\Controllers\UserController;
-// use jidaikobo\kontiki\Controllers\TestController;
 
 return function ($app) use ($container) {
-    // $app->get('/test', [TestController::class, 'test'])
-    //     ->add($container->get(AuthMiddleware::class));
 
     $app->get('/login', [AuthController::class, 'showLoginForm'])
         ->setName('login');
     $app->post('/login', [AuthController::class, 'processLogin']);
-    $app->post('/logout', [AuthController::class, 'logout']);
+    $app->get('/logout', [AuthController::class, 'logout']);
 
     $app->group(
         '/admin',
@@ -29,8 +26,10 @@ return function ($app) use ($container) {
                 function (RouteCollectorProxy $subgroup) {
                     $subgroup->get('/index', [UserController::class, 'index'])
                         ->setName('users_list');
-                    $subgroup->get('/edit', [UserController::class, 'create'])
+                    $subgroup->get('/create', [UserController::class, 'create'])
                         ->setName('add_new_user');
+                    $subgroup->get('/edit/{id}', [UserController::class, 'edit']);
+                    $subgroup->get('/delete/{id}', [UserController::class, 'delete']);
                 }
             );
 
@@ -39,17 +38,14 @@ return function ($app) use ($container) {
                 function (RouteCollectorProxy $subgroup) {
                     $subgroup->get('/index', [PostController::class, 'index'])
                         ->setName('posts_list');
-                    $subgroup->get('/edit', [PostController::class, 'create'])
+                    $subgroup->get('/create', [PostController::class, 'create'])
                         ->setName('add_new_post');
+                    $subgroup->get('/edit/{id}', [UserController::class, 'edit']);
+                    $subgroup->get('/trash/{id}', [UserController::class, 'trash']);
+                    $subgroup->get('/restore/{id}', [UserController::class, 'restore']);
+                    $subgroup->get('/delete/{id}', [UserController::class, 'delete']);
                 }
             );
-
-            // $group->get('/users/{id}/edit', [UserController::class, 'edit']);
-            // $group->delete('/users/{id}', [UserController::class, 'delete']);
-
-            // $group->get('/posts/{id}', [PostController::class, 'show']);
-            // $group->put('/posts/{id}', [PostController::class, 'update']);
-            // $group->delete('/posts/{id}', [PostController::class, 'delete']);
         }
     )->add($container->get(AuthMiddleware::class));
 

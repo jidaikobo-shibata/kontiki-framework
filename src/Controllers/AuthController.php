@@ -53,7 +53,7 @@ class AuthController
         ];
 
         // ログインフォームをレンダリング
-        $content = $this->view->fetch('Auth/login.php', $data);
+        $content = $this->view->fetch('auth/login.php', $data);
 
         // エラーがある場合にDOMを加工
         if (!empty($error)) {
@@ -145,6 +145,10 @@ class AuthController
     {
         $this->session->destroy();
 
-        return $response->withJson(['message' => 'Logged out successfully'], 200);
+        $routeContext = RouteContext::fromRequest($request);
+        $loginUrl = $routeContext->getRouteParser()->urlFor('login');
+        return $response
+            ->withHeader('Location', $loginUrl)
+            ->withStatus(302);
     }
 }
