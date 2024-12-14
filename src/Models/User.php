@@ -3,6 +3,7 @@
 namespace jidaikobo\kontiki\Models;
 
 use PDO;
+use jidaikobo\kontiki\Utils\Lang;
 
 class User extends BaseModel
 {
@@ -10,18 +11,35 @@ class User extends BaseModel
 
     protected string $table = 'users';
 
-    protected static array $fieldDefinitions = [
-        'username' => [
-    //            'rules' => ['required', ['lengthMin', 3]],
-            'default' => '',
-            'filter' => FILTER_SANITIZE_STRING,
-        ],
-        'password' => [
-        //            'rules' => ['required', ['lengthMin', 3]],
-            'default' => '',
-            'filter' => FILTER_UNSAFE_RAW,
-        ],
-    ];
+    public function getFieldDefinitions(): array
+    {
+        return [
+            'username' => [
+                'label' => Lang::get('username', 'Username'),
+                'type' => 'text',
+                'attributes' => ['class' => 'input-title'],
+                'label_attributes' => ['class' => 'form-label'],
+                'default' => '',
+                'rules' => ['required', ['lengthMin', 3]],
+                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'template' => 'default',
+                'group' => 'main',
+                'fieldset_template' => 'forms/fieldset/flat.php',
+            ],
+            'password' => [
+                'label' => Lang::get('password', 'Password'),
+                'type' => 'password',
+                'attributes' => [],
+                'label_attributes' => ['class' => 'form-label'],
+                'default' => '',
+                'rules' => ['required', ['lengthMin', 3]],
+                'filter' => FILTER_UNSAFE_RAW,
+                'template' => 'default',
+                'group' => 'main',
+                'fieldset_template' => 'forms/fieldset/flat.php',
+            ],
+        ];
+    }
 
     /**
      * Get the user by their username.

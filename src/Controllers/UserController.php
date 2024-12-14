@@ -2,21 +2,28 @@
 
 namespace jidaikobo\kontiki\Controllers;
 
+use Aura\Session\Session;
 use jidaikobo\kontiki\Models\User;
 use jidaikobo\kontiki\Services\SidebarService;
 use jidaikobo\kontiki\Utils\Lang;
+use jidaikobo\kontiki\Utils\FormHandler;
+use jidaikobo\kontiki\Utils\FormRenderer;
+use jidaikobo\Log;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\PhpRenderer;
 
 class UserController extends BaseController
 {
+    private Session $session;
+    protected PhpRenderer $view;
     private User $userModel;
 
-    public function __construct(User $userModel, PhpRenderer $view, SidebarService $sidebarService)
+    public function __construct(User $userModel, PhpRenderer $view, SidebarService $sidebarService, Session $session)
     {
         parent::__construct($view, $sidebarService);
         $this->userModel = $userModel;
+        $this->session = $session;
     }
 
     /**
@@ -54,44 +61,79 @@ class UserController extends BaseController
      * @param  Response $response
      * @return Response
      */
-    public function createForm(Request $request, Response $response): Response
+    public function create(Request $request, Response $response): Response
     {
+        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
+        $error = $segment->get('error', []);
+        $data = $segment->get('data', []);
+
+        $segment->clear();
+
+        $fields = $this->userModel->getFieldDefinitionsWithDefaults($data);
+
+        $formRenderer = new FormRenderer($fields, $this->view);
+        $formHtml = $formRenderer->render();
+
+        $content = $this->view->fetch(
+            'forms/edit.php',
+            [
+                'actionAttribute' => './save',
+                'csrfToken' => $this->session->getCsrfToken(),
+                'formHtml' => $formHtml
+            ]
+        );
+
+        if (!empty($error)) {
+            $formHandler = new FormHandler($content);
+            $formHandler->addErrors($error);
+            $content = $formHandler->getHtml();
+        }
+
         return $this->view->render(
             $response,
-            'users/create.php',
+            'layout.php',
             [
-            'pageTitle' => 'Create New User',
+                'pageTitle' => Lang::get('create_new_user', 'Create New User'),
+                'content' => $content
             ]
         );
     }
 
-    /**
-     * Store a new user in the database.
-     *
-     * @param  Request  $request
-     * @param  Response $response
-     * @return Response
-     */
-    public function store(Request $request, Response $response): Response
+    public function save(Request $request, Response $response): Response
     {
+        $csrfToken = $this->session->getCsrfToken();
+        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
+
         $data = $request->getParsedBody();
 
-        try {
-            $this->userModel->create($data);
-            return $response
-                ->withHeader('Location', '/admin/users')
-                ->withStatus(302);
-        } catch (\InvalidArgumentException $e) {
-            return $this->view->render(
-                $response,
-                'users/create.php',
-                [
-                'pageTitle' => 'Create New User',
-                'error' => $e->getMessage(),
-                'oldInput' => $data,
-                ]
-            );
+        if (!isset($data['_csrf_value']) || !$csrfToken->isValid($data['_csrf_value'])) {
+            $response->getBody()->write('Invalid CSRF token.');
+            return $response->withStatus(400);
         }
+
+        $validationResult = $this->userModel->validate($data);
+        if (!$validationResult['valid']) {
+            $segment->set('error', $validationResult['errors']);
+            $segment->set('data', $data);
+            return $this->redirect($request, $response, 'add_new_user');
+        }
+
+        // save
+        try {
+            if ($this->userModel->create($data)) {
+                $segment->set('success', Lang::get('success', 'Success'));
+                $id = $this->userModel->getLastInsertId();
+                $redirect = $this->redirect($request, $response, '.edit_user', ['id' => $id]);
+            }
+        } catch (\RuntimeException $e) {
+            $segment->set(
+                'error',
+                [[$e->getMessage()]]
+            );
+            $segment->set('data', $data);
+            $redirect = $this->redirect($request, $response, 'add_new_user');
+        }
+        return $redirect;
     }
 
     /**
@@ -102,27 +144,46 @@ class UserController extends BaseController
      * @param  array    $args
      * @return Response
      */
-    public function editForm(Request $request, Response $response, array $args): Response
+    public function edit(Request $request, Response $response, array $args): Response
     {
-        $id = (int)$args['id'];
-        $user = $this->userModel->getById($id);
+        $id = $args['id'];
 
-        if (!$user) {
-            return $this->view->render(
-                $response,
-                'errors/404.php',
-                [
-                'pageTitle' => 'User Not Found',
-                ]
-            )->withStatus(404);
+        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
+        $error = $segment->get('error', []);
+        $data = $segment->get('data', $this->userModel->getById($id));
+
+        $segment->clear();
+
+        if (!$data) {
+            return $redirect = $this->redirect($request, $response, 'add_new_user');
+        }
+
+        $fields = $this->userModel->getFieldDefinitionsWithDefaults($data);
+
+        $formRenderer = new FormRenderer($fields, $this->view);
+        $formHtml = $formRenderer->render();
+
+        $content = $this->view->fetch(
+            'forms/edit.php',
+            [
+                'actionAttribute' => './update',
+                'csrfToken' => $this->session->getCsrfToken(),
+                'formHtml' => $formHtml
+            ]
+        );
+
+        if (!empty($error)) {
+            $formHandler = new FormHandler($content);
+            $formHandler->addErrors($error);
+            $content = $formHandler->getHtml();
         }
 
         return $this->view->render(
             $response,
-            'users/edit.php',
+            'layout.php',
             [
-            'pageTitle' => 'Edit User',
-            'user' => $user,
+                'pageTitle' => Lang::get('edit_user', 'Edit User'),
+                'content' => $content
             ]
         );
     }

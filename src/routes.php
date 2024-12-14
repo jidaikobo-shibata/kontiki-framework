@@ -28,7 +28,9 @@ return function ($app) use ($container) {
                         ->setName('users_list');
                     $subgroup->get('/create', [UserController::class, 'create'])
                         ->setName('add_new_user');
-                    $subgroup->get('/edit/{id}', [UserController::class, 'edit']);
+                    $subgroup->post('/save', [UserController::class, 'save']);
+                    $subgroup->get('/edit/{id}', [UserController::class, 'edit'])
+                        ->setName('.edit_user');
                     $subgroup->get('/delete/{id}', [UserController::class, 'delete']);
                 }
             );

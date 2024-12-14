@@ -10,6 +10,8 @@ return [
     'found_the_problem' => '問題が見つかりました',
     'wrong_username_or_password' => 'ユーザ名かパスワードが間違っています',
 
+    'database_error' => 'データベースでエラーがありました',
+
     '404_text' => 'ページが見つかりませんでした。',
 
     'management_portal' => '管理画面',

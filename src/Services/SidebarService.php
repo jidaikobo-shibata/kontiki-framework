@@ -33,6 +33,11 @@ class SidebarService
                 continue;
             }
 
+            // 名前が "." から始まるルートはメニュー用でない
+            if (!$name || strpos($name, '.') === 0) {
+                continue;
+            }
+
             // グループの抽出
             $group = $this->extractGroupFromPattern($pattern);
 

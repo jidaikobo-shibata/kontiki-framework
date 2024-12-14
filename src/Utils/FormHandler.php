@@ -3,6 +3,8 @@
 namespace jidaikobo\kontiki\Utils;
 
 use DOMDocument;
+use jidaikobo\kontiki\Utils\FormUtils;
+use jidaikobo\Log;
 
 class FormHandler
 {
@@ -24,55 +26,12 @@ class FormHandler
 
     public function loadHTML(string $html): void
     {
-        $this->dom->loadHTML(
-            mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'),
-            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
-        );
-    }
-
-    /**
-     * Validate the name and id attributes for form elements.
-     *
-     * @throws \Exception if validation errors are found.
-     * @return void
-     */
-    public function validateNameIdMapping(): void
-    {
-        $errors = [];
-        $elements = ['input', 'textarea', 'select', 'button', 'fieldset', 'label'];
-
-        foreach ($elements as $tag) {
-            $nodes = $this->dom->getElementsByTagName($tag);
-            foreach ($nodes as $node) {
-                $name = $node->getAttribute('name');
-                $id = $node->getAttribute('id');
-
-                // Special handling for <label>
-                if ($tag === 'label') {
-                    $for = $node->getAttribute('for');
-                    if ($for && !$this->dom->getElementById($for)) {
-                        $errors[] = sprintf("Label 'for' attribute references a non-existent input ID: '%s'.", $for);
-                    }
-                    continue;
-                }
-
-                // Missing name or id
-                if (!$name || !$id) {
-                    $errors[] = sprintf("<%s> element is missing a 'name' or 'id' attribute.", $tag);
-                    continue;
-                }
-
-                // Mismatch between name and id
-                if ($this->nameToId($name) !== $id) {
-                    $errors[] = sprintf("Mismatch in <%s>: name='%s' and id='%s' are not consistent.", $tag, $name, $id);
-                }
-            }
-        }
-
-        // Throw exception if errors are found
-        if (!empty($errors)) {
-            throw new \Exception("Form validation failed:\n" . implode("\n", $errors));
-        }
+      $map = [0x80, 0x10FFFF, 0, 0xFFFF];
+      $html = mb_encode_numericentity($html, $map, 'UTF-8');
+      $this->dom->loadHTML(
+        $html,
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+      );
     }
 
     /**
@@ -118,7 +77,7 @@ class FormHandler
     public function addErrors(array $errors): void
     {
         foreach ($errors as $field => $messages) {
-            $id = $this->nameToId($field);
+            $id = FormUtils::nameToId($field);;
 
             // Add ARIA attributes and classes to the element
             $this->setAttributeById($id, 'aria-invalid', 'true');
@@ -158,6 +117,7 @@ class FormHandler
                 // Nested <ul> for form-wide error messages
                 $nestedUl = $this->dom->createElement('ul');
                 $nestedUl->setAttribute('class', 'ps-3');
+
                 foreach ($messages as $message) {
                     $nestedLi = $this->dom->createElement('li', $message);
                     $nestedLi->setAttribute('class', 'pt-2');
@@ -171,7 +131,7 @@ class FormHandler
             }
 
             // Handle field-specific errors
-            $id = $this->nameToId($field);
+            $id = FormUtils::nameToId($field);
             $inputElement = $this->dom->getElementById($id);
 
             // Find the corresponding <label> element

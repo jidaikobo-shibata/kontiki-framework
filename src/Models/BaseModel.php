@@ -28,14 +28,6 @@ abstract class BaseModel implements ModelInterface
     protected string $table;
 
     /**
-     * Field definitions for validation and filtering.
-     * Override this in child classes if necessary.
-     *
-     * @var array
-     */
-    protected static array $fieldDefinitions = [];
-
-    /**
      * BaseModel constructor.
      *
      * @param PDO $pdo Database connection instance.
@@ -46,13 +38,24 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * Get field definitions for validation and filtering.
+     * Get field definitions for the model.
+     * This method must be implemented in child classes.
      *
      * @return array Field definitions.
      */
-    public static function getFieldDefinitions(): array
+    abstract public function getFieldDefinitions(): array;
+
+    public function getFieldDefinitionsWithDefaults(array $data): array
     {
-        return static::$fieldDefinitions;
+        $fields = $this->getFieldDefinitions();
+
+        foreach ($fields as $fieldName => &$field) {
+            if (isset($data[$fieldName])) {
+                $field['default'] = $data[$fieldName];
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -67,7 +70,7 @@ abstract class BaseModel implements ModelInterface
         $validator = new Validator($data);
         $validator->setPrependLabels(false);
 
-        foreach (static::$fieldDefinitions as $field => $definition) {
+        foreach ($this->getFieldDefinitions() as $field => $definition) {
             if (isset($definition['rules'])) {
                 foreach ($definition['rules'] as $rule) {
                     if (is_array($rule)) {
@@ -114,6 +117,18 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
+     * Filter the given data array to include only allowed fields.
+     *
+     * @param array $data The data to filter.
+     * @return array The filtered data.
+     */
+    protected function filterAllowedFields(array $data): array
+    {
+      $allowedFields = array_keys($this->getFieldDefinitions());
+      return array_intersect_key($data, array_flip($allowedFields));
+    }
+
+    /**
      * Create a new record in the table.
      *
      * @param  array $data Key-value pairs of column names and values.
@@ -122,6 +137,8 @@ abstract class BaseModel implements ModelInterface
      */
     public function create(array $data): bool
     {
+        $data = $this->filterAllowedFields($data);
+
         // Validate the data
         $validation = $this->validate($data);
 
@@ -129,6 +146,7 @@ abstract class BaseModel implements ModelInterface
             throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
         }
 
+    try {
         // Prepare the SQL query for insertion
         $columns = implode(', ', array_keys($data));
         $placeholders = implode(', ', array_map(fn($key) => ":$key", array_keys($data)));
@@ -136,8 +154,25 @@ abstract class BaseModel implements ModelInterface
         $query = "INSERT INTO {$this->table} ($columns) VALUES ($placeholders)";
         $stmt = $this->pdo->prepare($query);
 
-        // Execute the query
-        return $stmt->execute($data);
+        $success = $stmt->execute($data);
+
+        $this->lastInsertId = $success ? (int) $this->pdo->lastInsertId() : null;
+
+        return $success;
+    } catch (\PDOException $e) {
+
+        // PDOExceptionをRuntimeExceptionに変換
+        throw new \RuntimeException(
+            'Database error: ' . $e->getMessage(),
+            $e->getCode(),
+            $e
+        );
+    }
+    }
+
+    public function getLastInsertId(): ?int
+    {
+        return $this->lastInsertId;
     }
 
     /**
@@ -149,6 +184,8 @@ abstract class BaseModel implements ModelInterface
      */
     public function update(int $id, array $data): bool
     {
+        $data = $this->filterAllowedFields($data);
+
         // Validate the data
         $validation = $this->validate($data);
 

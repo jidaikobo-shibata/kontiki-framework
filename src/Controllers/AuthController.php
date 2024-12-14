@@ -2,10 +2,10 @@
 
 namespace jidaikobo\kontiki\Controllers;
 
+use Aura\Session\Session;
 use jidaikobo\kontiki\Models\User;
 use jidaikobo\kontiki\Utils\FormHandler;
 use jidaikobo\kontiki\Utils\Lang;
-use Aura\Session\Session;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Routing\RouteContext;
@@ -35,7 +35,7 @@ class AuthController
     public function showLoginForm(Request $request, Response $response): Response
     {
         // セッションからエラーと入力値を取得
-        $segment = $this->session->getSegment('jidaikobo\kontiki\Session');
+        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
         $error = $segment->get('error', []);
         $input = $segment->get(
             'input',
@@ -90,7 +90,7 @@ class AuthController
         // バリデーションの実行
         $validationResult = $this->userModel->validate($data);
         if (!$validationResult['valid']) {
-            $segment = $this->session->getSegment('jidaikobo\kontiki\Session');
+            $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
             $segment->set('error', $validationResult['errors']);
             $segment->set(
                 'input',
@@ -115,7 +115,7 @@ class AuthController
 
         if ($stored_password !== null && password_verify($password, $stored_password)) {
             // セッションにユーザー情報を保存
-            $segment = $this->session->getSegment('jidaikobo\kontiki\Session');
+            $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
             $segment->set('user', $user);
 
             $dashboardUrl = $routeContext->getRouteParser()->urlFor('dashboard');
@@ -125,7 +125,7 @@ class AuthController
         }
 
         // ログイン失敗
-        $segment = $this->session->getSegment('jidaikobo\kontiki\Session');
+        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
         $segment->set('error', [[Lang::get('wrong_username_or_password', 'Incorrect username or password')]]);
         $segment->set(
             'input',
