@@ -3,26 +3,22 @@
 namespace jidaikobo\kontiki\Utils;
 
 use DOMDocument;
-use jidaikobo\kontiki\Utils\FormUtils;
-use jidaikobo\Log;
+use jidaikobo\kontiki\Models\BaseModel;
 
 class FormHandler
 {
     private DOMDocument $dom;
 
-    /**
-     * Initialize the DOM helper with HTML content.
-     *
-     * @param string $html The HTML content to parse.
-     */
-    public function __construct(string $html = '')
+    public function __construct(string $html = '', BaseModel $model)
     {
         $this->dom = new DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
         if (!empty($html)) {
             $this->loadHTML($html);
         }
+        $this->model = $model;
     }
+
 
     public function loadHTML(string $html): void
     {
@@ -67,118 +63,36 @@ class FormHandler
         }
     }
 
-    /**
-     * Add error messages to form elements based on their name attributes.
-     *
-     * @param  array $errors Associative array where the key is the form element's name
-     *                       and the value is an array of error messages.
-     * @return void
-     */
     public function addErrors(array $errors): void
     {
         foreach ($errors as $field => $messages) {
-            $id = FormUtils::nameToId($field);;
+            $id = FormUtils::nameToId($field);
 
             // Add ARIA attributes and classes to the element
             $this->setAttributeById($id, 'aria-invalid', 'true');
             $this->setAttributeById($id, 'aria-errormessage', 'errormessage_' . $id);
             $this->addClassById($id, 'is-invalid');
         }
-        // Append error messages
-        $this->addErrorSummary($errors);
+
+        // Use MessageUtils to generate the error summary
+        $errorHtml = MessageUtils::generateErrorMessages($errors, $this->model);
+        $this->injectMessageIntoForm($errorHtml);
     }
 
-    /**
-     * Add a summary of error messages to the form as the first child element.
-     *
-     * The summary includes a list of errors, each linking to the corresponding input field.
-     * If the name is "0", it is treated as a form-wide error.
-     *
-     * @param  array $errors Associative array where the key is the form element's name
-     *                       and the value is an array of error messages.
-     * @return void
-     */
-    public function addErrorSummary(array $errors): void
+    public function addSuccessMessages(array $successMessages): void
     {
-        // Wrapper for the error summary (used for AJAX or general styling)
-        $wrapper = $this->dom->createElement('div');
-        $wrapper->setAttribute('class', 'errormessages');
+        // Use MessageUtils to generate success messages
+        $successHtml = MessageUtils::generateSuccessMessages($successMessages);
+        $this->injectMessageIntoForm($successHtml);
+    }
 
-        // Create the summary <ul> element
-        $summary = $this->dom->createElement('ul');
-        $summary->setAttribute('class', 'alert alert-danger p-3 ps-5 pt-0 mt-3 mb-3 fs-6');
-
-        foreach ($errors as $field => $messages) {
-            // Handle form-wide errors (when name is "0")
-            if ($field === 0) {
-                $li = $this->dom->createElement('li', Lang::get('found_the_problem', 'Found the problem'));
-                $li->setAttribute('class', 'pt-3');
-
-                // Nested <ul> for form-wide error messages
-                $nestedUl = $this->dom->createElement('ul');
-                $nestedUl->setAttribute('class', 'ps-3');
-
-                foreach ($messages as $message) {
-                    $nestedLi = $this->dom->createElement('li', $message);
-                    $nestedLi->setAttribute('class', 'pt-2');
-                    $nestedUl->appendChild($nestedLi);
-                }
-                $li->appendChild($nestedUl);
-
-                // Append the form-wide error to the main summary
-                $summary->appendChild($li);
-                continue;
-            }
-
-            // Handle field-specific errors
-            $id = FormUtils::nameToId($field);
-            $inputElement = $this->dom->getElementById($id);
-
-            // Find the corresponding <label> element
-            $labelText = '';
-            $labels = $this->dom->getElementsByTagName('label');
-            foreach ($labels as $label) {
-                if ($label->getAttribute('for') === $id) {
-                    $labelText = $label->nodeValue;
-                    break;
-                }
-            }
-
-            // Fallback for cases where no <label> is found
-            if (empty($labelText)) {
-                $labelText = ucfirst($field);
-            }
-
-            // Create the main <li> element for this field
-            $li = $this->dom->createElement('li');
-            $li->setAttribute('id', 'errormessage_' . $id);
-            $li->setAttribute('class', 'pt-3');
-
-            // Add the main error message with a link to the field
-            $link = $this->dom->createElement('a', sprintf(Lang::get('error_at_label', 'Error at %s'), $labelText));
-            $link->setAttribute('href', "#{$id}");
-            $li->appendChild($link);
-
-            // Add a nested <ul> with all specific error messages
-            $nestedUl = $this->dom->createElement('ul');
-            $nestedUl->setAttribute('class', 'ps-3');
-            foreach ($messages as $message) {
-                $nestedLi = $this->dom->createElement('li', $labelText . $message);
-                $nestedLi->setAttribute('class', 'pt-2');
-                $nestedUl->appendChild($nestedLi);
-            }
-            $li->appendChild($nestedUl);
-
-            // Append this <li> to the main summary <ul>
-            $summary->appendChild($li);
-        }
-
-        // Wrap the summary and prepend it to the form
-        $wrapper->appendChild($summary);
-
+    protected function injectMessageIntoForm(string $messageHtml): void
+    {
         $form = $this->dom->getElementsByTagName('form')->item(0);
         if ($form) {
-            $form->insertBefore($wrapper, $form->firstChild);
+            $messageNode = $this->dom->createDocumentFragment();
+            $messageNode->appendXML($messageHtml);
+            $form->insertBefore($messageNode, $form->firstChild);
         }
     }
 
@@ -192,14 +106,4 @@ class FormHandler
         return $this->dom->saveHTML();
     }
 
-    /**
-     * Convert a name attribute to an id-compatible string.
-     *
-     * @param  string $name The name attribute.
-     * @return string The converted id.
-     */
-    public function nameToId(string $name): string
-    {
-        return preg_replace('/[^a-zA-Z0-9_\-]/', '_', $name);
-    }
 }

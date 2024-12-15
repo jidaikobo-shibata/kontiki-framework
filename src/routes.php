@@ -25,13 +25,14 @@ return function ($app) use ($container) {
                 '/users',
                 function (RouteCollectorProxy $subgroup) {
                     $subgroup->get('/index', [UserController::class, 'index'])
-                        ->setName('users_list');
+                        ->setName('users_index');
                     $subgroup->get('/create', [UserController::class, 'create'])
-                        ->setName('add_new_user');
-                    $subgroup->post('/save', [UserController::class, 'save']);
-                    $subgroup->get('/edit/{id}', [UserController::class, 'edit'])
-                        ->setName('.edit_user');
+                        ->setName('users_create');
+                    $subgroup->post('/create', [UserController::class, 'handleCreate']);
+                    $subgroup->get('/edit/{id}', [UserController::class, 'edit']);
+                    $subgroup->post('/edit/{id}', [UserController::class, 'handleEdit']);
                     $subgroup->get('/delete/{id}', [UserController::class, 'delete']);
+                    $subgroup->post('/delete/{id}', [UserController::class, 'handledelete']);
                 }
             );
 

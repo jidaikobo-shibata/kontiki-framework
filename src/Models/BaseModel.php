@@ -14,6 +14,13 @@ use Valitron\Validator;
 abstract class BaseModel implements ModelInterface
 {
     /**
+     * The ID of the last inserted record.
+     *
+     * @var int|null
+     */
+    protected ?int $lastInsertId = null;
+
+    /**
      * PDO instance for database connection.
      *
      * @var PDO
@@ -36,6 +43,28 @@ abstract class BaseModel implements ModelInterface
     {
         $this->pdo = $pdo;
     }
+
+    // 削除タイプを取得（Hard DeleteまたはSoft Delete）
+    public function getDeleteType(): string
+    {
+        return 'hard';
+    }
+
+    // アクション定義を取得
+    public function getActions(string $context): array
+    {
+        if ($this->getDeleteType() === 'hard') {
+            return ['edit', 'delete'];
+        }
+
+        if ($context === 'trash') {
+            return ['restore', 'delete'];
+        }
+
+        return ['edit', 'trash'];
+    }
+
+    abstract public function getDisplayFields(): array;
 
     /**
      * Get field definitions for the model.
@@ -122,7 +151,7 @@ abstract class BaseModel implements ModelInterface
      * @param array $data The data to filter.
      * @return array The filtered data.
      */
-    protected function filterAllowedFields(array $data): array
+    public function filterAllowedFields(array $data): array
     {
       $allowedFields = array_keys($this->getFieldDefinitions());
       return array_intersect_key($data, array_flip($allowedFields));

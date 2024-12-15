@@ -17,8 +17,8 @@ return [
     'management_portal' => '管理画面',
 
     'users_management' => 'ユーザ管理',
-    'users_list' => 'ユーザ一覧',
-    'add_new_user' => '新規ユーザ追加',
+    'users_index' => 'ユーザ一覧',
+    'users_create' => '新規ユーザ追加',
 
     'posts_management' => '記事管理',
     'posts_list' => '記事一覧',

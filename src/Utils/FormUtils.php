@@ -5,10 +5,10 @@ namespace jidaikobo\kontiki\Utils;
 class FormUtils
 {
     /**
-     * Convert a name attribute to an id-compatible string.
+     * Convert a name attribute to an ID-compatible string.
      *
      * @param string $name The name attribute.
-     * @return string The converted id.
+     * @return string The converted ID.
      */
     public static function nameToId(string $name): string
     {

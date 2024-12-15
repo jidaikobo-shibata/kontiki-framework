@@ -11,6 +11,11 @@ class User extends BaseModel
 
     protected string $table = 'users';
 
+    public function getDisplayFields(): array
+    {
+        return ['username', 'created_at'];
+    }
+
     public function getFieldDefinitions(): array
     {
         return [
