@@ -8,6 +8,7 @@ use jidaikobo\kontiki\Models\BaseModel;
 class FormHandler
 {
     private DOMDocument $dom;
+    private BaseModel $model;
 
     public function __construct(string $html = '', BaseModel $model)
     {
@@ -65,6 +66,10 @@ class FormHandler
 
     public function addErrors(array $errors): void
     {
+        if (empty($errors)) {
+            return;
+        }
+
         foreach ($errors as $field => $messages) {
             $id = FormUtils::nameToId($field);
 

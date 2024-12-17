@@ -39,7 +39,7 @@ class MessageUtils
             $labelText = $fieldDefinitions[$field]['label'] ?? ucfirst($field);
 
             $html .= sprintf(
-                '<a href="#%s">%s</a>',
+                '<a href="#%s" class="alert-link">%s</a>',
                 htmlspecialchars($id, ENT_QUOTES, 'UTF-8'),
                 sprintf(
                     Lang::get('error_at_label', 'Error at %s'),

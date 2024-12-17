@@ -45,7 +45,6 @@ class AuthMiddleware implements MiddlewareInterface
                     'content' => $content
                 ]
             );
-            ;
         }
 
         // ログイン中の場合は次のミドルウェアまたはコントローラーに進む

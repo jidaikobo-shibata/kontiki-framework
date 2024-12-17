@@ -3,33 +3,78 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use Aura\Session\Session;
+use jidaikobo\kontiki\Middleware\AuthMiddleware;
+use jidaikobo\kontiki\Models\BaseModel;
 use jidaikobo\kontiki\Services\SidebarService;
 use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\Lang;
+use jidaikobo\kontiki\Utils\CsrfManager;
+use jidaikobo\kontiki\Utils\FlashManager;
 use jidaikobo\kontiki\Utils\FormHandler;
 use jidaikobo\kontiki\Utils\FormRenderer;
-use jidaikobo\kontiki\Utils\TableHandler;
-use jidaikobo\kontiki\Utils\TableRenderer;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\App;
 use Slim\Routing\RouteContext;
+use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
 
 abstract class BaseController
 {
+    protected BaseModel $model;
+    protected CsrfManager $csrfManager;
+    protected FlashManager $flashManager;
     protected PhpRenderer $view;
-    protected SidebarService $sidebarService;
     protected Session $session;
-    protected string $model;
+    protected SidebarService $sidebarService;
+    protected string $modelClass;
+    protected string $table;
 
     public function __construct(PhpRenderer $view, SidebarService $sidebarService, Session $session, PDO $pdo)
     {
         $this->view = $view;
         $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
-        $this->sidebarService = $sidebarService;
         $this->session = $session;
-        $this->pdo = $pdo;
+        $this->flashManager = new FlashManager($session);
+        $this->csrfManager = new CsrfManager($session);
+
+        if (!class_exists($this->modelClass)) {
+            throw new \RuntimeException("Model class {$this->modelClass} not found.");
+        }
+        $this->model = new $this->modelClass($pdo);
+        $this->table = $this->model->getTableName();
+    }
+
+    public static function registerRoutes(App $app): void
+    {
+        $basePath = static::getBasePath();
+
+        $controllerClass = static::class;
+
+        $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
+            $traits = class_uses($controllerClass);
+
+            foreach ($traits as $trait) {
+                $routeClass = self::resolveRouteClass($trait);
+                if (class_exists($routeClass) && method_exists($routeClass, 'register')) {
+                    $routeClass::register($group, $basePath, $controllerClass);
+                }
+            }
+        })->add(AuthMiddleware::class);
+    }
+
+    protected static function getBasePath(): string
+    {
+        throw new \LogicException('You must override getBasePath() in the child class.');
+    }
+
+    /**
+     * トレイト名からルートクラス名を生成
+     */
+    private static function resolveRouteClass(string $trait): string
+    {
+        $traitName = (new \ReflectionClass($trait))->getShortName();
+        return "jidaikobo\\kontiki\\Controllers\\Routes\\" . str_replace('Trait', 'Routes', $traitName);
     }
 
     /**
@@ -56,122 +101,19 @@ abstract class BaseController
             ->withStatus($status);
     }
 
-    protected function getCsrfToken(): string
+    protected function renderFormHtml(string $action, array $fields, string $description = '', string $buttonText = 'Submit'): string
     {
-        return $this->session->getCsrfToken()->getValue();
-    }
+        $formRenderer = new FormRenderer($fields, $this->view);
 
-    protected function validateCsrfToken(?string $token): bool
-    {
-        return $this->session->getCsrfToken()->isValid($token);
-    }
-
-    protected function setFlashMessage(string $type, string $message): void
-    {
-        // セッションセグメントを取得
-        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
-
-        // 指定されたタイプ（例: success, error）にメッセージを追加
-        $existingMessages = $segment->get($type, []);
-        $existingMessages[] = $message;
-        $segment->set($type, $existingMessages);
-    }
-
-    protected function setFlashErrors(array $errors): void
-    {
-        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
-
-        // 既存のエラーを取得し、新しいエラーをマージ
-        $existingErrors = $segment->get('errors', []);
-        $mergedErrors = array_merge_recursive($existingErrors, $errors);
-
-        $segment->set('errors', $mergedErrors);
-    }
-
-    protected function getFlashMessages(string $type, array $default = []): array
-    {
-        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
-        $messages = $segment->get($type, $default);
-        if (empty($messages)) {
-          $messages = $default;
-        }
-        $segment->set($type, []);
-        return $messages;
-    }
-
-    /**
-     * モデルインスタンスを取得
-     */
-    protected function getModelInstance(): object
-    {
-        if (!class_exists($this->model)) {
-            throw new \RuntimeException("Model class {$this->model} not found.");
-        }
-
-        return new $this->model($this->pdo);
-    }
-
-    /**
-     * 一覧表示の汎用メソッド
-     */
-    public function index(Request $request, Response $response): Response
-    {
-        $model = $this->getModelInstance();
-        $error = $this->getFlashMessages('errors', []);
-        $success = $this->getFlashMessages('success', []);
-        $data = $model->getAll();
-
-        $tableRenderer = new TableRenderer($model, $data, $this->view);
-        $content = $tableRenderer->render();
-
-        $tableHandler = new TableHandler();
-
-        if (!empty($error)) {
-            $content = $tableHandler->addErrors($content, $error);
-        }
-
-        if (!empty($success)) {
-            $content = $tableHandler->addSuccessMessages($content, $success);
-        }
-
-        return $this->view->render(
-            $response,
-            'layout.php',
+        return $this->view->fetch(
+            'forms/edit.php',
             [
-                'pageTitle' => Lang::get("{$this->table}_management", ucfirst($this->table) . ' Management'),
-                'content' => $content,
+                'actionAttribute' => Env::get('BASEPATH') . $action,
+                'csrfToken' => $this->csrfManager->getToken(),
+                'formHtml' => $formRenderer->render(),
+                'description' => $description,
+                'buttonText' => $buttonText,
             ]
-        );
-    }
-
-    public function create(Request $request, Response $response): Response
-    {
-        $model = $this->getModelInstance();
-        $data = [];
-
-        return $this->renderForm(
-            $response,
-            "/admin/{$this->table}/create",
-            Lang::get("{$this->table}_create", 'Create ' . ucfirst($this->table)),
-            $model->getFieldDefinitionsWithDefaults($data)
-        );
-    }
-
-    public function edit(Request $request, Response $response, array $args): Response
-    {
-        $id = $args['id'];
-        $model = $this->getModelInstance();
-        $data = $this->getFlashMessages('data', $model->getById($id));
-
-        if (!$data) {
-            return $this->redirect($request, $response, "/admin/{$this->table}/index");
-        }
-
-        return $this->renderForm(
-            $response,
-            "/admin/{$this->table}/edit/{$id}",
-            Lang::get("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
-            $model->getFieldDefinitionsWithDefaults($data)
         );
     }
 
@@ -179,11 +121,37 @@ abstract class BaseController
         Response $response,
         string $action,
         string $title,
-        array $fields
+        array $fields,
+        string $description = '',
+        string $buttonText = 'Submit'
     ): Response {
-        $segment = $this->session->getSegment('jidaikobo\kontiki\flash');
-        $error = $this->getFlashMessages('errors', []);
-        $success = $this->getFlashMessages('success', []);
+        $content = $this->renderFormHtml($action, $fields, $description, $buttonText);
+
+        $formHandler = new FormHandler($content, $this->model);
+        $formHandler->addErrors($this->flashManager->getData('errors', []));
+        $formHandler->addSuccessMessages($this->flashManager->getData('success', []));
+
+        return $this->view->render(
+            $response,
+            'layout.php',
+            [
+                'pageTitle' => $title,
+                'content' => $formHandler->getHtml(),
+            ]
+        );
+    }
+
+/*
+    protected function renderForm(
+        Response $response,
+        string $action,
+        string $title,
+        array $fields,
+        string $description = '',
+        string $buttonText = 'Submit'
+    ): Response {
+        $error = $this->flashManager->getData('errors', []);
+        $success = $this->flashManager->getData('success', []);
 
         $formRenderer = new FormRenderer($fields, $this->view);
         $formHtml = $formRenderer->render();
@@ -192,12 +160,14 @@ abstract class BaseController
             'forms/edit.php',
             [
                 'actionAttribute' => Env::get('BASEPATH') . $action,
-                'csrfToken' => $this->getCsrfToken(),
+                'csrfToken' => $this->csrfManager->getToken(),
                 'formHtml' => $formHtml,
+                'description' => $description,
+                'buttonText' => $buttonText,
             ]
         );
 
-        $formHandler = new FormHandler($content, $this->getModelInstance());
+        $formHandler = new FormHandler($content, $this->model);
 
         if (!empty($error)) {
             $formHandler->addErrors($error);
@@ -217,107 +187,5 @@ abstract class BaseController
             ]
         );
     }
-
-    public function handleCreate(Request $request, Response $response): Response
-    {
-        return $this->handleSave($request, $response, 'create');
-    }
-
-    public function handleEdit(Request $request, Response $response, array $args): Response
-    {
-        $id = $args['id'];
-        return $this->handleSave($request, $response, 'edit', $id);
-    }
-
-    protected function handleSave(Request $request, Response $response, string $actionType, ?int $id = null): Response
-    {
-        $model = $this->getModelInstance();
-        $data = $request->getParsedBody();
-
-        $redirectTo = $actionType === 'create' ? "/admin/{$this->table}/create" : "/admin/{$this->table}/edit/{$id}";
-
-        // CSRFトークン検証
-        if (empty($data['_csrf_value']) || !$this->validateCsrfToken($data['_csrf_value'])) {
-            $this->setFlashErrors([Lang::get("csrf_invalid", 'Invalid CSRF token.')]);
-            return $this->redirect($request, $response, $redirectTo);
-        }
-
-        // バリデーション
-        $validationResult = $model->validate($data);
-        if (!$validationResult['valid']) {
-            $this->setFlashErrors($validationResult['errors']);
-            return $this->redirect($request, $response, $redirectTo);
-        }
-
-        // 保存または更新
-        try {
-            if ($actionType === 'create') {
-                $model->create($data);
-                $lastInsertId = $model->getLastInsertId();
-                $redirectTo = "/admin/{$this->table}/edit/{$lastInsertId}";
-            } elseif ($actionType === 'edit' && $id !== null) {
-                $model->update($id, $data);
-                $redirectTo = "/admin/{$this->table}/edit/{$id}";
-            }
-
-            $this->setFlashMessage('success', Lang::get("{$this->table}_save_success", 'Saved successfully.'));
-            return $this->redirect($request, $response, $redirectTo);
-        } catch (\Exception $e) {
-            $this->setFlashErrors([[$e->getMessage()]]);
-            $redirectTo = $actionType === 'create' ? "/admin/{$this->table}/create" : "/admin/{$this->table}/edit/{$id}";
-            return $this->redirect($request, $response, $redirectTo);
-        }
-    }
-
-    public function delete(Request $request, Response $response, array $args): Response
-    {
-        $id = $args['id'];
-        $model = $this->getModelInstance();
-
-        // 対象データを取得
-        $data = $model->getById($id);
-
-        if (!$data) {
-            return $this->redirect($request, $response, "/admin/{$this->table}/index");
-        }
-
-        // 全フィールドをreadonlyに設定
-        $fields = $model->getFieldDefinitionsWithDefaults($data);
-        foreach ($fields as &$field) {
-            $field['attributes']['readonly'] = 'readonly';
-        }
-
-        return $this->renderForm(
-            $response,
-            "/admin/{$this->table}/delete/{$id}",
-            Lang::get("{$this->table}_edit", 'Delete ' . ucfirst($this->table)),
-            $fields
-        );
-    }
-
-    public function handleDelete(Request $request, Response $response, array $args): Response
-    {
-        $id = $args['id'];
-        $model = $this->getModelInstance();
-        $data = $request->getParsedBody();
-
-        // CSRFトークン検証
-        if (empty($data['_csrf_value']) || !$this->validateCsrfToken($data['_csrf_value'])) {
-            return $response->withStatus(400)->write('Invalid CSRF token.');
-        }
-
-        // データ削除
-        try {
-            if ($model->delete($id)) {
-                $this->setFlashMessage('success', Lang::get("{$this->table}_delete_success", ucfirst($this->table) . " deleted successfully."));
-                return $this->redirect($request, $response, "/admin/{$this->table}/index");
-            }
-        } catch (\Exception $e) {
-            $this->setFlashErrors([Lang::get("{$this->table}_delete_failed", "Failed to delete " . ucfirst($this->table) . ".")]);
-        }
-
-        $redirectTo = "/admin/{$this->table}/edit/{$id}";
-        return $this->redirect($request, $response, $redirectTo);
-    }
-
+*/
 }

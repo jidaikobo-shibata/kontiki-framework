@@ -8,6 +8,7 @@ use jidaikobo\kontiki\Utils\FormHandler;
 use jidaikobo\kontiki\Utils\Lang;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\App;
 use Slim\Routing\RouteContext;
 use Slim\Views\PhpRenderer;
 use Valitron\Validator;
@@ -25,6 +26,14 @@ class AuthController
         $this->userModel = $userModel;
     }
 
+    public static function registerRoutes(App $app): void
+    {
+        $app->get('/login', [AuthController::class, 'showLoginForm'])
+            ->setName('login');
+        $app->post('/login', [AuthController::class, 'processLogin']);
+        $app->get('/logout', [AuthController::class, 'logout']);
+    }
+
     /**
      * Display the login form.
      *
@@ -40,8 +49,8 @@ class AuthController
         $input = $segment->get(
             'input',
             [
-            'username' => '',
-            'password' => '',
+                'username' => '',
+                'password' => '',
             ]
         );
 
@@ -57,7 +66,7 @@ class AuthController
 
         // エラーがある場合にDOMを加工
         if (!empty($error)) {
-            $formHandler = new FormHandler($content);
+            $formHandler = new FormHandler($content, $this->userModel);
             $formHandler->addErrors($error);
             $content = $formHandler->getHtml();
         }
@@ -66,8 +75,8 @@ class AuthController
             $response,
             'layout-simple.php',
             [
-            'pageTitle' => Lang::get('login', 'Login'),
-            'content' => $content
+                'pageTitle' => Lang::get('login', 'Login'),
+                'content' => $content
             ]
         );
         ;
@@ -86,28 +95,6 @@ class AuthController
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
         $routeContext = RouteContext::fromRequest($request);
-
-        // バリデーションの実行
-        $validationResult = $this->userModel->validate($data);
-        if (!$validationResult['valid']) {
-            $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-            $segment->set('error', $validationResult['errors']);
-            $segment->set(
-                'input',
-                [
-                'username' => $username,
-                'password' => '', // パスワードは再入力を促すため空にする
-                ]
-            );
-
-            // ログインフォームにリダイレクト
-            $routeContext = RouteContext::fromRequest($request);
-            $loginUrl = $routeContext->getRouteParser()->urlFor('login');
-
-            return $response
-                ->withHeader('Location', $loginUrl)
-                ->withStatus(302);
-        }
 
         // ログイン検証
         $user = $this->userModel->getByUsername($username);

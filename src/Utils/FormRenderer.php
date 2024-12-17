@@ -94,6 +94,7 @@ class FormRenderer
             'type' => $config['type'],
             'value' => htmlspecialchars($config['default'] ?? '', ENT_QUOTES, 'UTF-8'),
             'attributes' => $renderedAttributes,
+            'description' => $config['description'] ?? '',
         ]);
     }
 

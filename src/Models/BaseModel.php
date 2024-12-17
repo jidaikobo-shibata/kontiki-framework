@@ -66,6 +66,11 @@ abstract class BaseModel implements ModelInterface
 
     abstract public function getDisplayFields(): array;
 
+    public function getTableName(): string
+    {
+        return $this->table;
+    }
+
     /**
      * Get field definitions for the model.
      * This method must be implemented in child classes.
@@ -93,13 +98,13 @@ abstract class BaseModel implements ModelInterface
      * @param  array $data The data to validate.
      * @return array An array with 'valid' (bool) and 'errors' (array of errors).
      */
-    public function validate(array $data): array
+    public function validate(array $data, array $fieldDefinitions): array
     {
         Validator::lang(Env::get('LANG'));
         $validator = new Validator($data);
         $validator->setPrependLabels(false);
 
-        foreach ($this->getFieldDefinitions() as $field => $definition) {
+        foreach ($fieldDefinitions as $field => $definition) {
             if (isset($definition['rules'])) {
                 foreach ($definition['rules'] as $rule) {
                     if (is_array($rule)) {
@@ -169,34 +174,37 @@ abstract class BaseModel implements ModelInterface
         $data = $this->filterAllowedFields($data);
 
         // Validate the data
-        $validation = $this->validate($data);
+        $validation = $this->validate($data, $this->getFieldDefinitions());
 
         if (!$validation['valid']) {
             throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
         }
 
-    try {
-        // Prepare the SQL query for insertion
-        $columns = implode(', ', array_keys($data));
-        $placeholders = implode(', ', array_map(fn($key) => ":$key", array_keys($data)));
-
-        $query = "INSERT INTO {$this->table} ($columns) VALUES ($placeholders)";
-        $stmt = $this->pdo->prepare($query);
-
-        $success = $stmt->execute($data);
-
-        $this->lastInsertId = $success ? (int) $this->pdo->lastInsertId() : null;
-
-        return $success;
-    } catch (\PDOException $e) {
-
-        // PDOExceptionをRuntimeExceptionに変換
-        throw new \RuntimeException(
-            'Database error: ' . $e->getMessage(),
-            $e->getCode(),
-            $e
-        );
+        return $this->executeInsert($data);
     }
+
+    protected function executeInsert(array $data): bool
+    {
+        try {
+            $columns = implode(', ', array_keys($data));
+            $placeholders = implode(', ', array_map(fn($key) => ":$key", array_keys($data)));
+
+            $query = "INSERT INTO {$this->table} ($columns) VALUES ($placeholders)";
+            $stmt = $this->pdo->prepare($query);
+
+            $success = $stmt->execute($data);
+
+            $this->lastInsertId = $success ? (int) $this->pdo->lastInsertId() : null;
+
+            return $success;
+        } catch (\PDOException $e) {
+            // PDOExceptionをRuntimeExceptionに変換
+            throw new \RuntimeException(
+                'Database error during insert: ' . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     public function getLastInsertId(): ?int
@@ -216,19 +224,31 @@ abstract class BaseModel implements ModelInterface
         $data = $this->filterAllowedFields($data);
 
         // Validate the data
-        $validation = $this->validate($data);
+        $validation = $this->validate($data, $this->getFieldDefinitions());
 
         if (!$validation['valid']) {
             throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
         }
 
-        // Prepare the SQL query for update
-        $setClause = implode(', ', array_map(fn($key) => "$key = :$key", array_keys($data)));
+        return $this->executeUpdate($id, $data);
+    }
 
+    /**
+     * Execute an update operation on the database.
+     *
+     * @param int $id
+     * @param array $data
+     * @return bool
+     */
+    protected function executeUpdate(int $id, array $data): bool
+    {
+        // SQLクエリの準備と実行
+        $setClause = implode(', ', array_map(fn($key) => "$key = :$key", array_keys($data)));
         $query = "UPDATE {$this->table} SET $setClause WHERE id = :id";
         $stmt = $this->pdo->prepare($query);
 
         $data['id'] = $id;
+
         return $stmt->execute($data);
     }
 

@@ -6,6 +6,13 @@ return [
     'username' => 'ユーザ名',
     'password' => 'パスワード',
 
+    'submit' => '送信する',
+    'create' => '作成する',
+    'update' => '更新する',
+    'delete' => '削除する',
+
+    'confirm_delete_message' => '項目は完全に削除されます。本当にこの項目を削除してもいいですか？',
+
     'error_at_label' => '「%s」にエラーがあります',
     'found_the_problem' => '問題が見つかりました',
     'wrong_username_or_password' => 'ユーザ名かパスワードが間違っています',
@@ -19,6 +26,7 @@ return [
     'users_management' => 'ユーザ管理',
     'users_index' => 'ユーザ一覧',
     'users_create' => '新規ユーザ追加',
+    'users_edit_message' => 'パスワードが空の場合、パスワードは変更されません',
 
     'posts_management' => '記事管理',
     'posts_list' => '記事一覧',

@@ -1,5 +1,6 @@
 <?php
 
+use jidaikobo\kontiki\Middleware\AuthMiddleware;
 use jidaikobo\kontiki\Services\SidebarService;
 use jidaikobo\kontiki\Utils\Env;
 use Aura\Session\SessionFactory;
@@ -51,18 +52,4 @@ return function (App $app) {
             );
         }
     );
-
-    /*
-    $container->set(Slim\Routing\RouteParser::class, function () use ($app) {
-        return $app->getRouteCollector()->getRouteParser();
-    });
-
-    $container->set(RouteCollector::class, function ($container) use ($app) {
-        return $app->getRouteCollector();
-    });
-
-    $container->set(SidebarService::class, function () {
-        return new SidebarService();
-    });
-    */
 };
