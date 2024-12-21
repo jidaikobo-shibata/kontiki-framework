@@ -2,9 +2,8 @@
 
 namespace jidaikobo\kontiki\Models;
 
+use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Utils\Env;
-use PDO;
-use PDOException;
 use Valitron\Validator;
 
 /**
@@ -13,35 +12,15 @@ use Valitron\Validator;
  */
 abstract class BaseModel implements ModelInterface
 {
-    /**
-     * The ID of the last inserted record.
-     *
-     * @var int|null
-     */
-    protected ?int $lastInsertId = null;
-
-    /**
-     * PDO instance for database connection.
-     *
-     * @var PDO
-     */
-    protected PDO $pdo;
-
-    /**
-     * Table name associated with the model.
-     *
-     * @var string
-     */
+    protected DatabaseHandler $db;
     protected string $table;
 
     /**
      * BaseModel constructor.
-     *
-     * @param PDO $pdo Database connection instance.
      */
-    public function __construct(PDO $pdo)
+    public function __construct(DatabaseHandler $db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
     // 削除タイプを取得（Hard DeleteまたはSoft Delete）
@@ -64,12 +43,11 @@ abstract class BaseModel implements ModelInterface
         return ['edit', 'trash'];
     }
 
-    abstract public function getDisplayFields(): array;
-
     public function getTableName(): string
     {
         return $this->table;
     }
+    abstract public function getDisplayFields(): array;
 
     /**
      * Get field definitions for the model.
@@ -125,29 +103,38 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * Retrieve all records from the table.
+     * Get options in the form of id => field value.
      *
-     * @return array List of all records.
+     * @param string $fieldName The field name to use as the value.
+     * @param bool $includeEmpty Whether to include an empty option at the start.
+     * @param string $emptyLabel The label for the empty option (default: '').
+     * @return array Associative array of id => field value.
      */
-    public function getAll(): array
+    public function getOptions(string $fieldName, bool $includeEmpty = false, string $emptyLabel = ''): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM {$this->table}");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+        // バリデーション: フィールド名が空でないことを確認
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('Field name cannot be empty.');
+        }
 
-    /**
-     * Retrieve a specific record by its ID.
-     *
-     * @param  int $id The ID of the record.
-     * @return array|null The record if found, or null if not.
-     */
-    public function getById(int $id): ?array
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        // SQLクエリの実行: id と 指定フィールド名を取得
+        $query = "SELECT id, {$fieldName} FROM {$this->table}";
+        $results = $this->db->executeQuery($query);
 
-        return $result ?: null;
+        // id => 指定フィールド名の配列に加工
+        $options = [];
+        foreach ($results as $row) {
+            if (isset($row['id'], $row[$fieldName])) {
+                $options[$row['id']] = $row[$fieldName];
+            }
+        }
+
+        // 空の要素を先頭に追加
+        if ($includeEmpty) {
+            $options = ['' => $emptyLabel] + $options;
+        }
+
+        return $options;
     }
 
     /**
@@ -172,44 +159,7 @@ abstract class BaseModel implements ModelInterface
     public function create(array $data): bool
     {
         $data = $this->filterAllowedFields($data);
-
-        // Validate the data
-        $validation = $this->validate($data, $this->getFieldDefinitions());
-
-        if (!$validation['valid']) {
-            throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
-        }
-
-        return $this->executeInsert($data);
-    }
-
-    protected function executeInsert(array $data): bool
-    {
-        try {
-            $columns = implode(', ', array_keys($data));
-            $placeholders = implode(', ', array_map(fn($key) => ":$key", array_keys($data)));
-
-            $query = "INSERT INTO {$this->table} ($columns) VALUES ($placeholders)";
-            $stmt = $this->pdo->prepare($query);
-
-            $success = $stmt->execute($data);
-
-            $this->lastInsertId = $success ? (int) $this->pdo->lastInsertId() : null;
-
-            return $success;
-        } catch (\PDOException $e) {
-            // PDOExceptionをRuntimeExceptionに変換
-            throw new \RuntimeException(
-                'Database error during insert: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-    }
-
-    public function getLastInsertId(): ?int
-    {
-        return $this->lastInsertId;
+        return $this->db->insert($this->table, $data);
     }
 
     /**
@@ -222,45 +172,79 @@ abstract class BaseModel implements ModelInterface
     public function update(int $id, array $data): bool
     {
         $data = $this->filterAllowedFields($data);
+        return $this->db->update($this->table, $id, $data);
+    }
 
-        // Validate the data
-        $validation = $this->validate($data, $this->getFieldDefinitions());
+    /**
+     * Get searchable columns from the model's properties.
+     *
+     * @return array
+     */
+    protected function getSearchableColumns(): array
+    {
+        $searchableColumns = [];
+        foreach ($this->getFieldDefinitions() as $column => $config) {
+            if (isset($config['searchable']) && $config['searchable'] === true) {
+                $searchableColumns[] = $column;
+            }
+        }
+        return $searchableColumns;
+    }
 
-        if (!$validation['valid']) {
-            throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
+    public function countByKeyword(string $keyword): int
+    {
+        $conditions = $this->buildSearchConditions($keyword);
+        return $this->db->countAll($this->table, $conditions['where'], $conditions['params']);
+    }
+
+    /**
+     * Build search conditions and parameters for SQL queries.
+     *
+     * @param string $keyword Search keyword for filtering.
+     * @param array $customSearchableColumns Optional custom searchable columns.
+     * @return array An associative array with 'where' (SQL WHERE clause) and 'params' (parameters).
+     */
+    public function buildSearchConditions(string $keyword = '', array $customSearchableColumns = []): array
+    {
+        // 検索対象のカラムを取得
+        $searchableColumns = !empty($customSearchableColumns)
+            ? $customSearchableColumns
+            : $this->getSearchableColumns();
+
+        $whereClause = '';
+        $params = [];
+
+        if (!empty($keyword) && !empty($searchableColumns)) {
+            $conditions = [];
+            foreach ($searchableColumns as $column) {
+                $conditions[] = "{$column} LIKE :keyword";
+            }
+            $whereClause = " WHERE " . implode(' OR ', $conditions);
+            $params[':keyword'] = "%{$keyword}%";
         }
 
-        return $this->executeUpdate($id, $data);
+        return ['where' => $whereClause, 'params' => $params];
     }
 
     /**
-     * Execute an update operation on the database.
+     * Get paginated data with optional keyword filtering.
      *
-     * @param int $id
-     * @param array $data
-     * @return bool
+     * @param string $keyword Search keyword.
+     * @param int $offset SQL offset.
+     * @param int $limit SQL limit.
+     * @param array $customSearchableColumns Custom searchable columns.
+     * @return array Fetched data.
      */
-    protected function executeUpdate(int $id, array $data): bool
+    public function search(string $keyword = '', int $offset = 0, int $limit = 10, array $customSearchableColumns = []): array
     {
-        // SQLクエリの準備と実行
-        $setClause = implode(', ', array_map(fn($key) => "$key = :$key", array_keys($data)));
-        $query = "UPDATE {$this->table} SET $setClause WHERE id = :id";
-        $stmt = $this->pdo->prepare($query);
+        $searchConditions = $this->buildSearchConditions($keyword, $customSearchableColumns);
 
-        $data['id'] = $id;
+        $query = "SELECT * FROM {$this->table} {$searchConditions['where']} LIMIT :limit OFFSET :offset";
+        $params = array_merge($searchConditions['params'], [
+            ':limit' => $limit,
+            ':offset' => $offset,
+        ]);
 
-        return $stmt->execute($data);
-    }
-
-    /**
-     * Delete a record from the table by its ID.
-     *
-     * @param  int $id The ID of the record to delete.
-     * @return bool True if the record was deleted, false otherwise.
-     */
-    public function delete(int $id): bool
-    {
-        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        return $this->db->executeQuery($query, $params);
     }
 }

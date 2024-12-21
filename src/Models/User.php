@@ -13,18 +13,22 @@ class User extends BaseModel
 
     public function getDisplayFields(): array
     {
-        return ['username', 'created_at'];
+        return ['id', 'username', 'created_at'];
     }
 
     public function getFieldDefinitions(): array
     {
         return [
+            'id' => [
+                'label' => 'ID',
+            ],
             'username' => [
                 'label' => Lang::get('username', 'Username'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
+                'searchable' => TRUE,
                 'rules' => ['required', ['lengthMin', 3]],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
@@ -38,11 +42,15 @@ class User extends BaseModel
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
+                'searchable' => false,
                 'rules' => ['required', ['lengthMin', 8]],
                 'filter' => FILTER_UNSAFE_RAW,
                 'template' => 'default',
                 'group' => 'main',
                 'fieldset_template' => 'forms/fieldset/flat.php',
+            ],
+            'created_at' => [
+                'label' => Lang::get('created_at', 'Created'),
             ],
         ];
     }

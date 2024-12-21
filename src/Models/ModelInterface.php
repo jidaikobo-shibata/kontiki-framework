@@ -4,10 +4,8 @@ namespace jidaikobo\kontiki\Models;
 
 interface ModelInterface
 {
-    /**
-     * Get field definitions for the model.
-     *
-     * @return array The field definitions.
-     */
+    public function getTableName(): string;
+    public function getDisplayFields(): array;
     public function getFieldDefinitions(): array;
+    public function countByKeyword(string $keyword): int;
 }

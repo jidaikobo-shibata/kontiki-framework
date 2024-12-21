@@ -11,6 +11,9 @@ return [
     'update' => '更新する',
     'delete' => '削除する',
 
+    'search_str' => '検索文字',
+    'search' => '検索する',
+
     'confirm_delete_message' => '項目は完全に削除されます。本当にこの項目を削除してもいいですか？',
 
     'error_at_label' => '「%s」にエラーがあります',

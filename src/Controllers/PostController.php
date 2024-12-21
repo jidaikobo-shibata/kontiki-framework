@@ -2,16 +2,32 @@
 
 namespace jidaikobo\kontiki\Controllers;
 
-use jidaikobo\kontiki\Models\Post;
+use Aura\Session\Session;
+use jidaikobo\kontiki\Models\Post as PostModel;
+use jidaikobo\kontiki\Services\SidebarService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\PhpRenderer;
 
-class PostController
+class PostController extends BaseController
 {
-    private Post $postModel;
+    use Traits\IndexTrait;
+    use Traits\CreateEditTrait;
+    use Traits\DeleteTrait;
 
-    public function __construct(Post $postModel)
+    protected string $modelClass = '\\jidaikobo\\kontiki\\Models\\Post';
+
+    public function __construct(
+        PhpRenderer $view,
+        SidebarService $sidebarService,
+        Session $session,
+        PostModel $model
+    ) {
+        parent::__construct($view, $sidebarService, $session, $model);
+    }
+
+    protected static function getBasePath(): string
     {
-        $this->postModel = $postModel;
+        return 'posts';
     }
 }

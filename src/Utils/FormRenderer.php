@@ -32,6 +32,7 @@ class FormRenderer
     {
         $grouped = [];
         foreach ($this->fields as $name => $config) {
+            if (!isset($config['type'])) continue;
             $group = $config['group'] ?? 'default';
             $grouped[$group][$name] = $config;
         }
@@ -88,13 +89,26 @@ class FormRenderer
 
         $fieldTemplate = $this->getFieldTemplate($config['type']);
 
+        $ariaDescribedby = '';
+        $ariaDescribedbyAttribute = '';
+        $description = $config['description'] ?? '';
+        if (!empty($description))
+        {
+          $ariaDescribedby = 'ariaDesc_' . $id;
+          $ariaDescribedbyAttribute = ' aria-describedby="' . $ariaDescribedby . '"';
+          $description = '<div class="form-text" id="' . $ariaDescribedby . '">' . $description . '</div>';
+        }
+
         return $this->view->fetch($fieldTemplate, [
             'id' => $id,
             'name' => $name,
             'type' => $config['type'],
             'value' => htmlspecialchars($config['default'] ?? '', ENT_QUOTES, 'UTF-8'),
+            'options' => $config['options'] ?? [],
             'attributes' => $renderedAttributes,
-            'description' => $config['description'] ?? '',
+            'ariaDescribedby' => $ariaDescribedby,
+            'ariaDescribedbyAttribute' => $ariaDescribedbyAttribute,
+            'description' => $description,
         ]);
     }
 
@@ -120,11 +134,13 @@ class FormRenderer
     protected function getFieldTemplate(string $type): string
     {
         $templates = [
-            'text' => 'forms/fields/text_input.php',
-            'textarea' => 'forms/fields/textarea_input.php',
-            'checkbox' => 'forms/fields/checkbox_input.php',
+            'text' => 'forms/fields/text.php',
+            'textarea' => 'forms/fields/textarea.php',
+            'checkbox' => 'forms/fields/checkbox.php',
+            'radio' => 'forms/fields/radio.php',
+            'select' => 'forms/fields/select.php',
         ];
-        return $templates[$type] ?? 'forms/fields/text_input.php';
+        return $templates[$type] ?? 'forms/fields/text.php';
     }
 
     protected function getGroupTemplate(string $group): string

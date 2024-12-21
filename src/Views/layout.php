@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?php echo \jidaikobo\kontiki\Utils\Env::get('LANG') ?>">
+<html lang="<?= \jidaikobo\kontiki\Utils\Env::get('LANG') ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
   <script src="/file/script/file_manager_instance/"></script>
 <?php endif; ?>
 
-  <title><?php echo htmlspecialchars($pageTitle) ?></title>
+  <title><?= htmlspecialchars($pageTitle) ?></title>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -32,7 +32,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?php echo \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?php echo \jidaikobo\kontiki\Utils\Lang::get('logout', 'Logout') ?></a>
+    <a href="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= \jidaikobo\kontiki\Utils\Lang::get('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->
@@ -44,20 +44,20 @@
   <main class="content-wrapper">
     <section class="content-header">
       <div class="container-fluid">
-        <h1><?php echo htmlspecialchars($pageTitle) ?></h1>
+        <h1><?= htmlspecialchars($pageTitle) ?></h1>
       </div>
     </section>
 
     <section class="content">
       <div class="container-fluid">
-        <?php echo $content ?>
+        <?= $content ?>
       </div>
     </section>
   </main><!-- /.content-wrapper -->
 
   <!-- .main-footer -->
   <footer class="main-footer">
-    <?php echo \jidaikobo\kontiki\Utils\Env::get('COPYRIGHT') ?>
+    <?= \jidaikobo\kontiki\Utils\Env::get('COPYRIGHT') ?>
   </footer><!-- /.main-footer -->
 </div>
 </body>

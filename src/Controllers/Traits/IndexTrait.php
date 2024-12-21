@@ -2,7 +2,9 @@
 
 namespace jidaikobo\kontiki\Controllers\Traits;
 
+use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\kontiki\Utils\Lang;
+use jidaikobo\kontiki\Utils\Pagination;
 use jidaikobo\kontiki\Utils\TableHandler;
 use jidaikobo\kontiki\Utils\TableRenderer;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -28,7 +30,17 @@ trait IndexTrait
     {
         $error = $this->flashManager->getData('errors', []);
         $success = $this->flashManager->getData('success', []);
-        $data = $this->model->getAll();
+
+        $currentPage = (int)($request->getQueryParams()['paged'] ?? 1);
+        $itemsPerPage = 10;
+        $pagination = new Pagination($currentPage, $itemsPerPage);
+
+        $keyword = $request->getQueryParams()['s'] ?? '';
+        $totalItems = $this->model->countByKeyword($keyword);
+
+        $pagination->setTotalItems($totalItems);
+
+        $data = $this->model->search($keyword, $pagination->getOffset(), $pagination->getLimit());
 
         $tableRenderer = new TableRenderer($this->model, $data, $this->view);
         $content = $tableRenderer->render();
@@ -42,6 +54,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
+        $content.= $pagination->render(Env::get('BASEPATH') . "/admin/{$this->table}/index");
 
         return $this->view->render(
             $response,

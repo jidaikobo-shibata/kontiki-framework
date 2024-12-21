@@ -94,6 +94,6 @@ class TableRenderer
             }
         }
 
-        return sprintf('<td>%s</td>', $html);
+        return sprintf('<td class="text-nowrap">%s</td>', $html);
     }
 }

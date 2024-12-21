@@ -3,15 +3,15 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use Aura\Session\Session;
+use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Models\BaseModel;
+use jidaikobo\kontiki\Models\ModelInterface;
 use jidaikobo\kontiki\Services\SidebarService;
 use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\kontiki\Utils\CsrfManager;
 use jidaikobo\kontiki\Utils\FlashManager;
 use jidaikobo\kontiki\Utils\FormHandler;
 use jidaikobo\kontiki\Utils\FormRenderer;
-use PDO;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -21,28 +21,30 @@ use Slim\Views\PhpRenderer;
 
 abstract class BaseController
 {
-    protected BaseModel $model;
-    protected CsrfManager $csrfManager;
-    protected FlashManager $flashManager;
+//    protected DatabaseHandler $db;
+    protected ModelInterface $model;
     protected PhpRenderer $view;
     protected Session $session;
     protected SidebarService $sidebarService;
-    protected string $modelClass;
-    protected string $table;
+//    protected string $modelClass;
 
-    public function __construct(PhpRenderer $view, SidebarService $sidebarService, Session $session, PDO $pdo)
-    {
+    protected string $table;
+    protected CsrfManager $csrfManager;
+    protected FlashManager $flashManager;
+
+    public function __construct(
+      PhpRenderer $view,
+      SidebarService $sidebarService,
+      Session $session,
+      ModelInterface $model
+    ) {
+        $this->csrfManager = new CsrfManager($session);
+        $this->flashManager = new FlashManager($session);
+        $this->model = $model;
+        $this->table = $this->model->getTableName();
+        $this->session = $session;
         $this->view = $view;
         $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
-        $this->session = $session;
-        $this->flashManager = new FlashManager($session);
-        $this->csrfManager = new CsrfManager($session);
-
-        if (!class_exists($this->modelClass)) {
-            throw new \RuntimeException("Model class {$this->modelClass} not found.");
-        }
-        $this->model = new $this->modelClass($pdo);
-        $this->table = $this->model->getTableName();
     }
 
     public static function registerRoutes(App $app): void
