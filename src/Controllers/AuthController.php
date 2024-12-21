@@ -97,7 +97,7 @@ class AuthController
         $routeContext = RouteContext::fromRequest($request);
 
         // ログイン検証
-        $user = $this->userModel->getByUsername($username);
+        $user = $this->userModel->getByField('username', $username);
         $stored_password = $user['password'] ?? null ;
 
         if ($stored_password !== null && password_verify($password, $stored_password)) {

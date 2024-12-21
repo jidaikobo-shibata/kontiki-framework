@@ -49,6 +49,25 @@ class DatabaseHandler
     }
 
     /**
+     * Retrieve a specific record by a given field.
+     *
+     * @param string $table Table name.
+     * @param string $field Field name to filter by.
+     * @param mixed $value Value to filter by.
+     * @return array|null The record if found, or null if not.
+     */
+    public function getByField(string $table, string $field, mixed $value): ?array
+    {
+        $query = "SELECT * FROM {$table} WHERE {$field} = :value LIMIT 1";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute(['value' => $value]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result ?: null;
+    }
+
+    /**
      * Execute an insert query.
      *
      * @param string $table Table name.

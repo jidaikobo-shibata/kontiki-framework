@@ -16,6 +16,8 @@ return [
 
     'confirm_delete_message' => '項目は完全に削除されます。本当にこの項目を削除してもいいですか？',
 
+    'is_already_exists' => 'はすでに存在します',
+
     'error_at_label' => '「%s」にエラーがあります',
     'found_the_problem' => '問題が見つかりました',
     'wrong_username_or_password' => 'ユーザ名かパスワードが間違っています',

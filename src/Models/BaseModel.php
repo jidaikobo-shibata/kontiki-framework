@@ -3,6 +3,7 @@
 namespace jidaikobo\kontiki\Models;
 
 use jidaikobo\kontiki\Database\DatabaseHandler;
+use jidaikobo\kontiki\Services\ValidationService;
 use jidaikobo\kontiki\Utils\Env;
 use Valitron\Validator;
 
@@ -13,14 +14,16 @@ use Valitron\Validator;
 abstract class BaseModel implements ModelInterface
 {
     protected DatabaseHandler $db;
+    protected ValidationService $validationService;
     protected string $table;
 
     /**
      * BaseModel constructor.
      */
-    public function __construct(DatabaseHandler $db)
+    public function __construct(DatabaseHandler $db, ValidationService $validationService)
     {
         $this->db = $db;
+        $this->validationService = $validationService;
     }
 
     // 削除タイプを取得（Hard DeleteまたはSoft Delete）
@@ -76,30 +79,20 @@ abstract class BaseModel implements ModelInterface
      * @param  array $data The data to validate.
      * @return array An array with 'valid' (bool) and 'errors' (array of errors).
      */
-    public function validate(array $data, array $fieldDefinitions): array
+    public function validate(array $data): array
     {
-        Validator::lang(Env::get('LANG'));
-        $validator = new Validator($data);
-        $validator->setPrependLabels(false);
+        // 必要に応じてフィールド定義を動的に加工
+        $fieldDefinitions = $this->processFieldDefinitions($this->getFieldDefinitions());
+        return $this->validationService->validate($data, $fieldDefinitions);
+    }
 
-        foreach ($fieldDefinitions as $field => $definition) {
-            if (isset($definition['rules'])) {
-                foreach ($definition['rules'] as $rule) {
-                    if (is_array($rule)) {
-                        $validator->rule($rule[0], $field, ...array_slice($rule, 1));
-                    } else {
-                        $validator->rule($rule, $field);
-                    }
-                }
-            }
-        }
-
-        $isValid = $validator->validate();
-
-        return [
-            'valid' => $isValid,
-            'errors' => $isValid ? [] : $validator->errors(),
-        ];
+    /**
+     * 動的なフィールド定義の加工を行うメソッド。
+     * 子クラスでオーバーライド可能。
+     */
+    protected function processFieldDefinitions(array $fieldDefinitions): array
+    {
+        return $fieldDefinitions; // デフォルトでは加工しない
     }
 
     /**
@@ -149,17 +142,28 @@ abstract class BaseModel implements ModelInterface
       return array_intersect_key($data, array_flip($allowedFields));
     }
 
+    public function getById(int $id): ?array
+    {
+        return $this->db->getById($this->table, $id);
+    }
+
+    public function getByField(string $field, mixed $value): ?array
+    {
+        return $this->db->getByField($this->table, $field, $value);
+    }
+
     /**
      * Create a new record in the table.
      *
-     * @param  array $data Key-value pairs of column names and values.
-     * @return bool True if the record was created, false otherwise.
+     * @param array $data Key-value pairs of column names and values.
+     * @return int|null The ID of the newly created record, or null if the operation failed.
      * @throws InvalidArgumentException If validation fails.
      */
-    public function create(array $data): bool
+    public function create(array $data): ?int
     {
-        $data = $this->filterAllowedFields($data);
-        return $this->db->insert($this->table, $data);
+        $filteredData = $this->filterAllowedFields($data);
+        $success = $this->db->insert($this->table, $filteredData);
+        return $success ? $this->db->getLastInsertId() : null;
     }
 
     /**

@@ -36,11 +36,13 @@ trait CreateEditTrait
             return $this->redirect($request, $response, "/admin/{$this->table}/index");
         }
 
+        $fields = $this->model->processFieldDefinitions($this->model->getFieldDefinitionsWithDefaults($data));
+
         return $this->renderForm(
             $response,
             "/admin/{$this->table}/edit/{$id}",
             Lang::get("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
-            $this->model->getFieldDefinitionsWithDefaults($data),
+            $fields,
             '',
             Lang::get("update", 'Update'),
         );
@@ -73,7 +75,7 @@ trait CreateEditTrait
             return $this->redirect($request, $response, $defaultRedirect);
         }
 
-        $validationResult = $this->validateData($data);
+        $validationResult = $this->model->validate($data);
         if (!$validationResult['valid']) {
             $this->flashManager->addErrors($validationResult['errors']);
             return $this->redirect($request, $response, $defaultRedirect);
@@ -81,8 +83,10 @@ trait CreateEditTrait
 
         try {
             if ($actionType === 'create') {
-                $this->model->create($data);
-                $id = $this->model->getLastInsertId();
+                $id = $this->model->create($data);
+                if ($id === null) {
+                    throw new \RuntimeException('Failed to create record. No ID returned.');
+                }
             } elseif ($actionType === 'edit' && $id !== null) {
                 $this->model->update($id, $data);
             }
@@ -99,16 +103,5 @@ trait CreateEditTrait
             ]);
             return $this->redirect($request, $response, $defaultRedirect);
         }
-    }
-
-    /**
-     * Validate the given data using the model's validation logic.
-     *
-     * @param array $data
-     * @return array Validation result with 'valid' and 'errors' keys.
-     */
-    protected function validateData(array $data): array
-    {
-        return $this->model->validate($data, $this->model->getFieldDefinitions());
     }
 }

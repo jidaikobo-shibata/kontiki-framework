@@ -47,10 +47,8 @@ abstract class BaseController
         $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
     }
 
-    public static function registerRoutes(App $app): void
+    public static function registerRoutes(App $app, string $basePath): void
     {
-        $basePath = static::getBasePath();
-
         $controllerClass = static::class;
 
         $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
@@ -63,11 +61,6 @@ abstract class BaseController
                 }
             }
         })->add(AuthMiddleware::class);
-    }
-
-    protected static function getBasePath(): string
-    {
-        throw new \LogicException('You must override getBasePath() in the child class.');
     }
 
     /**
@@ -142,52 +135,4 @@ abstract class BaseController
             ]
         );
     }
-
-/*
-    protected function renderForm(
-        Response $response,
-        string $action,
-        string $title,
-        array $fields,
-        string $description = '',
-        string $buttonText = 'Submit'
-    ): Response {
-        $error = $this->flashManager->getData('errors', []);
-        $success = $this->flashManager->getData('success', []);
-
-        $formRenderer = new FormRenderer($fields, $this->view);
-        $formHtml = $formRenderer->render();
-
-        $content = $this->view->fetch(
-            'forms/edit.php',
-            [
-                'actionAttribute' => Env::get('BASEPATH') . $action,
-                'csrfToken' => $this->csrfManager->getToken(),
-                'formHtml' => $formHtml,
-                'description' => $description,
-                'buttonText' => $buttonText,
-            ]
-        );
-
-        $formHandler = new FormHandler($content, $this->model);
-
-        if (!empty($error)) {
-            $formHandler->addErrors($error);
-        }
-
-        if (!empty($success)) {
-            $formHandler->addSuccessMessages($success);
-        }
-        $content = $formHandler->getHtml();
-
-        return $this->view->render(
-            $response,
-            'layout.php',
-            [
-                'pageTitle' => $title,
-                'content' => $content,
-            ]
-        );
-    }
-*/
 }

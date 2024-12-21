@@ -3,12 +3,9 @@
 namespace jidaikobo\kontiki\Models;
 
 use jidaikobo\kontiki\Utils\Lang;
-use PDO;
 
 class Post extends BaseModel
 {
-    protected PDO $pdo;
-
     protected string $table = 'posts';
 
     public function getDisplayFields(): array
@@ -18,7 +15,7 @@ class Post extends BaseModel
 
     public function getFieldDefinitions(): array
     {
-        $userModel = new User($this->db);
+        $userModel = new User($this->db, $this->validationService);
 
         return [
             'id' => [
@@ -112,19 +109,5 @@ class Post extends BaseModel
                 'label' => Lang::get('created_at', 'Created'),
             ],
         ];
-    }
-
-    /**
-     * Get the user by their slug.
-     *
-     * @param  string $slug The slug to search for.
-     * @return array|null user information, or null if not.
-     */
-    public function getBySlug(string $slug): ?array
-    {
-        $query = "SELECT * FROM {$this->table} WHERE slug = :slug LIMIT 1";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute(['slug' => $slug]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

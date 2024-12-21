@@ -2,13 +2,10 @@
 
 namespace jidaikobo\kontiki\Models;
 
-use PDO;
 use jidaikobo\kontiki\Utils\Lang;
 
 class User extends BaseModel
 {
-    protected PDO $pdo;
-
     protected string $table = 'users';
 
     public function getDisplayFields(): array
@@ -29,7 +26,11 @@ class User extends BaseModel
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
                 'searchable' => TRUE,
-                'rules' => ['required', ['lengthMin', 3]],
+                'rules' => [
+                    'required',
+                    ['lengthMin', 3],
+                    ['unique', 'users', 'username']
+                ],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
                 'group' => 'main',
@@ -55,30 +56,16 @@ class User extends BaseModel
         ];
     }
 
-    /**
-     * Get the user by their username.
-     *
-     * @param  string $username The username to search for.
-     * @return array|null user information, or null if not.
-     */
-    public function getByUsername(string $username): ?array
+    public function processFieldDefinitions(array $fieldDefinitions): array
     {
-        $query = "SELECT password FROM {$this->table} WHERE username = :username LIMIT 1";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute(['username' => $username]);
-
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $result = $result === false ? NULL : $result;
-
-        return $result ?? null;
-    }
-
-    public function processFieldDefinitions($fields): array
-    {
-        $fields['password']['rules'] = array_filter($fields['password']['rules'], function ($rule) {
-            return $rule !== 'required';
-        });
-        return $fields;
+        // パスワードの `required` ルールを除外
+        if (isset($fieldDefinitions['password']['rules'])) {
+            $fieldDefinitions['password']['rules'] = array_filter(
+                $fieldDefinitions['password']['rules'],
+                fn($rule) => $rule !== 'required'
+            );
+        }
+        return $fieldDefinitions;
     }
 
     public function update(int $id, array $data): bool
@@ -95,13 +82,6 @@ class User extends BaseModel
             }
         }
 
-        $data = $this->filterAllowedFields($data);
-
-        $validation = $this->validate($data, $fieldDefinitions);
-        if (!$validation['valid']) {
-            throw new InvalidArgumentException('Validation failed: ' . json_encode($validation['errors']));
-        }
-
-        return $this->executeUpdate($id, $data);
+        return parent::update($id, $data);
     }
 }
