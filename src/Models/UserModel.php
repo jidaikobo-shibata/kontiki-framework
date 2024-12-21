@@ -4,7 +4,7 @@ namespace jidaikobo\kontiki\Models;
 
 use jidaikobo\kontiki\Utils\Lang;
 
-class User extends BaseModel
+class UserModel extends BaseModel
 {
     protected string $table = 'users';
 

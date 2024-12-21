@@ -21,13 +21,10 @@ use Slim\Views\PhpRenderer;
 
 abstract class BaseController
 {
-//    protected DatabaseHandler $db;
     protected ModelInterface $model;
     protected PhpRenderer $view;
     protected Session $session;
     protected SidebarService $sidebarService;
-//    protected string $modelClass;
-
     protected string $table;
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;

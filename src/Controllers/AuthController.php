@@ -3,7 +3,7 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\User;
+use jidaikobo\kontiki\Models\UserModel;
 use jidaikobo\kontiki\Utils\FormHandler;
 use jidaikobo\kontiki\Utils\Lang;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -17,9 +17,9 @@ class AuthController
 {
     private Session $session;
     private PhpRenderer $view;
-    private User $userModel;
+    private UserModel $userModel;
 
-    public function __construct(Session $session, PhpRenderer $view, User $userModel)
+    public function __construct(Session $session, PhpRenderer $view, UserModel $userModel)
     {
         $this->session = $session;
         $this->view = $view;

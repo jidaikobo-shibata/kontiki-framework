@@ -3,7 +3,7 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\Post as PostModel;
+use jidaikobo\kontiki\Models\PostModel;
 use jidaikobo\kontiki\Services\SidebarService;
 use Slim\Views\PhpRenderer;
 

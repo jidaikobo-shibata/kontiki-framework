@@ -3,7 +3,7 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\User as UserModel;
+use jidaikobo\kontiki\Models\UserModel;
 use jidaikobo\kontiki\Services\SidebarService;
 use Slim\Views\PhpRenderer;
 

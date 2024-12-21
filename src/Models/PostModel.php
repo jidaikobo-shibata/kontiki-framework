@@ -2,11 +2,21 @@
 
 namespace jidaikobo\kontiki\Models;
 
+use Aura\Session\Session;
+use jidaikobo\kontiki\Database\DatabaseHandler;
+use jidaikobo\kontiki\Services\ValidationService;
 use jidaikobo\kontiki\Utils\Lang;
 
-class Post extends BaseModel
+class PostModel extends BaseModel
 {
     protected string $table = 'posts';
+    private Session $session;
+
+    public function __construct(DatabaseHandler $db, ValidationService $validationService, Session $session)
+    {
+        parent::__construct($db, $validationService);
+        $this->session = $session;
+    }
 
     public function getDisplayFields(): array
     {
@@ -15,7 +25,9 @@ class Post extends BaseModel
 
     public function getFieldDefinitions(): array
     {
-        $userModel = new User($this->db, $this->validationService);
+        $userModel = new UserModel($this->db, $this->validationService);
+        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
+        $user = $segment->get('user');
 
         return [
             'id' => [
@@ -97,7 +109,7 @@ class Post extends BaseModel
                 'options' => $userModel->getOptions('username'),
                 'attributes' => ['class' => 'form-control form-select'],
                 'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
+                'default' => $user['id'],
                 'searchable' => TRUE,
                 'rules' => ['required'],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

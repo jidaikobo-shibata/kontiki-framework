@@ -15,11 +15,9 @@
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
   <!-- Scripts -->
-  <script src="/assets/js/script.js"></script>
 <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
-  <script src="/common/script/confirm_dialog/"></script>
-  <script src="/file/script/file_manager/"></script>
-  <script src="/file/script/file_manager_instance/"></script>
+  <script src="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManager.js"></script>
+  <script src="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManagerInstance.js"></script>
 <?php endif; ?>
 
   <title><?= htmlspecialchars($pageTitle) ?></title>
@@ -48,7 +46,7 @@
       </div>
     </section>
 
-    <section class="content">
+    <section class="content pb-5">
       <div class="container-fluid">
         <?= $content ?>
       </div>

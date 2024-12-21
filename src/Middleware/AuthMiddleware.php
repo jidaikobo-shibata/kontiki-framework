@@ -2,10 +2,10 @@
 
 namespace jidaikobo\kontiki\Middleware;
 
+use Aura\Session\Session;
 use jidaikobo\kontiki\Utils\Lang;
 use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\Log;
-use Aura\Session\Session;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
