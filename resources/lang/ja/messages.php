@@ -36,4 +36,6 @@ return [
     'posts_management' => '記事管理',
     'posts_list' => '記事一覧',
     'add_new_post' => '新規記事追加',
+
+    'description' => '説明',
 ];

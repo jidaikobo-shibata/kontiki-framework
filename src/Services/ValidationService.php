@@ -4,6 +4,7 @@ namespace jidaikobo\kontiki\Services;
 
 use Valitron\Validator;
 use jidaikobo\kontiki\Database\DatabaseHandler;
+use jidaikobo\Log;
 use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\kontiki\Utils\Lang;
 
@@ -56,9 +57,20 @@ class ValidationService
 
         $isValid = $validator->validate();
 
+        $errors = [];
+
+        if (!$isValid) {
+            foreach ($validator->errors() as $field => $messages) {
+                $errors[$field] = [
+                    'messages' => $messages,
+                    'htmlName' => $field,
+                ];
+            }
+        }
+
         return [
             'valid' => $isValid,
-            'errors' => $isValid ? [] : $validator->errors(),
+            'errors' => $errors,
         ];
     }
 

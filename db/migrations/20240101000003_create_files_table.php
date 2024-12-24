@@ -7,8 +7,7 @@ class CreateFilesTable extends AbstractMigration
     public function change()
     {
         $table = $this->table('files');
-        $table->addColumn('name', 'string', ['limit' => 255, 'null' => false])
-              ->addColumn('path', 'string', ['limit' => 255, 'null' => false])
+        $table->addColumn('path', 'string', ['limit' => 255, 'null' => false])
               ->addColumn('description', 'text', ['null' => true])
               ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
               ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])

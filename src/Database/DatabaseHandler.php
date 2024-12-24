@@ -182,4 +182,21 @@ class DatabaseHandler
     {
         $this->pdo->rollBack();
     }
+
+    /**
+     * Get Table Columns.
+     */
+    public function getTableColumns(string $table): array
+    {
+        $query = "PRAGMA table_info({$table})";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+
+        $columns = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $columns[] = $row['name'];
+        }
+
+        return $columns;
+    }
 }

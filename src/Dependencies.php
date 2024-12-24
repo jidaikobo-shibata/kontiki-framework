@@ -1,6 +1,7 @@
 <?php
 
 use jidaikobo\kontiki\Middleware\AuthMiddleware;
+use jidaikobo\kontiki\Services\FileService;
 use jidaikobo\kontiki\Services\SidebarService;
 use jidaikobo\kontiki\Utils\Env;
 use Aura\Session\SessionFactory;
@@ -39,6 +40,17 @@ return function (App $app) {
         PhpRenderer::class,
         function (ContainerInterface $container) {
             return new PhpRenderer(__DIR__ . '/Views');
+        }
+    );
+
+    // FileService の登録
+    $container->set(
+        FileService::class,
+        function (ContainerInterface $container) {
+            $uploadDir = dirname(__DIR__, 2) . Env::get('UPLOADDIR');
+            $allowedTypes = json_decode(Env::get('ALLOWED_MIME_TYPES'), true);
+            $maxSize = Env::get('MAXSIZE');
+            return new FileService($uploadDir, $allowedTypes, $maxSize);
         }
     );
 

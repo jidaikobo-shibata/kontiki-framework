@@ -23,7 +23,7 @@
 				<td>
 					<div class="text-center">
 					<?php
-					echo renderImageOrLink(pathToUrl($file['path']), $file['description']);
+					echo $file['imageOrLink'];
 					?>
 	 			</div>
 					<div class="text-center text-nowrap"><a href="#" class="text-danger file-delete-link" data-confirm="critical" data-delete-id="<?php echo $fileId ?>" data-csrf_token="">完全に削除する</a></div>
@@ -33,17 +33,17 @@
 					<table class="table table-bordered m-0">
 					<tr>
 						<th class="align-middle" scope="row">URL</th>
-						<td class="text-break"><span class="fileUrl"><?php echo escHtml(pathToUrl($file['path'])); ?></span></td>
+						<td class="text-break"><span class="fileUrl"><?php echo htmlspecialchars($file['url']); ?></span></td>
 						<td class="text-nowrap align-middle"><a href="#" class="fileCopyUrl">URLをコピー</a></td>
 					</tr>
 					<tr>
 						<th class="align-middle" scope="row">説明</th>
-						<td class="text-break"><?php echo escHtml($file['description']); ?></td>
+						<td class="text-break"><?php echo htmlspecialchars($file['description']); ?></td>
 						<td class="text-nowrap align-middle"><a href="#" class="fileEditBtn">編集する</a></td>
 					</tr>
 					<tr>
 						<th class="text-nowrap align-middle" scope="row">コード</th>
-						<td class="text-break"><code>![<?php echo escHtml($file['description']); ?>](<?php echo escHtml(pathToUrl($file['path'])); ?>)</code></td>
+						<td class="text-break"><code>![<?php echo htmlspecialchars($file['description']); ?>](<?php echo htmlspecialchars($file['url']); ?>)</code></td>
 						<td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn">挿入する</a></td>
 					</tr>
 					</table>
@@ -53,7 +53,7 @@
 						echo '<div class="updateStatus"></div>';
 						echo '<div class="mb-3">';
 						echo '<label for="eachDescription_'.$fileId.'" class="form-label">説明</label>';
-						echo '<textarea name="eachDescription_'.$fileId.'" id="eachDescription_'.$fileId.'" class="eachDescription form-control" aria-describedby="eachDescriptionHelp" data-file-id="'.$fileId.'" data-csrf_token="">'.escHtml($file['description']).'</textarea>';
+						echo '<textarea name="eachDescription_'.$fileId.'" id="eachDescription_'.$fileId.'" class="eachDescription form-control" aria-describedby="eachDescriptionHelp" data-file-id="'.$fileId.'" data-csrf_token="">'.htmlspecialchars($file['description']).'</textarea>';
 						echo '</div>';
 						echo '<div class="d-flex justify-content-end">';
 						echo '<button type="submit" class="btn btn-primary">更新する</button>';

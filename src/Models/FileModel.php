@@ -20,19 +20,6 @@ class FileModel extends BaseModel
             'id' => [
                 'label' => 'ID',
             ],
-            'name' => [
-                'label' => Lang::get('name', 'Name'),
-                'type' => 'text',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => TRUE,
-                'rules' => ['required'],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
             'path' => [
                 'label' => Lang::get('path', 'Path'),
                 'type' => 'text',
@@ -47,7 +34,7 @@ class FileModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'description' => [
-                'label' => Lang::get('content', 'Content'),
+                'label' => Lang::get('description', 'Description'),
                 'description' => '',
                 'type' => 'textarea',
                 'attributes' => [
@@ -57,7 +44,7 @@ class FileModel extends BaseModel
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
                 'searchable' => true,
-                'rules' => [],
+                'rules' => [['lengthMin', 8]],
                 'filter' => FILTER_UNSAFE_RAW,
                 'template' => 'default',
                 'group' => 'main',

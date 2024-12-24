@@ -44,7 +44,7 @@ abstract class BaseController
         $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
     }
 
-    public static function registerRoutes(App $app, string $basePath): void
+    public static function registerRoutes(App $app, string $basePath = ''): void
     {
         $controllerClass = static::class;
 
@@ -91,6 +91,20 @@ abstract class BaseController
         return $response
             ->withHeader('Location', Env::get('BASEPATH') . $redirectUrl)
             ->withStatus($status);
+    }
+
+    /**
+     * Create a JSON response.
+     *
+     * @param Response $response The original response object.
+     * @param array $data The data to be included in the JSON response.
+     * @param int $status The HTTP status code.
+     * @return Response The modified response object with JSON content.
+     */
+    public static function jsonResponse(Response $response, array $data, int $status = 200): Response
+    {
+        $response->getBody()->write(json_encode($data));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
 
     protected function renderFormHtml(string $action, array $fields, string $description = '', string $buttonText = 'Submit'): string

@@ -5,6 +5,7 @@ namespace jidaikobo\kontiki\Models;
 use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Services\ValidationService;
 use jidaikobo\kontiki\Utils\Env;
+use jidaikobo\Log;
 use Valitron\Validator;
 
 /**
@@ -90,7 +91,7 @@ abstract class BaseModel implements ModelInterface
      * 動的なフィールド定義の加工を行うメソッド。
      * 子クラスでオーバーライド可能。
      */
-    protected function processFieldDefinitions(array $fieldDefinitions): array
+    public function processFieldDefinitions(array $fieldDefinitions): array
     {
         return $fieldDefinitions; // デフォルトでは加工しない
     }
@@ -179,6 +180,14 @@ abstract class BaseModel implements ModelInterface
         return $this->db->update($this->table, $id, $data);
     }
 
+    public function delete(int $id): bool
+    {
+        if (!$this->getById($id)) {
+            return false;
+        }
+        return $this->db->delete($this->table, $id);
+    }
+
     /**
      * Get searchable columns from the model's properties.
      *
@@ -231,19 +240,43 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * Get paginated data with optional keyword filtering.
+     * Get paginated data with optional keyword filtering and ordering.
      *
      * @param string $keyword Search keyword.
      * @param int $offset SQL offset.
      * @param int $limit SQL limit.
      * @param array $customSearchableColumns Custom searchable columns.
+     * @param string|null $orderBy Column name to order by.
+     * @param string $orderDirection Sorting direction ('ASC' or 'DESC').
      * @return array Fetched data.
      */
-    public function search(string $keyword = '', int $offset = 0, int $limit = 10, array $customSearchableColumns = []): array
-    {
+    public function search(
+        string $keyword = '',
+        int $offset = 0,
+        int $limit = 10,
+        array $customSearchableColumns = [],
+        ?string $orderBy = null,
+        string $orderDirection = 'ASC'
+    ): array {
         $searchConditions = $this->buildSearchConditions($keyword, $customSearchableColumns);
 
-        $query = "SELECT * FROM {$this->table} {$searchConditions['where']} LIMIT :limit OFFSET :offset";
+        // Validate orderDirection
+        $orderDirection = strtoupper($orderDirection);
+        if (!in_array($orderDirection, ['ASC', 'DESC'], true)) {
+            throw new \InvalidArgumentException('Invalid order direction: must be ASC or DESC');
+        }
+
+        // Build ORDER BY clause if $orderBy is specified
+        $orderClause = '';
+        if ($orderBy) {
+            if (!in_array($orderBy, $this->db->getTableColumns($this->table), true)) {
+                throw new \InvalidArgumentException("Invalid column for ordering: {$orderBy}");
+            }
+            $orderClause = "ORDER BY {$orderBy} {$orderDirection}";
+        }
+
+        // Construct SQL query
+        $query = "SELECT * FROM {$this->table} {$searchConditions['where']} {$orderClause} LIMIT :limit OFFSET :offset";
         $params = array_merge($searchConditions['params'], [
             ':limit' => $limit,
             ':offset' => $offset,

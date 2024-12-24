@@ -5,38 +5,45 @@ namespace jidaikobo\kontiki\Controllers;
 use Aura\Session\Session;
 use jidaikobo\kontiki\Middleware\AuthMiddleware;
 use jidaikobo\kontiki\Models\FileModel;
+use jidaikobo\kontiki\Services\FileService;
 use jidaikobo\kontiki\Utils\CsrfManager;
 use jidaikobo\kontiki\Utils\Env;
+use jidaikobo\kontiki\Utils\MessageUtils;
 use jidaikobo\kontiki\Utils\Pagination;
+use jidaikobo\Log;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
 
-class FileController
+class FileController extends BaseController
 {
     protected Session $session;
     protected PhpRenderer $view;
     protected FileModel $fileModel;
+    protected FileService $fileService;
     protected CsrfManager $csrfManager;
 
-    public function __construct(Session $session, PhpRenderer $view, FileModel $fileModel)
+    public function __construct(Session $session, PhpRenderer $view, FileModel $fileModel, FileService $fileService)
     {
         $this->csrfManager = new CsrfManager($session);
         $this->session = $session;
         $this->view = $view;
         $this->fileModel = $fileModel;
+        $this->fileService = $fileService;
     }
 
-    public static function registerRoutes(App $app): void
+    public static function registerRoutes(App $app, string $basePath = ''): void
     {
         $app->group(
             '/admin',
             function (RouteCollectorProxy $group) {
                 $group->get('/get_csrf_token', [FileController::class, 'getCsrfToken']);
                 $group->get('/filelist', [FileController::class, 'filelist']);
-                $group->get('/upload', [FileController::class, 'fileUpload']);
+                $group->post('/upload', [FileController::class, 'handleFileUpload']);
+                $group->post('/update', [FileController::class, 'handleUpdate']);
+                $group->post('/delete', [FileController::class, 'handleDelete']);
                 $group->get('/fileManager.js', [FileController::class, 'serveJs']);
                 $group->get('/fileManagerInstance.js', [FileController::class, 'serveInstanceJs']);
             }
@@ -69,11 +76,8 @@ class FileController
 
     public function getCsrfToken(Request $request, Response $response): Response
     {
-        $token = $this->csrfManager->getToken();
-        $data = ['csrf_token' => $token];
-        $response->getBody()->write(json_encode($data));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(200);
+        $data = ['csrf_token' => $this->csrfManager->getToken()];
+        return $this->jsonResponse($response, $data);
     }
 
     /**
@@ -85,31 +89,14 @@ class FileController
      *
      * @throws Exception If there is an issue with moving the uploaded file or invalid request method.
      */
-    public function fileUpload(Request $request, Response $response): Response
+    public function handleFileUpload(Request $request, Response $response): Response
     {
         try {
             // CSRF Token validation
             $csrfToken = $request->getParsedBody()['csrf_token'] ?? null;
-            if (!$this->csrfManager->validateToken($this->tokenname, $csrfToken)) {
+            if (!$this->csrfManager->isValid($csrfToken)) {
                 $data = ['message' => $this->messages['invalid_request']];
-                $response->getBody()->write(json_encode($data));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(405);
-            }
-
-            // check method
-            if ($request->getMethod() !== 'POST') {
-                $data = ['message' => $this->messages['method_not_allowed']];
-                $response->getBody()->write(json_encode($data));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(405);
-            }
-
-            // validation
-            $data = $request->getParsedBody();
-            $errors = $this->fileModel->validateData($data, false);
-            if ($errors !== true) {
-                $data = ['message' => generateAllErrorMessagesHtml($errors)];
-                $response->getBody()->write(json_encode($data));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+                return $this->jsonResponse($response, $data, 405);
             }
 
             // upload
@@ -126,33 +113,42 @@ class FileController
                 ];
 
                 // ファイルのアップロード処理
-                $result = $this->fileUploader->upload($fileInfo);
+                $result = $this->fileService->upload($fileInfo);
 
                 if ($result['success']) {
                     $data['path'] = $result['path'];
-                    $isDbUpdate = $this->fileModel->createItem($data);
+                    $data['description'] = $request->getParsedBody()['description'];
+
+/*
+                    $errors = $this->fileModel->validate($data);
+                    if ($errors['valid'] !== true) {
+
+                    }
+*/
+
+                    $isDbUpdate = $this->fileModel->create($data);
 
                     if ($isDbUpdate) {
-                        $response->getBody()->write(json_encode(['message' => generateStatusSection('success', $this->messages['upload_success'])]));
-                        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+                        $data = ['message' => MessageUtils::alertHtml($this->messages['upload_success'])];
+                        return $this->jsonResponse($response, $data);
                     } else {
-                        $response->getBody()->write(json_encode(['message' => generateStatusSection('error', $this->messages['database_update_failed'])]));
-                        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+                        $data = ['message' => MessageUtils::alertHtml($this->messages['database_update_failed'], 'error')];
+                        return $this->jsonResponse($response, $data, 500);
                     }
                 } else {
-                    $response->getBody()->write(json_encode(['message' => generateStatusSection('error', $this->messages['upload_error'])]));
-                    return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+                    $data = ['message' => MessageUtils::alertHtml($this->messages['upload_error'], 'error')];
+                    return $this->jsonResponse($response, $data, 500);
                 }
             } else {
                 // アップロードに失敗した場合
-                $response->getBody()->write(json_encode(['message' => generateStatusSection('error', $this->messages['file_missing'])]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+                $data = ['message' => MessageUtils::alertHtml($this->messages['file_missing'], 'error')];
+                return $this->jsonResponse($response, $data, 400);
             }
         } catch (\Exception $e) {
             // 例外処理とエラーログ
             Log::write('Unexpected error in ajaxHandleFileUpload: ' . $e->getMessage(), 'ERROR');
-            $response->getBody()->write(json_encode(['message' => $this->messages['invalid_request']]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+            $data = ['message' => $this->messages['invalid_request']];
+            return $this->jsonResponse($response, $data, 500);
         }
     }
 
@@ -161,48 +157,47 @@ class FileController
      * Validates the CSRF token, retrieves the file details by ID,
      * updates the file information, and returns a JSON response indicating success or failure.
      *
-     * @return void
+     * @return Response
      */
-    public function ajaxHandleFileUpdate()
+    public function handleUpdate(Request $request, Response $response): Response
     {
         try {
-            // Check if it's a POST request
-            if (!Input::isPostRequest()) {
-                return;
-            }
-
             // CSRF Token validation
-            if (!Csrf::validateToken($this->tokenname)) {
-                Response::sendJson(['message' => $this->messages['invalid_request']], 405);
-                return;
+            $csrfToken = $request->getParsedBody()['csrf_token'] ?? null;
+            if (!$this->csrfManager->isValid($csrfToken)) {
+                $data = ['message' => $this->messages['invalid_request']];
+                return $this->jsonResponse($response, $data, 405);
             }
 
             // Get the file ID from the POST request
-            $fileId = Input::post('id', 0); // Default to 0 if no ID is provided
+            $fileId = $request->getParsedBody()['id'] ?? 0; // Default to 0 if no ID is provided
 
             // Retrieve the file details from the database using the file ID
-            $data = $this->fileModel->getItemById($fileId);
+            $data = $this->fileModel->getById($fileId);
 
             if (!$data) {
-                Response::sendJson(['message' => $this->messages['file_not_found']], 404);
-                return;
+                $data = ['message' => $this->messages['file_not_found']];
+                return $this->jsonResponse($response, $data, 405);
             }
 
             // Update the description field
-            $data['description'] = Input::post('description', $data['description']);
+            $data['description'] = $request->getParsedBody()['description'] ?? $data['description'];
 
             // Update the main item
             $result = $this->update($data, $fileId);
 
             if ($result['success']) {
-                Response::sendJson(['message' => $this->messages['update_success']]);
+                $data = ['message' => $this->messages['update_success']];
+                return $this->jsonResponse($response, $data, 200);
             } else {
-                Response::sendJson(['message' => generateAllErrorMessagesHtml($result['errors'])], 500);
+                $data = ['message' => MessageUtils::errorHtml($result['errors'], $this->fileModel)];
+                return $this->jsonResponse($response, $data, 405);
             }
         } catch (\Exception $e) {
             // Log unexpected errors and return a generic error message
             Log::write('Unexpected error in ajaxHandleFileUpdate: ' . $e->getMessage(), 'ERROR');
-            Response::sendJson(['message' => $this->messages['invalid_request']], 500);
+            $data = ['message' => 'Unexpected error'];
+            return $this->jsonResponse($response, $data, 405);
         }
     }
 
@@ -215,24 +210,22 @@ class FileController
      */
     protected function update(array $data, int $id = null)
     {
-        $isEdit = true;
-        $errors = $this->fileModel->validateData($data, $isEdit, $id);
+        $results = $this->fileModel->validate($data);
 
-        if ($errors !== true) {
-            if (isset($errors['description'])) {
-                    $newKey = 'eachDescription_' . $id;
-                    $errors[$newKey] = $errors['description'];
-                    unset($errors['description']);
+        if ($results['valid'] !== true) {
+            if (isset($results['errors']['description'])) {
+                $newKey = 'eachDescription_' . $id;
+                $results['errors']['description']['htmlName'] = $newKey;
             }
 
             return [
                 'success' => false,
-                'errors' => $errors
+                'errors' => $results['errors']
             ];
         }
 
         // Process if valid
-        $success = $this->fileModel->updateItem($id, $data);
+        $success = $this->fileModel->update($id, $data);
 
         return [
             'success' => $success,
@@ -261,7 +254,8 @@ class FileController
         $pagination->setTotalItems($totalItems);
         $paginationHtml = $pagination->render(Env::get('BASEPATH') . "/admin/filelist");
 
-        $items = $this->fileModel->search($keyword, $pagination->getOffset(), $pagination->getLimit());
+        $items = $this->fileModel->search($keyword, $pagination->getOffset(), $pagination->getLimit(), [], 'created_at', 'DESC');
+        $items = $this->processItemsForList($request, $items);
 
         $content = $this->view->fetch(
             'forms/incFilelist.php',
@@ -286,60 +280,56 @@ class FileController
      * @return void
      * @throws ResponseException If there is an error during the deletion process.
      */
-    public function ajaxHandleFileDelete()
+    public function handleDelete(Request $request, Response $response): Response
     {
         try {
             // CSRF Token validation
-            if (!Csrf::validateToken($this->tokenname)) {
-                Response::sendJson(['message' => $this->messages['invalid_request']], 405);
-                return;
+            $csrfToken = $request->getParsedBody()['csrf_token'] ?? null;
+            if (!$this->csrfManager->isValid($csrfToken)) {
+                $data = ['message' => $this->messages['invalid_request']];
+                return $this->jsonResponse($response, $data, 405);
             }
 
-            // Check if it's a POST request
-            if (Input::isPostRequest()) {
-                // Get the file ID from the POST request
-                $fileId = Input::post('id', 0); // Default to 0 if no ID is provided
-                if (!$fileId) {
-                    Response::sendJson(['message' => $this->messages['file_id_required']], 400);
-                    return;
-                }
+            // Get the file ID from the POST request
+            $fileId = $request->getParsedBody()['id'] ?? 0; // Default to 0 if no ID is provided
 
-                // Retrieve the file details from the database using the file ID
-                $file = $this->fileModel->getItemById($fileId);
+            // Retrieve the file details from the database using the file ID
+            $data = $this->fileModel->getById($fileId);
 
-                if (!$file) {
-                    Response::sendJson(['message' => $this->messages['file_not_found']], 404);
-                    return;
-                }
-
-                // Delete the file from the server
-                $filePath = $file['path'];
-
-                if (file_exists($filePath)) {
-                    if (unlink($filePath)) {
-                        Log::write("File deleted: " . $filePath);
-                    } else {
-                        Response::sendJson(['message' => $this->messages['file_delete_failed']], 500);
-                        return;
-                    }
-                }
-
-                // Remove the file record from the database
-                $deleteSuccess = $this->fileModel->hardDelete($fileId);
-                if (!$deleteSuccess) {
-                    Response::sendJson(['message' => $this->messages['db_update_failed']], 500);
-                    return;
-                }
-
-                // Send a success response back
-                Response::sendJson(['message' => $this->messages['file_delete_success']]);
+            if (!$data) {
+                $data = ['message' => $this->messages['file_not_found']];
+                return $this->jsonResponse($response, $data, 405);
             }
+
+            // Delete the file from the server
+            $filePath = $data['path'];
+
+            if (file_exists($filePath)) {
+                if (unlink($filePath)) {
+                    Log::write("File deleted: " . $filePath);
+                } else {
+                    $data = ['message' => $this->messages['file_delete_failed']];
+                    return $this->jsonResponse($response, $data, 500);
+                }
+            }
+
+            // Remove the file record from the database
+            $deleteSuccess = $this->fileModel->delete($fileId);
+            if (!$deleteSuccess) {
+                $data = ['message' => $this->messages['db_update_failed']];
+                return $this->jsonResponse($response, $data, 500);
+            }
+
+            // Send a success response back
+            $data = ['message' => $this->messages['file_delete_success']];
+            return $this->jsonResponse($response, $data);
         } catch (\Exception $e) {
             // Log the exception details for debugging
             Log::write('Unexpected error in ajaxHandleFileDelete: ' . $e->getMessage(), 'ERROR');
 
             // Send a generic error response to the user
-            Response::sendJson(['message' => $this->messages['unexpected_error']], 500);
+            $data = ['message' => $this->messages['unexpected_error']];
+            return $this->jsonResponse($response, $data, 500);
         }
     }
 
@@ -372,4 +362,63 @@ class FileController
         $response->getBody()->write($content);
         return $response->withHeader('Content-Type', 'application/javascript; charset=utf-8')->withStatus(200);
     }
+
+    private function processItemsForList(Request $request, array $items): array
+    {
+        foreach ($items as $key => $value)
+        {
+            $url = $this->pathToUrl($request, $items[$key]['path']);
+            $items[$key]['imageOrLink'] = $this->renderImageOrLink($url, $items[$key]['description'] ?? '');
+            $items[$key]['url'] = $url;
+        }
+        return $items;
+    }
+
+    /**
+     * Render an image or a link based on the provided URL.
+     *
+     * @param string $url The input URL, either an image URL or a standard URL.
+     * @param string|null $desc description text.
+     * @return string The generated HTML.
+     */
+    private function renderImageOrLink(string $url, string $desc): string
+    {
+      // Check if the URL is an image URL (basic check based on file extension)
+      $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+      $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
+
+      if (isset($pathInfo['extension']) && in_array(strtolower($pathInfo['extension']), $imageExtensions)) {
+        // Return an <img> tag for images
+        $descText = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
+        $imgSrc = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        return "<img src=\"{$imgSrc}\" alt=\"{$descText}を拡大表示する\" class=\"clickable-image img-thumbnail\" tabindex=\"0\">";
+      }
+
+      // Otherwise, return an <a> tag for links
+      $linkHref = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+
+      $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : null;
+
+      switch ($extension) {
+        case 'pdf':
+          $class = 'bi-filetype-pdf';
+          break;
+        case 'zip':
+          $class = 'bi-file-zip';
+          break;
+        default:
+          $class = 'bi-file-text';
+          break;
+      }
+
+      return "<a href=\"{$linkHref}\" target=\"_blank\" aria-label=\"ダウンロード\" download class=\"bi {$class} display-3\">
+            <span class=\"visually-hidden\">{$desc}をダウンロードする</span>
+          </a>";
+    }
+
+    function pathToUrl($request, $path) {
+      $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
+      return str_replace(dirname(__DIR__, 3), $baseUrl, $path);
+    }
+
 }

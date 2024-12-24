@@ -46,11 +46,11 @@
       </div>
     </section>
 
-    <section class="content pb-5">
+    <div class="content pb-5">
       <div class="container-fluid">
         <?= $content ?>
       </div>
-    </section>
+    </div>
   </main><!-- /.content-wrapper -->
 
   <!-- .main-footer -->

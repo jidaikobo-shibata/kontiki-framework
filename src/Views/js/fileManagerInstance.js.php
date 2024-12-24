@@ -1,3 +1,3 @@
 $(document).ready(function() {
-	const fileManager = new KontikiFileManager('<?= $basepath ?>/admin/', 'content');
+    const fileManager = new KontikiFileManager('<?= $basepath ?>/admin/', 'content');
 });

@@ -46,9 +46,8 @@ trait IndexTrait
         $content = $tableRenderer->render();
 
         $tableHandler = new TableHandler();
-
         if (!empty($error)) {
-            $content = $tableHandler->addErrors($content, $error);
+            $content = $tableHandler->addErrors($content, $error, $this->model);
         }
 
         if (!empty($success)) {

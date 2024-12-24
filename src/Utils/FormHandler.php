@@ -4,6 +4,7 @@ namespace jidaikobo\kontiki\Utils;
 
 use DOMDocument;
 use jidaikobo\kontiki\Models\BaseModel;
+use jidaikobo\Log;
 
 class FormHandler
 {
@@ -19,7 +20,6 @@ class FormHandler
         }
         $this->model = $model;
     }
-
 
     public function loadHTML(string $html): void
     {
@@ -80,14 +80,16 @@ class FormHandler
         }
 
         // Use MessageUtils to generate the error summary
-        $errorHtml = MessageUtils::generateErrorMessages($errors, $this->model);
+        $errorHtml = MessageUtils::errorHtml($errors, $this->model);
         $this->injectMessageIntoForm($errorHtml);
     }
 
     public function addSuccessMessages(array $successMessages): void
     {
-        // Use MessageUtils to generate success messages
-        $successHtml = MessageUtils::generateSuccessMessages($successMessages);
+        if (empty($successMessages)) {
+            return;
+        }
+        $successHtml = MessageUtils::alertHtml(join($successMessages));
         $this->injectMessageIntoForm($successHtml);
     }
 
@@ -108,7 +110,7 @@ class FormHandler
      */
     public function getHtml(): string
     {
-        return $this->dom->saveHTML();
+        $html = $this->dom->saveHTML();
+        return mb_decode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFF], 'UTF-8');
     }
-
 }
