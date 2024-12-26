@@ -14,7 +14,7 @@ class FileModel extends BaseModel
         return ['id', 'name', 'path', 'created_at'];
     }
 
-    public function getFieldDefinitions(): array
+    public function getFieldDefinitions(array $params = []): array
     {
         return [
             'id' => [

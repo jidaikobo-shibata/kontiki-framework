@@ -5,6 +5,7 @@ php vendor/bin/phinx migrate
 php vendor/bin/phinx rollback
 
 php vendor/bin/phinx seed:run
+php vendor/bin/phinx seed:run -s PostsSeeder
 */
 
 $env = file_exists(__DIR__ . '/.dev') ? 'development' : 'production';

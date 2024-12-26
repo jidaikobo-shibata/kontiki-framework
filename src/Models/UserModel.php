@@ -13,8 +13,10 @@ class UserModel extends BaseModel
         return ['id', 'username', 'created_at'];
     }
 
-    public function getFieldDefinitions(): array
+    public function getFieldDefinitions(array $params = []): array
     {
+        $id = $params['id'] ?? null;
+
         return [
             'id' => [
                 'label' => 'ID',
@@ -29,7 +31,7 @@ class UserModel extends BaseModel
                 'rules' => [
                     'required',
                     ['lengthMin', 3],
-                    ['unique', 'users', 'username']
+                    ['unique', 'users', 'username', $id]
                 ],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
@@ -56,9 +58,9 @@ class UserModel extends BaseModel
         ];
     }
 
-    public function processFieldDefinitions(array $fieldDefinitions): array
+    public function processEditFieldDefinitions(array $fieldDefinitions): array
     {
-        // パスワードの `required` ルールを除外
+        // Exclude `required` password rules
         if (isset($fieldDefinitions['password']['rules'])) {
             $fieldDefinitions['password']['rules'] = array_filter(
                 $fieldDefinitions['password']['rules'],
@@ -70,13 +72,10 @@ class UserModel extends BaseModel
 
     public function update(int $id, array $data): bool
     {
-        $fieldDefinitions = $this->getFieldDefinitions();
-
-        // パスワード処理を分岐
+        // Branching password processing
         if (isset($data['password'])) {
             if (trim($data['password']) === '') {
                 unset($data['password']);
-                $fieldDefinitions = $this->processFieldDefinitions($fieldDefinitions);
             } else {
                 $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
             }

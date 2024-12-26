@@ -120,7 +120,7 @@ class FileController extends BaseController
                     $data['description'] = $request->getParsedBody()['description'];
 
 /*
-                    $errors = $this->fileModel->validate($data);
+                    $errors = $this->fileModel->validateByFields($data);
                     if ($errors['valid'] !== true) {
 
                     }
@@ -210,7 +210,10 @@ class FileController extends BaseController
      */
     protected function update(array $data, int $id = null)
     {
-        $results = $this->fileModel->validate($data);
+        $fields = $this->model->getFieldDefinitions();
+        $fields = $this->model->processCreateFieldDefinitions($fields);
+
+        $results = $this->fileModel->validateByFields($data, $fields);
 
         if ($results['valid'] !== true) {
             if (isset($results['errors']['description'])) {

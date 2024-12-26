@@ -54,12 +54,12 @@ abstract class BaseModel implements ModelInterface
     abstract public function getDisplayFields(): array;
 
     /**
-     * Get field definitions for the model.
-     * This method must be implemented in child classes.
+     * Get the field definitions.
      *
+     * @param array $params Optional parameters for dynamic adjustments.
      * @return array Field definitions.
      */
-    abstract public function getFieldDefinitions(): array;
+    abstract public function getFieldDefinitions(array $params = []): array;
 
     public function getFieldDefinitionsWithDefaults(array $data): array
     {
@@ -78,22 +78,23 @@ abstract class BaseModel implements ModelInterface
      * Validate the given data against the field definitions.
      *
      * @param  array $data The data to validate.
+     * @param  array $fieldDefinitions The field definitions.
+     *
      * @return array An array with 'valid' (bool) and 'errors' (array of errors).
      */
-    public function validate(array $data): array
+    public function validateByFields(array $data, array $fieldDefinitions): array
     {
-        // 必要に応じてフィールド定義を動的に加工
-        $fieldDefinitions = $this->processFieldDefinitions($this->getFieldDefinitions());
         return $this->validationService->validate($data, $fieldDefinitions);
     }
 
-    /**
-     * 動的なフィールド定義の加工を行うメソッド。
-     * 子クラスでオーバーライド可能。
-     */
-    public function processFieldDefinitions(array $fieldDefinitions): array
+    public function processCreateFieldDefinitions(array $fieldDefinitions): array
     {
-        return $fieldDefinitions; // デフォルトでは加工しない
+        return $fieldDefinitions;
+    }
+
+    public function processEditFieldDefinitions(array $fieldDefinitions): array
+    {
+        return $fieldDefinitions;
     }
 
     /**

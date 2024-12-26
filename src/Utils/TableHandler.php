@@ -1,7 +1,8 @@
 <?php
 
 namespace jidaikobo\kontiki\Utils;
-namespace jidaikobo\kontiki\Models\ModelInterface;
+
+use jidaikobo\kontiki\Models\ModelInterface;
 
 class TableHandler
 {
@@ -12,6 +13,7 @@ class TableHandler
 
     public function addSuccessMessages(string $content, array $successMessages): string
     {
-        return MessageUtils::alertHtml($successMessages) . $content;
+        $successMessage = join($successMessages);
+        return MessageUtils::alertHtml($successMessage) . $content;
     }
 }

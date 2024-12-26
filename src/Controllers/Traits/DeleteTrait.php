@@ -29,19 +29,24 @@ trait DeleteTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirect($request, $response, "{$this->table}_index");
+            return $this->redirectResponse($request, $response, "{$this->table}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForDelete($data);
 
-        return $this->renderForm(
-            $response,
+        $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/delete/{$id}",
-            Lang::get("delete_{$this->table}", "Delete " . ucfirst($this->table)),
             $data,
             Lang::get("confirm_delete_message", "Are you sure you want to delete this {$this->table}?"),
             Lang::get("delete", "Delete"),
+        );
+        $formHtml = $this->formService->processFormHtml($formHtml);
+
+        return $this->renderResponse(
+            $response,
+            Lang::get("delete_{$this->table}", "Delete " . ucfirst($this->table)),
+            $formHtml
         );
     }
 
@@ -50,25 +55,27 @@ trait DeleteTrait
         $id = $args['id'];
         $data = $request->getParsedBody();
 
-        // CSRFトークン検証
-        if (empty($data['_csrf_value']) || !$this->csrfManager->isValid($data['_csrf_value'])) {
-            return $response->withStatus(400)->write('Invalid CSRF token.');
+        // validate csrf token
+        $redirectTo = "/admin/{$this->table}/delete/{$id}";
+        $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
+        if ($redirectResponse) {
+            return $redirectResponse;
         }
 
         // データ削除
         try {
             if ($this->model->delete($id)) {
                 $this->flashManager->addMessage(
-                  'success', Lang::get("{$this->table}_delete_success",
-                   ucfirst($this->table) . " deleted successfully.")
+                  'success',
+                  Lang::get("{$this->table}_delete_success", ucfirst($this->table) . " deleted successfully.")
                 );
-                return $this->redirect($request, $response, "/admin/{$this->table}/index");
+                return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([Lang::get("{$this->table}_delete_failed", "Failed to delete " . ucfirst($this->table) . ".")]);
         }
 
         $redirectTo = "/admin/{$this->table}/edit/{$id}";
-        return $this->redirect($request, $response, $redirectTo);
+        return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

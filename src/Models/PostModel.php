@@ -23,7 +23,7 @@ class PostModel extends BaseModel
         return ['id', 'title', 'slug', 'created_at'];
     }
 
-    public function getFieldDefinitions(): array
+    public function getFieldDefinitions(array $params = []): array
     {
         $userModel = new UserModel($this->db, $this->validationService);
         $segment = $this->session->getSegment('jidaikobo\kontiki\auth');

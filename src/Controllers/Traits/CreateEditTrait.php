@@ -17,13 +17,21 @@ trait CreateEditTrait
     {
         $data = $this->prepareCreateEditData([]);
 
-        return $this->renderForm(
-            $response,
+        $fields = $this->model->getFieldDefinitionsWithDefaults($data);
+        $fields = $this->model->processCreateFieldDefinitions($fields);
+
+        $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/create",
-            Lang::get("{$this->table}_create", 'Create ' . ucfirst($this->table)),
-            $this->model->getFieldDefinitionsWithDefaults($data),
+            $fields,
             '',
             Lang::get("create", 'Create'),
+        );
+        $formHtml = $this->formService->processFormHtml($formHtml);
+
+        return $this->renderResponse(
+            $response,
+            Lang::get("{$this->table}_create", 'Create ' . ucfirst($this->table)),
+            $formHtml
         );
     }
 
@@ -33,18 +41,24 @@ trait CreateEditTrait
         $data = $this->prepareCreateEditData($this->model->getById($id));
 
         if (!$data) {
-            return $this->redirect($request, $response, "/admin/{$this->table}/index");
+            return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
         }
 
-        $fields = $this->model->processFieldDefinitions($this->model->getFieldDefinitionsWithDefaults($data));
+        $fields = $this->model->getFieldDefinitionsWithDefaults($data);
+        $fields = $this->model->processEditFieldDefinitions($fields);
 
-        return $this->renderForm(
-            $response,
+        $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/edit/{$id}",
-            Lang::get("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
             $fields,
             '',
-            Lang::get("update", 'Update'),
+            Lang::get("edit", 'Edit'),
+        );
+        $formHtml = $this->formService->processFormHtml($formHtml);
+
+        return $this->renderResponse(
+            $response,
+            Lang::get("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
+            $formHtml
         );
     }
 
@@ -68,17 +82,25 @@ trait CreateEditTrait
             ? "/admin/{$this->table}/create"
             : "/admin/{$this->table}/edit/{$id}";
 
-        if (empty($data['_csrf_value']) || !$this->csrfManager->isValid($data['_csrf_value'])) {
-            $this->flashManager->addErrors([
-                Lang::get("csrf_invalid", 'Invalid CSRF token.'),
-            ]);
-            return $this->redirect($request, $response, $defaultRedirect);
+        // validate csrf token
+        $redirectResponse = $this->validateCsrfToken($data, $request, $response, $defaultRedirect);
+        if ($redirectResponse) {
+            return $redirectResponse;
         }
 
-        $validationResult = $this->model->validate($data);
+        // field definition
+        $fields = $actionType === 'create'
+            ? $this->model->getFieldDefinitions()
+            : $this->model->getFieldDefinitions(['id' => $id]);
+        $fields = $actionType === 'create'
+            ? $this->model->processCreateFieldDefinitions($fields)
+            : $this->model->processEditFieldDefinitions($fields);
+
+        // Validate post data
+        $validationResult = $this->model->validateByFields($data, $fields);
         if (!$validationResult['valid']) {
             $this->flashManager->addErrors($validationResult['errors']);
-            return $this->redirect($request, $response, $defaultRedirect);
+            return $this->redirectResponse($request, $response, $defaultRedirect);
         }
 
         try {
@@ -96,12 +118,12 @@ trait CreateEditTrait
                 Lang::get("{$this->table}_save_success", 'Saved successfully.')
             );
 
-            return $this->redirect($request, $response, "/admin/{$this->table}/edit/{$id}");
+            return $this->redirectResponse($request, $response, $defaultRedirect);
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
                 [$e->getMessage()],
             ]);
-            return $this->redirect($request, $response, $defaultRedirect);
+            return $this->redirectResponse($request, $response, $defaultRedirect);
         }
     }
 }
