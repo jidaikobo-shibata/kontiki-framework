@@ -5,7 +5,6 @@ namespace jidaikobo\kontiki\Models;
 use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Services\ValidationService;
 use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\Log;
 use Valitron\Validator;
 
 /**

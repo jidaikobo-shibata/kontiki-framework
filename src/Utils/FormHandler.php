@@ -4,7 +4,6 @@ namespace jidaikobo\kontiki\Utils;
 
 use DOMDocument;
 use jidaikobo\kontiki\Models\BaseModel;
-use jidaikobo\Log;
 
 class FormHandler
 {

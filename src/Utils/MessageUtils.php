@@ -3,7 +3,6 @@
 namespace jidaikobo\kontiki\Utils;
 
 use jidaikobo\kontiki\Models\ModelInterface;
-use jidaikobo\Log;
 
 class MessageUtils
 {

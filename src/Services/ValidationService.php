@@ -4,7 +4,6 @@ namespace jidaikobo\kontiki\Services;
 
 use Valitron\Validator;
 use jidaikobo\kontiki\Database\DatabaseHandler;
-use jidaikobo\Log;
 use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\kontiki\Utils\Lang;
 
