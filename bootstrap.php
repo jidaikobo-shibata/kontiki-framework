@@ -2,7 +2,7 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-// .envをロード（.devがあったら開発環境）
+// Load .env (if .dev exists, it's the development environment)
 use jidaikobo\kontiki\Utils\Env;
 $env = file_exists(__DIR__ . '/.dev') ? 'development' : 'production';
 Env::setPath(__DIR__ . "/config/{$env}/");
@@ -11,7 +11,7 @@ if ($env === 'development') {
     require __DIR__ . '/dev/functions.php';
 }
 
-// PHP-DI コンテナを設定
+// Configure a PHP-DI container
 use DI\Container;
 use Slim\Factory\AppFactory;
 
@@ -22,19 +22,19 @@ AppFactory::setContainer($container);
 use jidaikobo\kontiki\Utils\Lang;
 Lang::setLanguage(Env::get('LANG'));
 
-// Slimアプリケーションの作成
+// Create a Slim application
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 $app->setBasePath(Env::get('BASEPATH'));
 
-// セキュリティ施策のheaderを追加
+// Add a header for security measures
 use jidaikobo\kontiki\Middleware\SecurityHeadersMiddleware;
 $app->add(SecurityHeadersMiddleware::class);
 
-// 依存関係の設定
+// Set dependencies
 (require __DIR__ . '/src/Dependencies.php')($app);
 
-// エラーログのハンドラ設定
+// Set the error log handler
 use jidaikobo\Log;
 Log::getInstance()->registerHandlers();
 
