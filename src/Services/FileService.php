@@ -117,7 +117,7 @@ class FileService
         // Increment the file name until it is unique
         $newFilePath = $filePath;
         while (file_exists($newFilePath)) {
-            $fileName = strIncrement($fileName);
+            $fileName = self::increment($fileName);
             $newFilePath = $this->uploadDir . $fileName . '.' . $fileExtension;
         }
         return $newFilePath;
@@ -157,5 +157,26 @@ class FileService
         ];
 
         return $uploadErrors[$errorCode] ?? "Unknown upload error.";
+    }
+
+    /**
+     * Increment a string by appending or incrementing a number at the end.
+     *
+     * @param string $str The input string.
+     * @param int $start The starting number if no number exists.
+     * @param int $separator The separator between the string and the number.
+     * @return string The incremented string.
+     */
+    private static function increment(string $str, int $start = 1, string $separator = '_'): string
+    {
+        // Check if the string already ends with a number
+        if (preg_match('/(.*)' . preg_quote($separator, '/') . '(\d+)$/', $str, $matches)) {
+            $base = $matches[1]; // The part before the separator
+            $number = (int) $matches[2]; // The existing number
+            return $base . $separator . ($number + 1);
+        }
+
+        // If no number exists, append the starting number
+        return $str . $separator . $start;
     }
 }

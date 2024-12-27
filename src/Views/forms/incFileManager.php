@@ -22,14 +22,14 @@
           <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
             <form class="pt-4 px-4 w-100" id="uploadForm" enctype="multipart/form-data">
               <div class="mt-4 mb-3 row">
-                <label for="attachment" class="col-sm-3 col-form-label text-end"><?= __('file') ?></label>
+                <label for="fileAttachment" class="col-sm-3 col-form-label text-end"><?= __('file') ?></label>
                 <div class="col-sm-8">
-                  <input type="file" name="attachment" id="attachment" required class="form-control fs-5" aria-describedby="attachmentHelp">
+                  <input type="file" name="attachment" id="fileAttachment" required class="form-control fs-5" aria-describedby="attachmentHelp">
                   <small id="attachmentHelp" class="form-text text-muted"><?= __('multi_bytes_warn', 'Multi-Bytes characters will be changed or deleted.') ?></small>
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="description" class="col-sm-3 col-form-label text-end"><?= __('description') ?></label>
+                <label for="fileDescription" class="col-sm-3 col-form-label text-end"><?= __('description') ?></label>
                 <div class="col-sm-8">
                   <input type="text" name="description" id="description" class="form-control fs-5" aria-describedby="textHelp">
                   <small id="textHelp" class="form-text text-muted"><?= __('desc_for_description', 'For images, it is used as the <code>alt attribute value</code>, and for PDFs, etc., it is used as the <code>link text</code>.') ?></small>
@@ -41,7 +41,7 @@
               </div>
             </form>
             <!-- Upload status -->
-            <div id="uploadStatus" class="mt-3"></div>
+            <div id="fileUploadStatus" class="mt-3"></div>
           </div><!-- /Tab pane 1 -->
 
           <!-- Tab pane 2 -->

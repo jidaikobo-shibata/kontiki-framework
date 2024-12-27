@@ -55,9 +55,9 @@ class KontikiFileManager {
             // console.log("Form submitted!");
 
             // Show upload status
-            var uploadStatus = document.getElementById('uploadStatus');
-            uploadStatus.innerText = 'アップロード中です';
-            uploadStatus.setAttribute('role', 'status');
+            var fileUploadStatus = document.getElementById('fileUploadStatus');
+            fileUploadStatus.innerText = 'アップロード中です';
+            fileUploadStatus.setAttribute('role', 'status');
 
             var formData = new FormData(event.target); // Create FormData object
 
@@ -70,9 +70,9 @@ class KontikiFileManager {
                 processData: false, // Prevent jQuery from processing data
                 success: (response) => {
                     // Handle successful upload
-                    $('#uploadStatus').html(response.message);
-                    $('#attachment').val('');
-                    $('#attachment').focus();
+                    $('#fileUploadStatus').html(response.message);
+                    $('#fileAttachment').val('');
+                    $('#fileAttachment').focus();
 
                     // Reset the input field's error state
                     $('#description').removeAttr('aria-invalid');
@@ -94,15 +94,15 @@ class KontikiFileManager {
                         $('#description').removeClass('is-invalid');
 
                         // Add aria-invalid and aria-errormessage to input#description
-                        if (response.message.includes('errormessage_text')) {
+                        if (response.message.includes('errormessage_description')) {
                             $('#description').attr('aria-invalid', 'true');
                             $('#description').attr('aria-errormessage', 'errormessage_text');
                             $('#description').addClass('is-invalid');
                         }
 
-                        $('#uploadStatus').html(response.message); // Display the error message from response
+                        $('#fileUploadStatus').html(response.message); // Display the error message from response
                     } else {
-                        $('#uploadStatus').text('アップロードできませんでした'); // Default error message
+                        $('#fileUploadStatus').text('アップロードできませんでした'); // Default error message
                     }
                     this.updateCsrfToken();
                 }

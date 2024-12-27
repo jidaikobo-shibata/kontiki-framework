@@ -112,16 +112,22 @@ class FileController extends BaseController
                 // ファイルのアップロード処理
                 $result = $this->fileService->upload($fileInfo);
 
+jlog($result);
+
                 if ($result['success']) {
                     $data['path'] = $result['path'];
                     $data['description'] = $request->getParsedBody()['description'];
 
-/*
-                    $errors = $this->fileModel->validateByFields($data);
-                    if ($errors['valid'] !== true) {
+                    $fields = $this->fileModel->getFieldDefinitions();
+                    $fields = $this->fileModel->processCreateFieldDefinitions($fields);
+                    $result = $this->fileModel->validateByFields($data, $fields);
 
+jlog($result);
+
+                    if ($result['valid'] !== true) {
+                        $data = ['message' => MessageUtils::errorHtml($result['errors'], $this->fileModel)];
+                        return $this->jsonResponse($response, $data, 405);
                     }
-*/
 
                     $isDbUpdate = $this->fileModel->create($data);
 
@@ -207,8 +213,8 @@ class FileController extends BaseController
      */
     protected function update(array $data, int $id = null)
     {
-        $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processCreateFieldDefinitions($fields);
+        $fields = $this->fileModel->getFieldDefinitions();
+        $fields = $this->fileModel->processCreateFieldDefinitions($fields);
 
         $results = $this->fileModel->validateByFields($data, $fields);
 
