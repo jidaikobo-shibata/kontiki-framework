@@ -1,4 +1,4 @@
-<?php if (!empty($description)): ?>
+<?php if (!empty($description)) : ?>
 <p class="alert alert-primary"><?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?></p>
 <?php endif; ?>
 

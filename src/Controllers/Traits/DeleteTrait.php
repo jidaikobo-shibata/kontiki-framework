@@ -38,9 +38,9 @@ trait DeleteTrait
             "/admin/{$this->table}/delete/{$id}",
             $data,
             __(
-              "x_delete_confirm",
-              "Are you sure you want to delete this :name?",
-              ['name' => __($this->table)]
+                "x_delete_confirm",
+                "Are you sure you want to delete this :name?",
+                ['name' => __($this->table)]
             ),
             __("delete", "Delete"),
         );
@@ -49,9 +49,9 @@ trait DeleteTrait
         return $this->renderResponse(
             $response,
             __(
-              "x_delete",
-              "Delete :name",
-              ['name' => __($this->table)]
+                "x_delete",
+                "Delete :name",
+                ['name' => __($this->table)]
             ),
             $formHtml
         );
@@ -73,12 +73,12 @@ trait DeleteTrait
         try {
             if ($this->model->delete($id)) {
                 $this->flashManager->addMessage(
-                  'success',
-                  __(
-                    "x_delete_success",
-                    ":name deleted successfully.",
-                    ['name' => __($this->table)]
-                  )
+                    'success',
+                    __(
+                        "x_delete_success",
+                        ":name deleted successfully.",
+                        ['name' => __($this->table)]
+                    )
                 );
                 return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
             }

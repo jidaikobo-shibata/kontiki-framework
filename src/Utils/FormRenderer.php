@@ -32,7 +32,9 @@ class FormRenderer
     {
         $grouped = [];
         foreach ($this->fields as $name => $config) {
-            if (!isset($config['type'])) continue;
+            if (!isset($config['type'])) {
+                continue;
+            }
             $group = $config['group'] ?? 'default';
             $grouped[$group][$name] = $config;
         }
@@ -92,11 +94,10 @@ class FormRenderer
         $ariaDescribedby = '';
         $ariaDescribedbyAttribute = '';
         $description = $config['description'] ?? '';
-        if (!empty($description))
-        {
-          $ariaDescribedby = 'ariaDesc_' . $id;
-          $ariaDescribedbyAttribute = ' aria-describedby="' . $ariaDescribedby . '"';
-          $description = '<div class="form-text" id="' . $ariaDescribedby . '">' . $description . '</div>';
+        if (!empty($description)) {
+            $ariaDescribedby = 'ariaDesc_' . $id;
+            $ariaDescribedbyAttribute = ' aria-describedby="' . $ariaDescribedby . '"';
+            $description = '<div class="form-text" id="' . $ariaDescribedby . '">' . $description . '</div>';
         }
 
         return $this->view->fetch($fieldTemplate, [

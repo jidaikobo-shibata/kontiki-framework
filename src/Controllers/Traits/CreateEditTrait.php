@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait CreateEditTrait
 {
-    public function prepareCreateEditData(array $default = []): Array
+    public function prepareCreateEditData(array $default = []): array
     {
         return $this->flashManager->getData('data', $default);
     }

@@ -11,5 +11,4 @@ return function ($app) use ($container) {
     \jidaikobo\kontiki\Controllers\UserController::registerRoutes($app, 'users');
     \jidaikobo\kontiki\Controllers\PostController::registerRoutes($app, 'posts');
 //    $app->get('/posts/slug/{slug}', [PostController::class, 'showBySlug']);
-
 };

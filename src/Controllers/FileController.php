@@ -377,8 +377,7 @@ class FileController extends BaseController
 
     private function processItemsForList(Request $request, array $items): array
     {
-        foreach ($items as $key => $value)
-        {
+        foreach ($items as $key => $value) {
             $url = $this->pathToUrl($request, $items[$key]['path']);
             $items[$key]['imageOrLink'] = $this->renderImageOrLink($url, $items[$key]['description'] ?? '');
             $items[$key]['url'] = $url;
@@ -396,38 +395,39 @@ class FileController extends BaseController
     private function renderImageOrLink(string $url, string $desc): string
     {
       // Check if the URL is an image URL (basic check based on file extension)
-      $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-      $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
 
-      if (isset($pathInfo['extension']) && in_array(strtolower($pathInfo['extension']), $imageExtensions)) {
-        // Return an <img> tag for images
-        $descText = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
-        $imgSrc = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
-        return '<img src="' . $imgSrc .'" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
-      }
+        if (isset($pathInfo['extension']) && in_array(strtolower($pathInfo['extension']), $imageExtensions)) {
+          // Return an <img> tag for images
+            $descText = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
+            $imgSrc = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            return '<img src="' . $imgSrc . '" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
+        }
 
       // Otherwise, return an <a> tag for links
-      $linkHref = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $linkHref = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
 
-      $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : null;
+        $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : null;
 
-      switch ($extension) {
-        case 'pdf':
-          $class = 'bi-filetype-pdf';
-          break;
-        case 'zip':
-          $class = 'bi-file-zip';
-          break;
-        default:
-          $class = 'bi-file-text';
-          break;
-      }
+        switch ($extension) {
+            case 'pdf':
+                $class = 'bi-filetype-pdf';
+                break;
+            case 'zip':
+                $class = 'bi-file-zip';
+                break;
+            default:
+                $class = 'bi-file-text';
+                break;
+        }
 
-      return '<a href="' . $linkHref. '" target="_blank" aria-label="' . __('downlaod') .'" download class="bi ' . $class .' display-3"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) .'</span></a>';
+        return '<a href="' . $linkHref . '" target="_blank" aria-label="' . __('downlaod') . '" download class="bi ' . $class . ' display-3"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) . '</span></a>';
     }
 
-    function pathToUrl($request, $path) {
-      $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
-      return str_replace(dirname(__DIR__, 3), $baseUrl, $path);
+    protected function pathToUrl($request, $path)
+    {
+        $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
+        return str_replace(dirname(__DIR__, 3), $baseUrl, $path);
     }
 }

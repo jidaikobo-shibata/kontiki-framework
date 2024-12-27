@@ -52,7 +52,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
-        $content.= $pagination->render(Env::get('BASEPATH') . "/admin/{$this->table}/index");
+        $content .= $pagination->render(Env::get('BASEPATH') . "/admin/{$this->table}/index");
 
         return $this->view->render(
             $response,

@@ -25,7 +25,7 @@ class UserModel extends BaseModel
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
-                'searchable' => TRUE,
+                'searchable' => true,
                 'rules' => [
                     'required',
                     ['lengthMin', 3],

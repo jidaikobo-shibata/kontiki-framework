@@ -136,8 +136,8 @@ abstract class BaseModel implements ModelInterface
      */
     public function filterAllowedFields(array $data): array
     {
-      $allowedFields = array_keys($this->getFieldDefinitions());
-      return array_intersect_key($data, array_flip($allowedFields));
+        $allowedFields = array_keys($this->getFieldDefinitions());
+        return array_intersect_key($data, array_flip($allowedFields));
     }
 
     public function getById(int $id): ?array

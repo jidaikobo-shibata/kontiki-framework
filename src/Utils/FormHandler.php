@@ -10,7 +10,7 @@ class FormHandler
     private DOMDocument $dom;
     private BaseModel $model;
 
-    public function __construct(string $html = '', BaseModel $model)
+    public function __construct(string $html, BaseModel $model)
     {
         $this->dom = new DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
@@ -22,12 +22,12 @@ class FormHandler
 
     public function loadHTML(string $html): void
     {
-      $map = [0x80, 0x10FFFF, 0, 0xFFFF];
-      $html = mb_encode_numericentity($html, $map, 'UTF-8');
-      $this->dom->loadHTML(
-        $html,
-        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
-      );
+        $map = [0x80, 0x10FFFF, 0, 0xFFFF];
+        $html = mb_encode_numericentity($html, $map, 'UTF-8');
+        $this->dom->loadHTML(
+            $html,
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
     }
 
     /**

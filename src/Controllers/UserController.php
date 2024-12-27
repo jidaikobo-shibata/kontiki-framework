@@ -22,7 +22,7 @@ class UserController extends BaseController
         parent::__construct($view, $sidebarService, $session, $model);
     }
 
-    public function prepareCreateEditData($default): Array
+    public function prepareCreateEditData($default): array
     {
         $data = $this->flashManager->getData('data', $default);
         unset($data['password']);

@@ -10,5 +10,5 @@ class DeleteRoutes
     {
         $group->get('/delete/{id}', [$controllerClass, 'delete']);
         $group->post('/delete/{id}', [$controllerClass, 'handleDelete']);
-   }
+    }
 }

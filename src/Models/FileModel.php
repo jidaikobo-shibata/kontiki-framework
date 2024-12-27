@@ -23,7 +23,7 @@ class FileModel extends BaseModel
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
-                'searchable' => TRUE,
+                'searchable' => true,
                 'rules' => ['required'],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',

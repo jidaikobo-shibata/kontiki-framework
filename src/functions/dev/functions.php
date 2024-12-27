@@ -7,7 +7,8 @@ if (!function_exists('jlog')) {
      * @param mixed $messages message
      * @return void
      */
-    function jlog ($messages) {
+    function jlog($messages)
+    {
         \jidaikobo\Log::write($messages);
     }
 }

@@ -1,9 +1,9 @@
 <select name="<?= $name; ?>" id="<?= $id; ?>" <?= $attributes ?><?= $ariaDescribedbyAttribute ?>>
 <?php
-foreach ($options as $key => $value):
-?>
+foreach ($options as $key => $value) :
+    ?>
 <option value="<?= $key ?>"><?= $value ?></option>
-<?php
+    <?php
 endforeach;
 ?>
 </select>

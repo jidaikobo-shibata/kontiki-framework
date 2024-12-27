@@ -39,10 +39,10 @@ abstract class BaseController
      * @param ModelInterface  $model          The model instance.
      */
     public function __construct(
-      PhpRenderer $view,
-      SidebarService $sidebarService,
-      Session $session,
-      ModelInterface $model
+        PhpRenderer $view,
+        SidebarService $sidebarService,
+        Session $session,
+        ModelInterface $model
     ) {
         $this->csrfManager = new CsrfManager($session);
         $this->flashManager = new FlashManager($session);

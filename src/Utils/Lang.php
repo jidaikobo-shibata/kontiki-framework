@@ -71,7 +71,8 @@ class Lang
         return self::get($key, $replace);
     }
 
-    public static function mergeMessages(array $defaultMessages, array $additionalMessages): array {
+    public static function mergeMessages(array $defaultMessages, array $additionalMessages): array
+    {
         return array_merge($defaultMessages, $additionalMessages);
     }
 }
