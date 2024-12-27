@@ -1,7 +1,7 @@
 <ul class="mt-4">
-	<li><code>URLをコピー</code>でURLをコピーできます</li>
-	<li><code>編集する</code>で、「説明」を編集できます。</li>
-	<li id="eachDescriptionHelp">「説明」は画像の場合はalt属性（画像の代替テキスト）、ファイルの場合はリンク文字列として使われます</li>
+	<li><?= __('file_desc_copy_url', 'You can copy the URL by clicking <code>Copy URL</code>') ?></li>
+	<li><?= __('file_desc_edit', 'You can edit the description by clicking <code>Edit</code>.') ?></li>
+	<li id="eachDescriptionHelp"><?= __('desc_for_description', 'For images, it is used as the <code>alt attribute value</code>, and for PDFs, etc., it is used as the <code>link text</code>.') ?></li>
 </ul>
 
 <!-- table-responsive -->
@@ -11,8 +11,8 @@
 	<thead class="table-light">
 		<tr class="table-dark">
 			<th class="text-center">ID</th>
-			<th class="w-25">ファイル</th>
-			<th>値</th>
+			<th class="w-25"><?= __('file') ?></th>
+			<th><?= __('value') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -26,7 +26,7 @@
 					echo $file['imageOrLink'];
 					?>
 	 			</div>
-					<div class="text-center text-nowrap"><a href="#" class="text-danger file-delete-link" data-confirm="critical" data-delete-id="<?php echo $fileId ?>" data-csrf_token="">完全に削除する</a></div>
+					<div class="text-center text-nowrap"><a href="#" class="text-danger file-delete-link" data-confirm="critical" data-delete-id="<?php echo $fileId ?>" data-csrf_token=""><?= __('delete_it_completely') ?></a></div>
 				</td>
 				<td class="eachFile">
 
@@ -34,17 +34,17 @@
 					<tr>
 						<th class="align-middle" scope="row">URL</th>
 						<td class="text-break"><span class="fileUrl"><?php echo htmlspecialchars($file['url']); ?></span></td>
-						<td class="text-nowrap align-middle"><a href="#" class="fileCopyUrl">URLをコピー</a></td>
+						<td class="text-nowrap align-middle"><a href="#" class="fileCopyUrl"><?= __('copy_url') ?></a></td>
 					</tr>
 					<tr>
-						<th class="align-middle" scope="row">説明</th>
+						<th class="align-middle" scope="row"><?= __('description') ?></th>
 						<td class="text-break"><?php echo htmlspecialchars($file['description']); ?></td>
 						<td class="text-nowrap align-middle"><a href="#" class="fileEditBtn">編集する</a></td>
 					</tr>
 					<tr>
-						<th class="text-nowrap align-middle" scope="row">コード</th>
+						<th class="text-nowrap align-middle" scope="row"><?= __('code') ?></th>
 						<td class="text-break"><code>![<?php echo htmlspecialchars($file['description']); ?>](<?php echo htmlspecialchars($file['url']); ?>)</code></td>
-						<td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn">挿入する</a></td>
+						<td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn"><?= __('insert') ?></a></td>
 					</tr>
 					</table>
 
@@ -52,11 +52,11 @@
 						echo '<form class="fileEdit d-none border p-3">';
 						echo '<div class="updateStatus"></div>';
 						echo '<div class="mb-3">';
-						echo '<label for="eachDescription_'.$fileId.'" class="form-label">説明</label>';
+						echo '<label for="eachDescription_'.$fileId.'" class="form-label">' . __('description') . '</label>';
 						echo '<textarea name="eachDescription_'.$fileId.'" id="eachDescription_'.$fileId.'" class="eachDescription form-control" aria-describedby="eachDescriptionHelp" data-file-id="'.$fileId.'" data-csrf_token="">'.htmlspecialchars($file['description']).'</textarea>';
 						echo '</div>';
 						echo '<div class="d-flex justify-content-end">';
-						echo '<button type="submit" class="btn btn-primary">更新する</button>';
+						echo '<button type="submit" class="btn btn-primary">' . __('update') . '</button>';
 						echo '</form>';
 					?>
 				</td>
@@ -71,11 +71,11 @@
 	<div class="modal-dialog modal-dialog-centered modal-xl">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="imageModalLabel">画像の拡大</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<h5 class="modal-title" id="imageModalLabel"><?= __('enlarge_image') ?></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= __('close') ?>"></button>
 			</div>
 			<div class="modal-body text-center">
-				<img id="modalImage" src="" class="img-fluid" alt="Enlarged Image">
+				<img id="modalImage" src="" class="img-fluid" alt="<?= __('enlarge_image') ?>">
 			</div>
 		</div>
 	</div>

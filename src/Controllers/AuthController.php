@@ -5,7 +5,6 @@ namespace jidaikobo\kontiki\Controllers;
 use Aura\Session\Session;
 use jidaikobo\kontiki\Models\UserModel;
 use jidaikobo\kontiki\Utils\FormHandler;
-use jidaikobo\kontiki\Utils\Lang;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -43,7 +42,6 @@ class AuthController
      */
     public function showLoginForm(Request $request, Response $response): Response
     {
-        // セッションからエラーと入力値を取得
         $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
         $error = $segment->get('error', []);
         $input = $segment->get(
@@ -53,8 +51,6 @@ class AuthController
                 'password' => '',
             ]
         );
-
-        // セッションから値を削除（1回限りの使用）
         $segment->clear();
 
         $data = [
@@ -75,7 +71,7 @@ class AuthController
             $response,
             'layout-simple.php',
             [
-                'pageTitle' => Lang::get('login', 'Login'),
+                'pageTitle' => __('login', 'Login'),
                 'content' => $content
             ]
         );
@@ -113,7 +109,7 @@ class AuthController
 
         // ログイン失敗
         $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-        $segment->set('error', [[Lang::get('wrong_username_or_password', 'Incorrect username or password')]]);
+        $segment->set('error', [[__('wrong_username_or_password', 'Incorrect username or password')]]);
         $segment->set(
             'input',
             [

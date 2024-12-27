@@ -2,8 +2,6 @@
 
 namespace jidaikobo\kontiki\Models;
 
-use jidaikobo\kontiki\Utils\Lang;
-
 class UserModel extends BaseModel
 {
     protected string $table = 'users';
@@ -22,7 +20,7 @@ class UserModel extends BaseModel
                 'label' => 'ID',
             ],
             'username' => [
-                'label' => Lang::get('username', 'Username'),
+                'label' => __('username', 'Username'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -39,8 +37,8 @@ class UserModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'password' => [
-                'label' => Lang::get('password', 'Password'),
-                'description' => Lang::get("users_edit_message", 'If the password is blank, the password will not be changed.'),
+                'label' => __('password', 'Password'),
+                'description' => __('users_edit_message', 'If the password is blank, the password will not be changed.'),
                 'type' => 'password',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -53,7 +51,7 @@ class UserModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'created_at' => [
-                'label' => Lang::get('created_at', 'Created'),
+                'label' => __('created_at', 'Created'),
             ],
         ];
     }

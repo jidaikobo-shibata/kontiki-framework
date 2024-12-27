@@ -7,9 +7,11 @@ use jidaikobo\kontiki\Utils\Env;
 $env = file_exists(__DIR__ . '/.dev') ? 'development' : 'production';
 Env::setPath(__DIR__ . "/config/{$env}/");
 
+// Load Functions
 if ($env === 'development') {
-    require __DIR__ . '/dev/functions.php';
+    require __DIR__ . '/src/functions/dev/functions.php';
 }
+require __DIR__ . '/src/functions/functions.php';
 
 // Configure a PHP-DI container
 use DI\Container;

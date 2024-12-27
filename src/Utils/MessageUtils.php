@@ -20,7 +20,7 @@ class MessageUtils
 
             // フォーム全体のエラー
             if ($field === 0) {
-                $html .= '<li class="pt-3">' . Lang::get('found_the_problem', 'Found the problem');
+                $html .= '<li class="pt-3">' . __('found_the_problem', 'Found the problem');
                 $html .= '<ul class="ps-3">';
                 foreach ($messages as $message) {
                     $html .= sprintf(
@@ -46,10 +46,7 @@ class MessageUtils
             $html .= sprintf(
                 '<a href="#%s" class="alert-link">%s</a>',
                 htmlspecialchars($id, ENT_QUOTES, 'UTF-8'),
-                sprintf(
-                    Lang::get('error_at_label', 'Error at %s'),
-                    htmlspecialchars($labelText, ENT_QUOTES, 'UTF-8')
-                )
+                __('error_at_x', 'Error at :name', ['name' => $labelText]),
             );
 
             $html .= '<ul class="ps-3">';

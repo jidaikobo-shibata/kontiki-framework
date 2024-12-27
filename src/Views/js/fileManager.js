@@ -354,7 +354,7 @@ class KontikiFileManager {
                 type: 'POST',
                 data: {
                     id: deleteId,
-                    csrf_token: csrfToken
+                    _csrf_token: csrfToken
                 },
                 success: (response) => {
                     alert(response.message);
@@ -398,7 +398,7 @@ class KontikiFileManager {
             // Prepare the data to be sent
             const formData = {
                 description: description,
-                csrf_token: csrfToken,
+                _csrf_token: csrfToken,
                 id: fileId
             };
 

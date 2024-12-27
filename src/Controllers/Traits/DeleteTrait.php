@@ -2,7 +2,6 @@
 
 namespace jidaikobo\kontiki\Controllers\Traits;
 
-use jidaikobo\kontiki\Utils\Lang;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -38,14 +37,22 @@ trait DeleteTrait
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/delete/{$id}",
             $data,
-            Lang::get("confirm_delete_message", "Are you sure you want to delete this {$this->table}?"),
-            Lang::get("delete", "Delete"),
+            __(
+              "x_delete_confirm",
+              "Are you sure you want to delete this :name?",
+              ['name' => __($this->table)]
+            ),
+            __("delete", "Delete"),
         );
         $formHtml = $this->formService->processFormHtml($formHtml);
 
         return $this->renderResponse(
             $response,
-            Lang::get("delete_{$this->table}", "Delete " . ucfirst($this->table)),
+            __(
+              "x_delete",
+              "Delete :name",
+              ['name' => __($this->table)]
+            ),
             $formHtml
         );
     }
@@ -62,17 +69,23 @@ trait DeleteTrait
             return $redirectResponse;
         }
 
-        // データ削除
+        // delete data
         try {
             if ($this->model->delete($id)) {
                 $this->flashManager->addMessage(
                   'success',
-                  Lang::get("{$this->table}_delete_success", ucfirst($this->table) . " deleted successfully.")
+                  __(
+                    "x_delete_success",
+                    ":name deleted successfully.",
+                    ['name' => __($this->table)]
+                  )
                 );
                 return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
             }
         } catch (\Exception $e) {
-            $this->flashManager->addErrors([Lang::get("{$this->table}_delete_failed", "Failed to delete " . ucfirst($this->table) . ".")]);
+            $this->flashManager->addErrors([
+                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->table)])
+              ]);
         }
 
         $redirectTo = "/admin/{$this->table}/edit/{$id}";

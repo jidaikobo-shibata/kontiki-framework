@@ -50,7 +50,7 @@ class TableRenderer
             $label = htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8');
             $headerHtml .= sprintf('<th>%s</th>', $label);
         }
-        $headerHtml .= '<th>Actions</th>'; // Add actions column
+        $headerHtml .= '<th>' . __('actions') . '</th>'; // Add actions column
         return $headerHtml;
     }
 
@@ -77,19 +77,16 @@ class TableRenderer
         foreach ($actions as $action) {
             switch ($action) {
                 case 'edit':
-                    $html .= sprintf('<a href="./edit/%s" class="btn btn-primary btn-sm">Edit</a> ', $id);
+                    $html .= sprintf('<a href="./edit/%s" class="btn btn-primary btn-sm">' . __('edit') . '</a> ', $id);
                     break;
                 case 'delete':
-                    $html .= sprintf('<a href="./delete/%s" class="btn btn-danger btn-sm">Delete</a> ', $id);
+                    $html .= sprintf('<a href="./delete/%s" class="btn btn-danger btn-sm">' . __('delete') . '</a> ', $id);
                     break;
                 case 'moveToTrash':
-                    $html .= sprintf('<a href="./trash/%s" class="btn btn-warning btn-sm">Move to Trash</a> ', $id);
+                    $html .= sprintf('<a href="./trash/%s" class="btn btn-warning btn-sm">' . __('trash') . '</a> ', $id);
                     break;
                 case 'restore':
-                    $html .= sprintf('<a href="./restore/%s" class="btn btn-success btn-sm">Restore</a> ', $id);
-                    break;
-                case 'forceDelete':
-                    $html .= sprintf('<a href="./force-delete/%s" class="btn btn-danger btn-sm">Force Delete</a> ', $id);
+                    $html .= sprintf('<a href="./restore/%s" class="btn btn-success btn-sm">' . __('restore') . '</a> ', $id);
                     break;
             }
         }

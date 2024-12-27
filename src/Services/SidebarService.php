@@ -2,7 +2,6 @@
 
 namespace jidaikobo\kontiki\Services;
 
-use jidaikobo\kontiki\Utils\Lang;
 use Slim\Routing\RouteCollector;
 use Slim\Routing\RouteParser;
 
@@ -43,12 +42,13 @@ class SidebarService
 
             // グループ名を設定
             if (!isset($groupNames[$group])) {
-                $groupNames[$group] = Lang::get("{$group}_management", ucfirst($group) . 'Management');
+                $groupNames[$group] = __("x_management", ':name Management', ['name' => __($group)]);
             }
 
             // グループごとにリンクを分類
+            $langLabel = preg_replace('/^[^_]+/', 'x', $name);
             $groupedLinks[$group][] = [
-                'name' => Lang::get($name, $name), // ルート名のローカライズ
+                'name' => __($langLabel, ':name index', ['name' => __($group)]),
                 'url' => $this->routeParser->urlFor($name),
                 'icon' => 'fa-' . strtolower($name) . '-alt',
             ];

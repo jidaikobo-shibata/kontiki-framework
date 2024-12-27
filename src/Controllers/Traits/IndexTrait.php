@@ -3,7 +3,6 @@
 namespace jidaikobo\kontiki\Controllers\Traits;
 
 use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\Lang;
 use jidaikobo\kontiki\Utils\Pagination;
 use jidaikobo\kontiki\Utils\TableHandler;
 use jidaikobo\kontiki\Utils\TableRenderer;
@@ -59,7 +58,7 @@ trait IndexTrait
             $response,
             'layout.php',
             [
-                'pageTitle' => Lang::get("{$this->table}_management", ucfirst($this->table) . ' Management'),
+                'pageTitle' => __("x_index", 'Index of :name', ['name' => __($this->table)]),
                 'content' => $content,
             ]
         );

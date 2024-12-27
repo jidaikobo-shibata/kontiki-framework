@@ -5,7 +5,6 @@ namespace jidaikobo\kontiki\Models;
 use Aura\Session\Session;
 use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Services\ValidationService;
-use jidaikobo\kontiki\Utils\Lang;
 
 class PostModel extends BaseModel
 {
@@ -34,7 +33,7 @@ class PostModel extends BaseModel
                 'label' => 'ID',
             ],
             'title' => [
-                'label' => Lang::get('title', 'Title'),
+                'label' => __('title'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -47,7 +46,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'content' => [
-                'label' => Lang::get('content', 'Content'),
+                'label' => __('content'),
                 'description' => '',
                 'type' => 'textarea',
                 'attributes' => [
@@ -64,7 +63,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'slug' => [
-                'label' => Lang::get('slug', 'Slug'),
+                'label' => __('slug'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -77,7 +76,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'published_at' => [
-                'label' => Lang::get('published', 'published'),
+                'label' => __('published_at'),
                 'type' => 'datetime-local',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -90,7 +89,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'is_draft' => [
-                'label' => Lang::get('draft', 'Draft'),
+                'label' => __('draft'),
                 'type' => 'select',
                 'options' => [0 => 'published', 1 => 'draft'],
                 'attributes' => ['class' => 'form-control form-select'],
@@ -105,7 +104,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'creator_id' => [
-                'label' => Lang::get('creator', 'Creator'),
+                'label' => __('creator'),
                 'type' => 'select',
                 'options' => $userModel->getOptions('username'),
                 'attributes' => ['class' => 'form-control form-select'],
@@ -120,7 +119,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'created_at' => [
-                'label' => Lang::get('created_at', 'Created'),
+                'label' => __('created_at', 'Created'),
             ],
         ];
     }

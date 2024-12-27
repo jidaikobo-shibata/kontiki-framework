@@ -6,7 +6,7 @@ class Lang
 {
     private static string $language = 'en'; // Default language
     private static array $messages = [];
-    private static string $langPath = __DIR__ . '/../../resources/lang'; // Path to language files
+    private static string $langPath = __DIR__ . '/../../locale'; // Path to language files
 
     /**
      * Set the language to use.
@@ -46,6 +46,10 @@ class Lang
      */
     public static function get(string $key, string $default = '', array $replace = []): string
     {
+        if ($default === '') {
+            $default = ucfirst(str_replace('_', ' ', $key));
+        }
+
         $message = self::$messages[$key] ?? $default;
 
         foreach ($replace as $search => $value) {
@@ -65,5 +69,9 @@ class Lang
     public static function trans(string $key, array $replace = []): string
     {
         return self::get($key, $replace);
+    }
+
+    public static function mergeMessages(array $defaultMessages, array $additionalMessages): array {
+        return array_merge($defaultMessages, $additionalMessages);
     }
 }

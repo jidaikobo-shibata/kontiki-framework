@@ -3,7 +3,6 @@
 namespace jidaikobo\kontiki\Middleware;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Utils\Lang;
 use jidaikobo\kontiki\Utils\Env;
 use jidaikobo\Log;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -41,7 +40,7 @@ class AuthMiddleware implements MiddlewareInterface
                 $response->withHeader('Content-Type', 'text/html')->withStatus(404),
                 'layout-error.php',
                 [
-                    'pageTitle' => Lang::get('404_text'),
+                    'pageTitle' => __('404_text'),
                     'content' => $content
                 ]
             );

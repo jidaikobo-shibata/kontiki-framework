@@ -2,7 +2,6 @@
 
 namespace jidaikobo\kontiki\Controllers\Traits;
 
-use jidaikobo\kontiki\Utils\Lang;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -24,13 +23,13 @@ trait CreateEditTrait
             "/admin/{$this->table}/create",
             $fields,
             '',
-            Lang::get("create", 'Create'),
+            __("create", 'Create'),
         );
         $formHtml = $this->formService->processFormHtml($formHtml);
 
         return $this->renderResponse(
             $response,
-            Lang::get("{$this->table}_create", 'Create ' . ucfirst($this->table)),
+            __("{$this->table}_create", 'Create ' . ucfirst($this->table)),
             $formHtml
         );
     }
@@ -51,13 +50,13 @@ trait CreateEditTrait
             "/admin/{$this->table}/edit/{$id}",
             $fields,
             '',
-            Lang::get("edit", 'Edit'),
+            __("update", 'Update'),
         );
         $formHtml = $this->formService->processFormHtml($formHtml);
 
         return $this->renderResponse(
             $response,
-            Lang::get("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
+            __("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
             $formHtml
         );
     }
@@ -115,14 +114,12 @@ trait CreateEditTrait
 
             $this->flashManager->addMessage(
                 'success',
-                Lang::get("{$this->table}_save_success", 'Saved successfully.')
+                __("x_save_success", ':name Saved successfully.', ['name' => __($this->table)])
             );
 
             return $this->redirectResponse($request, $response, $defaultRedirect);
         } catch (\Exception $e) {
-            $this->flashManager->addErrors([
-                [$e->getMessage()],
-            ]);
+            $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $defaultRedirect);
         }
     }

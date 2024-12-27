@@ -20,7 +20,7 @@
                 <li class="nav-item">
                   <a href="<?php echo htmlspecialchars($link['url']) ?>" class="nav-link">
                     <i class="nav-icon fas <?php echo htmlspecialchars($link['icon'] ?? 'fa-circle') ?>"></i>
-                    <p><?php echo htmlspecialchars($link['name']) ?></p>
+                    <p><?php echo __($link['name']) ?></p>
                   </a>
                 </li>
                 <?php endforeach; ?>

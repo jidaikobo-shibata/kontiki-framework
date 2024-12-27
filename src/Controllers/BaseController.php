@@ -113,7 +113,7 @@ abstract class BaseController
     ): ?Response {
         if (empty($data['_csrf_value']) || !$this->csrfManager->isValid($data['_csrf_value'])) {
             $this->flashManager->addErrors([
-                Lang::get("csrf_invalid", 'Invalid CSRF token.'),
+                __("csrf_invalid", 'Invalid CSRF token.'),
             ]);
             return $this->redirectResponse($request, $response, $redirectTarget);
         }

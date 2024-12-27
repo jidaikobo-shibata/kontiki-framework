@@ -50,6 +50,7 @@ abstract class BaseModel implements ModelInterface
     {
         return $this->table;
     }
+
     abstract public function getDisplayFields(): array;
 
     /**
@@ -106,16 +107,13 @@ abstract class BaseModel implements ModelInterface
      */
     public function getOptions(string $fieldName, bool $includeEmpty = false, string $emptyLabel = ''): array
     {
-        // バリデーション: フィールド名が空でないことを確認
         if (empty($fieldName)) {
             throw new \InvalidArgumentException('Field name cannot be empty.');
         }
 
-        // SQLクエリの実行: id と 指定フィールド名を取得
         $query = "SELECT id, {$fieldName} FROM {$this->table}";
         $results = $this->db->executeQuery($query);
 
-        // id => 指定フィールド名の配列に加工
         $options = [];
         foreach ($results as $row) {
             if (isset($row['id'], $row[$fieldName])) {
@@ -123,7 +121,6 @@ abstract class BaseModel implements ModelInterface
             }
         }
 
-        // 空の要素を先頭に追加
         if ($includeEmpty) {
             $options = ['' => $emptyLabel] + $options;
         }

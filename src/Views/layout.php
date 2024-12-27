@@ -30,7 +30,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= \jidaikobo\kontiki\Utils\Lang::get('logout', 'Logout') ?></a>
+    <a href="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->

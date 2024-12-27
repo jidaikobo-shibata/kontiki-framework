@@ -5,7 +5,6 @@ namespace jidaikobo\kontiki\Services;
 use Valitron\Validator;
 use jidaikobo\kontiki\Database\DatabaseHandler;
 use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\Lang;
 
 class ValidationService
 {
@@ -25,7 +24,7 @@ class ValidationService
             function ($field, $value, array $params, array $fields) {
                 return $this->isUnique($params[0], $params[1], $value, $params[2] ?? null);
             },
-            Lang::get('is_already_exists', 'is already exists')
+            __('is_already_exists', 'is already exists')
         );
     }
 

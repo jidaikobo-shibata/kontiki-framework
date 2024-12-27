@@ -3,7 +3,6 @@
 namespace jidaikobo\kontiki\Controllers;
 
 use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Utils\Lang;
 use jidaikobo\kontiki\Services\SidebarService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -42,7 +41,7 @@ class DashboardController
             $response,
             'layout.php',
             [
-                'pageTitle' => Lang::get('management_portal', 'Management Portal'),
+                'pageTitle' => __('management_portal', 'Management Portal'),
                 'content' => '',
             ]
         );

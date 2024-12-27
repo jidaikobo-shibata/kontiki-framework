@@ -2,12 +2,9 @@
 
 namespace jidaikobo\kontiki\Models;
 
-use jidaikobo\kontiki\Utils\Lang;
-
 class FileModel extends BaseModel
 {
     protected string $table = 'files';
-
 
     public function getDisplayFields(): array
     {
@@ -21,7 +18,7 @@ class FileModel extends BaseModel
                 'label' => 'ID',
             ],
             'path' => [
-                'label' => Lang::get('path', 'Path'),
+                'label' => __('path'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -34,7 +31,7 @@ class FileModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'description' => [
-                'label' => Lang::get('description', 'Description'),
+                'label' => __('description'),
                 'description' => '',
                 'type' => 'textarea',
                 'attributes' => [
