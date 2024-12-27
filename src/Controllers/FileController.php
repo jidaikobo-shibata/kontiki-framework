@@ -90,10 +90,9 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfToken = $request->getParsedBody()['_csrf_token'] ?? null;
-            if (!$this->csrfManager->isValid($csrfToken)) {
-                $data = ['message' => $this->getMessages()['invalid_request']];
-                return $this->jsonResponse($response, $data, 405);
+            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($csrfValidationResponse) {
+                return $csrfValidationResponse;
             }
 
             // prepare file
@@ -161,10 +160,9 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfToken = $request->getParsedBody()['_csrf_token'] ?? null;
-            if (!$this->csrfManager->isValid($csrfToken)) {
-                $data = ['message' => $this->getMessages()['invalid_request']];
-                return $this->jsonResponse($response, $data, 405);
+            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($csrfValidationResponse) {
+                return $csrfValidationResponse;
             }
 
             // Get the file ID from the POST request
@@ -285,10 +283,9 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfToken = $request->getParsedBody()['_csrf_token'] ?? null;
-            if (!$this->csrfManager->isValid($csrfToken)) {
-                $data = ['message' => $this->getMessages()['invalid_request']];
-                return $this->jsonResponse($response, $data, 405);
+            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($csrfValidationResponse) {
+                return $csrfValidationResponse;
             }
 
             // Get the file ID from the POST request
@@ -406,7 +403,7 @@ class FileController extends BaseController
         // Return an <img> tag for images
         $descText = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
         $imgSrc = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
-        return "<img src=\"{$imgSrc}\" alt=\"{$descText}を拡大表示する\" class=\"clickable-image img-thumbnail\" tabindex=\"0\">";
+        return '<img src="' . $imgSrc .'" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
       }
 
       // Otherwise, return an <a> tag for links
@@ -426,9 +423,7 @@ class FileController extends BaseController
           break;
       }
 
-      return "<a href=\"{$linkHref}\" target=\"_blank\" aria-label=\"ダウンロード\" download class=\"bi {$class} display-3\">
-            <span class=\"visually-hidden\">{$desc}をダウンロードする</span>
-          </a>";
+      return '<a href="' . $linkHref. '" target="_blank" aria-label="' . __('downlaod') .'" download class="bi ' . $class .' display-3"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) .'</span></a>';
     }
 
     function pathToUrl($request, $path) {

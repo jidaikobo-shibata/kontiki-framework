@@ -35,7 +35,7 @@
                   <small id="textHelp" class="form-text text-muted"><?= __('desc_for_description', 'For images, it is used as the <code>alt attribute value</code>, and for PDFs, etc., it is used as the <code>link text</code>.') ?></small>
                 </div>
               </div>
-              <input type="hidden" name="_csrf_token" id="file_manager_csrf_token" value="">
+              <input type="hidden" name="_csrf_value" id="file_manager_csrf_token" value="">
               <div class="text-center">
                 <button type="submit" class="btn btn-info"><?= __('submit') ?></button>
               </div>

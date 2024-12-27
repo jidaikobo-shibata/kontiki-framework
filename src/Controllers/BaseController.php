@@ -111,14 +111,33 @@ abstract class BaseController
         Response $response,
         string $redirectTarget
     ): ?Response {
-        if (empty($data['_csrf_value']) || !$this->csrfManager->isValid($data['_csrf_value'])) {
+        if (!$this->isCsrfTokenValid($data)) {
             $this->flashManager->addErrors([
                 __("csrf_invalid", 'Invalid CSRF token.'),
             ]);
             return $this->redirectResponse($request, $response, $redirectTarget);
         }
 
+        $this->csrfManager->regenerate();
+
         return null;
+    }
+
+    protected function validateCsrfForJson(array $data, Response $response): ?Response
+    {
+        if (!$this->isCsrfTokenValid($data)) {
+            $data = ['message' => __('csrf_invalid', 'Invalid CSRF token.')];
+            return $this->jsonResponse($response, $data, 403);
+        }
+
+        $this->csrfManager->regenerate();
+
+        return null;
+    }
+
+    private function isCsrfTokenValid(array $data): bool
+    {
+        return !empty($data['_csrf_value']) && $this->csrfManager->isValid($data['_csrf_value']);
     }
 
     /**

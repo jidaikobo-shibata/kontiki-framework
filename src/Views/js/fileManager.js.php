@@ -354,7 +354,7 @@ class KontikiFileManager {
                 type: 'POST',
                 data: {
                     id: deleteId,
-                    _csrf_token: csrfToken
+                    _csrf_value: csrfToken
                 },
                 success: (response) => {
                     alert(response.message);
@@ -398,7 +398,7 @@ class KontikiFileManager {
             // Prepare the data to be sent
             const formData = {
                 description: description,
-                _csrf_token: csrfToken,
+                _csrf_value: csrfToken,
                 id: fileId
             };
 
@@ -414,8 +414,6 @@ class KontikiFileManager {
                 error: (xhr, status, error) => {
                     // Handle upload error
                     var response = xhr.responseJSON; // Get the JSON response
-
-console.log(response);
 
                     // reset
                     form.find('.eachDescription').removeAttr('aria-invalid');

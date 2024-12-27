@@ -33,4 +33,14 @@ class CsrfManager
     {
         return $this->session->getCsrfToken()->isValid($token);
     }
+
+    /**
+     * CSRFトークンの再生成
+     *
+     * @return void
+     */
+    public function regenerate(): void
+    {
+        $this->session->getCsrfToken()->regenerateValue();
+    }
 }

@@ -88,6 +88,10 @@ return [
     'copy_failed' => 'コピー失敗',
     'insert_success' => '挿入成功',
 
+    'enlarge_x' => ':nameを拡大表示する',
+    'download' => 'ダウンロード',
+    'download_x' => ':nameをダウンロードする',
+
     'invalid_request' => 'リクエストが無効です。もう一度お試しください。',
     'validation_failed' => 'データの検証に失敗しました。入力内容をご確認ください。',
     'upload_success' => 'ファイルのアップロードに成功しました。',
