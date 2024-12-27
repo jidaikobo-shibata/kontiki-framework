@@ -96,12 +96,11 @@ class FileController extends BaseController
                 return $this->jsonResponse($response, $data, 405);
             }
 
-            // upload
+            // prepare file
             $uploadedFiles = $request->getUploadedFiles();
             $uploadedFile = $uploadedFiles['attachment'] ?? null;
 
             if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-                // ファイル情報を取得
                 $fileInfo = [
                     'name' => $uploadedFile->getClientFilename(),
                     'type' => $uploadedFile->getClientMediaType(),
@@ -109,10 +108,8 @@ class FileController extends BaseController
                     'size' => $uploadedFile->getSize(),
                 ];
 
-                // ファイルのアップロード処理
+                // file upload
                 $result = $this->fileService->upload($fileInfo);
-
-jlog($result);
 
                 if ($result['success']) {
                     $data['path'] = $result['path'];
@@ -121,8 +118,6 @@ jlog($result);
                     $fields = $this->fileModel->getFieldDefinitions();
                     $fields = $this->fileModel->processCreateFieldDefinitions($fields);
                     $result = $this->fileModel->validateByFields($data, $fields);
-
-jlog($result);
 
                     if ($result['valid'] !== true) {
                         $data = ['message' => MessageUtils::errorHtml($result['errors'], $this->fileModel)];
@@ -346,9 +341,23 @@ jlog($result);
      */
     public function serveJs(Request $request, Response $response): Response
     {
-        $filePath = dirname(__DIR__) . '/Views/js/fileManager.js';
-        $jsContent = file_get_contents($filePath);
-        $response->getBody()->write($jsContent);
+        $content = $this->view->fetch(
+            'js/fileManager.js.php',
+            [
+                'uploading' => __('uploading'),
+                'couldnt_upload' => __('couldnt_upload', "Could not upload"),
+                'get_file_list' => __('get_file_list'),
+                'couldnt_find_file' => __('couldnt_find_file'),
+                'couldnt_get_file_list' => __('couldnt_get_file_list'),
+                'copied' => __('copied'),
+                'copy_failed' => __('copy_failed'),
+                'close' => __('close'),
+                'edit' => __('edit'),
+                'couldnt_delete_file' => __('couldnt_delete_file'),
+                'insert_success' => __('insert_success'),
+            ]
+        );
+        $response->getBody()->write($content);
         return $response->withHeader('Content-Type', 'application/javascript; charset=utf-8')->withStatus(200);
     }
 
@@ -426,5 +435,4 @@ jlog($result);
       $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
       return str_replace(dirname(__DIR__, 3), $baseUrl, $path);
     }
-
 }

@@ -56,7 +56,7 @@ class KontikiFileManager {
 
             // Show upload status
             var fileUploadStatus = document.getElementById('fileUploadStatus');
-            fileUploadStatus.innerText = 'アップロード中です';
+            fileUploadStatus.innerText = '<?= $uploading ?>';
             fileUploadStatus.setAttribute('role', 'status');
 
             var formData = new FormData(event.target); // Create FormData object
@@ -102,7 +102,7 @@ class KontikiFileManager {
 
                         $('#fileUploadStatus').html(response.message); // Display the error message from response
                     } else {
-                        $('#fileUploadStatus').text('アップロードできませんでした'); // Default error message
+                        $('#fileUploadStatus').text('<?= $couldnt_upload ?>'); // Default error message
                     }
                     this.updateCsrfToken();
                 }
@@ -154,7 +154,7 @@ class KontikiFileManager {
         // Find the file-list element where we'll append the files
         var fileListContainer = $('#file-list');
 
-        fileListContainer.html('<p role="status">ファイルの一覧を取得中です。</p>'); // Show loading message
+        fileListContainer.html('<p role="status"><?= $get_file_list ?></p>'); // Show loading message
 
         // AJAX request to get the files
         $.ajax({
@@ -176,12 +176,12 @@ class KontikiFileManager {
                     this.updateCsrfToken();
                 } else {
                     // If no files are found, display a message
-                    fileListContainer.html('<p role="status">ファイルが見つかりませんでした。</p>');
+                    fileListContainer.html('<p role="status"><?= $couldnt_find_file ?></p>');
                 }
             },
             error: () => {
                 // Handle error
-                fileListContainer.html('<p role="status">ファイルの一覧の取得に失敗しました。</p>');
+                fileListContainer.html('<p role="status"><?= $couldnt_get_file_list ?></p>');
             }
         });
     }
@@ -234,8 +234,8 @@ class KontikiFileManager {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 半透明の黒
-                    zIndex: 1050, // モーダルの中身より高く設定
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 1050,
                 });
             $(parentModalId).append(overlay);
 
@@ -302,10 +302,10 @@ class KontikiFileManager {
             // Use the Clipboard API to copy the text
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // Append a success message
-                textField.after('<span role="status" class="ms-2 text-success">コピー成功</span>');
+                textField.after('<span role="status" class="ms-2 text-success"><?= $copied ?></span>');
             }).catch((error) => {
                 // Append an error message
-                textField.after('<span role="status" class="ms-2 text-danger">コピー失敗</span>');
+                textField.after('<span role="status" class="ms-2 text-danger"><?= $copy_failed ?></span>');
             });
         });
     }
@@ -327,11 +327,11 @@ class KontikiFileManager {
             if (form.hasClass('d-none')) {
                 // Show the form
                 form.removeClass('d-none');
-                editBtn.text('閉じる'); // Update the button text
+                editBtn.text('<?= $close ?>'); // Update the button text
             } else {
                 // Hide the form
                 form.addClass('d-none');
-                editBtn.text('編集する'); // Reset the button text
+                editBtn.text('<?= $edit ?>'); // Reset the button text
             }
         });
     }
@@ -367,7 +367,7 @@ class KontikiFileManager {
                     if (response && response.message) {
                         alert(response.message);
                     } else {
-                        $('#uploadStatus').text('ファイルの削除に失敗しました。'); // Default error message
+                        $('#uploadStatus').text('<?= $couldnt_delete_file ?>');
                     }
                     this.updateCsrfToken();
                 }
@@ -459,7 +459,7 @@ console.log(response);
 
             // Display success status
             const codeElement = fileRow.find('td.text-break code');
-            codeElement.after('<span role="status" class="ms-2 text-success">挿入成功</span>');
+            codeElement.after('<span role="status" class="ms-2 text-success"><?= $insert_success ?></span>');
         });
     }
 }

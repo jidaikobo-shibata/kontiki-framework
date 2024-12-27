@@ -78,6 +78,16 @@ return [
     'insert' => '挿入する',
     'enlarge_image' => '画像の拡大',
 
+    'uploading' => 'アップロード中です',
+    'couldnt_upload' => 'アップロードできませんでした',
+    'get_file_list' => 'ファイルの一覧を取得中です',
+    'couldnt_find_file' => 'ファイルが見つかりませんでした。',
+    'couldnt_get_file_list' => 'ファイルの一覧の取得に失敗しました。',
+    'couldnt_delete_file' => 'ファイルの削除に失敗しました。',
+    'copied' => 'コピー成功',
+    'copy_failed' => 'コピー失敗',
+    'insert_success' => '挿入成功',
+
     'invalid_request' => 'リクエストが無効です。もう一度お試しください。',
     'validation_failed' => 'データの検証に失敗しました。入力内容をご確認ください。',
     'upload_success' => 'ファイルのアップロードに成功しました。',
