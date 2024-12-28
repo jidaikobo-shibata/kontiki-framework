@@ -12,4 +12,3 @@
 /bin/phpcs
 /bin/phpstan
 /bin/phpstan.phar
-/src/Utils/MarkdownUtils.php

@@ -381,6 +381,7 @@ class FileController extends BaseController
             $url = $this->pathToUrl($request, $items[$key]['path']);
             $items[$key]['imageOrLink'] = $this->renderImageOrLink($url, $items[$key]['description'] ?? '');
             $items[$key]['url'] = $url;
+            $items[$key]['description'] = $items[$key]['description'] ?? ''; // don't use null
         }
         return $items;
     }

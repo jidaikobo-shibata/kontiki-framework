@@ -41,7 +41,7 @@ class Env
      * @param  string $path The new path to the .env file.
      * @return void
      */
-    public static function setPath(string $path): void
+    public static function loadConfigPath(string $path): void
     {
         self::$path = $path;
         self::load();
