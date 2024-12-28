@@ -1,10 +1,10 @@
 <?php
 
-namespace jidaikobo\kontiki\Models;
+namespace Jidaikobo\Kontiki\Models;
 
-use jidaikobo\kontiki\Database\DatabaseHandler;
-use jidaikobo\kontiki\Services\ValidationService;
-use jidaikobo\kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Database\DatabaseHandler;
+use Jidaikobo\Kontiki\Services\ValidationService;
+use Jidaikobo\Kontiki\Utils\Env;
 use Valitron\Validator;
 
 /**

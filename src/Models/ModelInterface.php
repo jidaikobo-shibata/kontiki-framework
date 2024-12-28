@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Models;
+namespace Jidaikobo\Kontiki\Models;
 
 interface ModelInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Utils;
+namespace Jidaikobo\Kontiki\Utils;
 
 /**
  * Pagination class to handle pagination logic for SQL queries.

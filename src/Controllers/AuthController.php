@@ -1,10 +1,10 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\UserModel;
-use jidaikobo\kontiki\Utils\FormHandler;
+use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Utils\FormHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

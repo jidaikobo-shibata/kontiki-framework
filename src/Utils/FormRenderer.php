@@ -1,8 +1,8 @@
 <?php
 
-namespace jidaikobo\kontiki\Utils;
+namespace Jidaikobo\Kontiki\Utils;
 
-use jidaikobo\kontiki\Utils\FormUtils;
+use Jidaikobo\Kontiki\Utils\FormUtils;
 use Slim\Views\PhpRenderer;
 
 class FormRenderer

@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <a href="<?php echo \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/admin/dashboard" class="brand-link">
-    <span class="brand-text font-weight-light"><?php echo \jidaikobo\kontiki\Utils\Env::get('COPYRIGHT') ?></span>
+  <a href="<?php echo \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/admin/dashboard" class="brand-link">
+    <span class="brand-text font-weight-light"><?php echo \Jidaikobo\Kontiki\Utils\Env::get('COPYRIGHT') ?></span>
   </a>
 
   <div class="sidebar">

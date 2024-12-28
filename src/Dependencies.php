@@ -1,9 +1,9 @@
 <?php
 
-use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Services\FileService;
-use jidaikobo\kontiki\Services\SidebarService;
-use jidaikobo\kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Services\FileService;
+use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Utils\Env;
 use Aura\Session\SessionFactory;
 use Aura\Session\Session;
 use Psr\Container\ContainerInterface;

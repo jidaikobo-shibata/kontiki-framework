@@ -1,11 +1,11 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers\Traits;
+namespace Jidaikobo\Kontiki\Controllers\Traits;
 
-use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\Pagination;
-use jidaikobo\kontiki\Utils\TableHandler;
-use jidaikobo\kontiki\Utils\TableRenderer;
+use Jidaikobo\Kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\Pagination;
+use Jidaikobo\Kontiki\Utils\TableHandler;
+use Jidaikobo\Kontiki\Utils\TableRenderer;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 

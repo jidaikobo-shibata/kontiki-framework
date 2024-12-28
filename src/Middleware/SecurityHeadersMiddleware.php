@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Middleware;
+namespace Jidaikobo\Kontiki\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

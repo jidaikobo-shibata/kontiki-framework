@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers\Routes;
+namespace Jidaikobo\Kontiki\Controllers\Routes;
 
 use Slim\Routing\RouteCollectorProxy;
 

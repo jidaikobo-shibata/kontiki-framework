@@ -1,10 +1,10 @@
 <?php
 
-namespace jidaikobo\kontiki\Models;
+namespace Jidaikobo\Kontiki\Models;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Database\DatabaseHandler;
-use jidaikobo\kontiki\Services\ValidationService;
+use Jidaikobo\Kontiki\Database\DatabaseHandler;
+use Jidaikobo\Kontiki\Services\ValidationService;
 
 class PostModel extends BaseModel
 {

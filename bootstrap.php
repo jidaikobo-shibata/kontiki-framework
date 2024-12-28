@@ -3,7 +3,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 // Load .env (if .dev exists, it's the development environment)
-use jidaikobo\kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\Env;
 $env = file_exists(__DIR__ . '/.dev') ? 'development' : 'production';
 Env::setPath(__DIR__ . "/config/{$env}/");
 
@@ -21,7 +21,7 @@ $container = new Container();
 AppFactory::setContainer($container);
 
 // Load default language on class load
-use jidaikobo\kontiki\Utils\Lang;
+use Jidaikobo\Kontiki\Utils\Lang;
 Lang::setLanguage(Env::get('LANG'));
 
 // Create a Slim application
@@ -30,14 +30,14 @@ $app->addErrorMiddleware(true, true, true);
 $app->setBasePath(Env::get('BASEPATH'));
 
 // Add a header for security measures
-use jidaikobo\kontiki\Middleware\SecurityHeadersMiddleware;
+use Jidaikobo\Kontiki\Middleware\SecurityHeadersMiddleware;
 $app->add(SecurityHeadersMiddleware::class);
 
 // Set dependencies
 (require __DIR__ . '/src/Dependencies.php')($app);
 
 // Set the error log handler
-use jidaikobo\Log;
+use Jidaikobo\Log;
 Log::getInstance()->registerHandlers();
 
 return $app;

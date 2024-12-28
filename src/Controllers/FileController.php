@@ -1,16 +1,16 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Models\FileModel;
-use jidaikobo\kontiki\Services\FileService;
-use jidaikobo\kontiki\Utils\CsrfManager;
-use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\MessageUtils;
-use jidaikobo\kontiki\Utils\Pagination;
-use jidaikobo\Log;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Models\FileModel;
+use Jidaikobo\Kontiki\Services\FileService;
+use Jidaikobo\Kontiki\Utils\CsrfManager;
+use Jidaikobo\Kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\MessageUtils;
+use Jidaikobo\Kontiki\Utils\Pagination;
+use Jidaikobo\Log;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

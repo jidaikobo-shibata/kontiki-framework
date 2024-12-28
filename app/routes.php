@@ -1,7 +1,7 @@
 <?php
 
 use Slim\Routing\RouteCollectorProxy;
-use jidaikobo\kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use App\Controllers\TestController;
 
 return function ($app) use ($container) {

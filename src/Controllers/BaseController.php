@@ -1,15 +1,15 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Models\ModelInterface;
-use jidaikobo\kontiki\Services\SidebarService;
-use jidaikobo\kontiki\Services\FormService;
-use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\CsrfManager;
-use jidaikobo\kontiki\Utils\FlashManager;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Models\ModelInterface;
+use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Services\FormService;
+use Jidaikobo\Kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\CsrfManager;
+use Jidaikobo\Kontiki\Utils\FlashManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -92,7 +92,7 @@ abstract class BaseController
     private static function resolveRouteClass(string $trait): string
     {
         $traitName = (new \ReflectionClass($trait))->getShortName();
-        return "jidaikobo\\kontiki\\Controllers\\Routes\\" . str_replace('Trait', 'Routes', $traitName);
+        return "Jidaikobo\\Kontiki\\Controllers\\Routes\\" . str_replace('Trait', 'Routes', $traitName);
     }
 
     /**

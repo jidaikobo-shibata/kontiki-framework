@@ -1,9 +1,9 @@
 <?php
 
-namespace jidaikobo\kontiki\Utils;
+namespace Jidaikobo\Kontiki\Utils;
 
 use Slim\Views\PhpRenderer;
-use jidaikobo\kontiki\Models\BaseModel;
+use Jidaikobo\Kontiki\Models\BaseModel;
 
 class TableRenderer
 {

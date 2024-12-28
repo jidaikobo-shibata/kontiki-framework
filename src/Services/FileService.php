@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Services;
+namespace Jidaikobo\Kontiki\Services;
 
 /**
  * Class for handling file uploads and deletions.

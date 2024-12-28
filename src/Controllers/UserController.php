@@ -1,10 +1,10 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\UserModel;
-use jidaikobo\kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Services\SidebarService;
 use Slim\Views\PhpRenderer;
 
 class UserController extends BaseController

@@ -12,6 +12,6 @@ if (!function_exists('__')) {
      */
     function __(string $key, string $default = '', array $replace = []): string
     {
-        return \jidaikobo\kontiki\Utils\Lang::get($key, $default, $replace);
+        return \Jidaikobo\Kontiki\Utils\Lang::get($key, $default, $replace);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Services;
+namespace Jidaikobo\Kontiki\Services;
 
 use Slim\Routing\RouteCollector;
 use Slim\Routing\RouteParser;

@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Database;
+namespace Jidaikobo\Kontiki\Database;
 
 use PDO;
 use PDOException;

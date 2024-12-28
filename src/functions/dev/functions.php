@@ -9,6 +9,6 @@ if (!function_exists('jlog')) {
      */
     function jlog($messages)
     {
-        \jidaikobo\Log::write($messages);
+        \Jidaikobo\Log::write($messages);
     }
 }

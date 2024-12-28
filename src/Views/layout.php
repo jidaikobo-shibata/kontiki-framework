@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= \jidaikobo\kontiki\Utils\Env::get('LANG') ?>">
+<html lang="<?= \Jidaikobo\Kontiki\Utils\Env::get('LANG') ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +16,8 @@
 
   <!-- Scripts -->
 <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
-  <script src="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManager.js"></script>
-  <script src="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManagerInstance.js"></script>
+  <script src="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManager.js"></script>
+  <script src="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManagerInstance.js"></script>
 <?php endif; ?>
 
   <title><?= htmlspecialchars($pageTitle) ?></title>
@@ -30,7 +30,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= \jidaikobo\kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
+    <a href="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->
@@ -55,7 +55,7 @@
 
   <!-- .main-footer -->
   <footer class="main-footer">
-    <?= \jidaikobo\kontiki\Utils\Env::get('COPYRIGHT') ?>
+    <?= \Jidaikobo\Kontiki\Utils\Env::get('COPYRIGHT') ?>
   </footer><!-- /.main-footer -->
 </div>
 </body>

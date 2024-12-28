@@ -1,9 +1,9 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
-use jidaikobo\kontiki\Middleware\AuthMiddleware;
-use jidaikobo\kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Services\SidebarService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

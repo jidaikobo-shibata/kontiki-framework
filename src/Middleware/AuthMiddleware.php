@@ -1,9 +1,9 @@
 <?php
 
-namespace jidaikobo\kontiki\Middleware;
+namespace Jidaikobo\Kontiki\Middleware;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\Env;
 use jidaikobo\Log;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

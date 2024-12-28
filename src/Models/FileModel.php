@@ -1,6 +1,6 @@
 <?php
 
-namespace jidaikobo\kontiki\Models;
+namespace Jidaikobo\Kontiki\Models;
 
 class FileModel extends BaseModel
 {

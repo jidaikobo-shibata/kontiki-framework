@@ -1,13 +1,13 @@
 <?php
 
-namespace jidaikobo\kontiki\Services;
+namespace Jidaikobo\Kontiki\Services;
 
-use jidaikobo\kontiki\Models\ModelInterface;
-use jidaikobo\kontiki\Utils\Env;
-use jidaikobo\kontiki\Utils\FormRenderer;
-use jidaikobo\kontiki\Utils\FormHandler;
-use jidaikobo\kontiki\Utils\FlashManager;
-use jidaikobo\kontiki\Utils\CsrfManager;
+use Jidaikobo\Kontiki\Models\ModelInterface;
+use Jidaikobo\Kontiki\Utils\Env;
+use Jidaikobo\Kontiki\Utils\FormRenderer;
+use Jidaikobo\Kontiki\Utils\FormHandler;
+use Jidaikobo\Kontiki\Utils\FlashManager;
+use Jidaikobo\Kontiki\Utils\CsrfManager;
 use Slim\Views\PhpRenderer;
 
 /**

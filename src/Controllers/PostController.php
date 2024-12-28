@@ -1,10 +1,10 @@
 <?php
 
-namespace jidaikobo\kontiki\Controllers;
+namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use jidaikobo\kontiki\Models\PostModel;
-use jidaikobo\kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Models\PostModel;
+use Jidaikobo\Kontiki\Services\SidebarService;
 use Slim\Views\PhpRenderer;
 
 class PostController extends BaseController
