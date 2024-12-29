@@ -3,17 +3,19 @@
 namespace Jidaikobo\Kontiki\Utils;
 
 use Slim\Views\PhpRenderer;
+use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Models\BaseModel;
 
 class TableRenderer
 {
-    protected $model;
     protected $fields;
     protected $data;
     protected $view;
+    protected $table;
     protected $context; // Context: "normal" or "trash"
+    protected $deleteType; // Context: "hardDelete" or "softDelete"
 
-    public function __construct(BaseModel $model, array $data, PhpRenderer $view, string $context = 'normal')
+    public function __construct(BaseModel $model, array $data, PhpRenderer $view, string $context = 'normal', string $deleteType = 'hardDelete', string $table = '')
     {
         // Automatically retrieve field definitions and display fields from the model
         $fieldDefinitions = $model->getFieldDefinitions();
@@ -24,9 +26,10 @@ class TableRenderer
             return in_array($key, $displayFields, true);
         }, ARRAY_FILTER_USE_KEY);
 
-        $this->model = $model;
         $this->data = $data;
         $this->view = $view;
+        $this->table = $table;
+        $this->deleteType = $deleteType;
         $this->context = $context;
     }
 
@@ -34,7 +37,7 @@ class TableRenderer
     {
         $headers = $this->renderHeaders();
         $rows = array_map(function ($row) {
-            return $this->renderRow($row, $this->model);
+            return $this->renderRow($row);
         }, $this->data);
 
         return $this->view->fetch('tables/table.php', [
@@ -54,7 +57,7 @@ class TableRenderer
         return $headerHtml;
     }
 
-    protected function renderRow(array $row, BaseModel $model): string
+    protected function renderRow(array $row): string
     {
         $cellsHtml = '';
         foreach ($this->fields as $name => $config) {
@@ -63,32 +66,33 @@ class TableRenderer
         }
 
         // Render the actions column
-        $cellsHtml .= $this->renderActions($row, $model);
+        $cellsHtml .= $this->renderActions($row);
 
         return sprintf('<tr>%s</tr>', $cellsHtml);
     }
 
-    protected function renderActions(array $row, BaseModel $model): string
+    protected function renderActions(array $row): string
     {
-        $actions = $model->getActions($this->context);
         $id = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
 
+        $uri = Env::get('BASEPATH') . "/admin/{$this->table}/%s/%s";
+        $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
+        $actions = [
+            'edit' => sprintf($tpl, 'edit', $id, 'primary', __('edit')),
+            'delete' => sprintf($tpl, 'delete', $id, 'danger', __('delete')),
+            'trash' => sprintf($tpl, 'trash', $id, 'warning', __('trash')),
+            'restore' => sprintf($tpl, 'restore', $id, 'success', __('restore')),
+        ];
+
         $html = '';
-        foreach ($actions as $action) {
-            switch ($action) {
-                case 'edit':
-                    $html .= sprintf('<a href="./edit/%s" class="btn btn-primary btn-sm">' . __('edit') . '</a> ', $id);
-                    break;
-                case 'delete':
-                    $html .= sprintf('<a href="./delete/%s" class="btn btn-danger btn-sm">' . __('delete') . '</a> ', $id);
-                    break;
-                case 'moveToTrash':
-                    $html .= sprintf('<a href="./trash/%s" class="btn btn-warning btn-sm">' . __('trash') . '</a> ', $id);
-                    break;
-                case 'restore':
-                    $html .= sprintf('<a href="./restore/%s" class="btn btn-success btn-sm">' . __('restore') . '</a> ', $id);
-                    break;
-            }
+        if ($this->context == 'normal' && $this->deleteType == 'softDelete') {
+            $html .= $actions['edit'] . $actions['trash'];
+        } elseif ($this->context == 'normal' && $this->deleteType == 'hardDelete') {
+            $html .= $actions['edit'] . $actions['delete'];
+        } elseif ($this->context == 'trash') {
+            $html .= $actions['restore'] . $actions['delete'];
+        } else {
+            $html .= $actions['edit'];
         }
 
         return sprintf('<td class="text-nowrap">%s</td>', $html);

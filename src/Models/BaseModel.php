@@ -26,26 +26,6 @@ abstract class BaseModel implements ModelInterface
         $this->validationService = $validationService;
     }
 
-    // 削除タイプを取得（Hard DeleteまたはSoft Delete）
-    public function getDeleteType(): string
-    {
-        return 'hard';
-    }
-
-    // アクション定義を取得
-    public function getActions(string $context): array
-    {
-        if ($this->getDeleteType() === 'hard') {
-            return ['edit', 'delete'];
-        }
-
-        if ($context === 'trash') {
-            return ['restore', 'delete'];
-        }
-
-        return ['edit', 'trash'];
-    }
-
     public function getTableName(): string
     {
         return $this->table;
@@ -177,12 +157,69 @@ abstract class BaseModel implements ModelInterface
         return $this->db->update($this->table, $id, $data);
     }
 
+    public function trash($id)
+    {
+        $data = $this->getById($id);
+        if (!$data) {
+            return false;
+        }
+        $data['deleted_at'] = date('Y-m-d H:i:s');
+        return $this->db->update($this->table, $id, $data);
+    }
+
+    public function restore($id)
+    {
+        $data = $this->getById($id);
+        if (!$data) {
+            return false;
+        }
+        $data['deleted_at'] = null;
+        return $this->db->update($this->table, $id, $data);
+    }
+
     public function delete(int $id): bool
     {
         if (!$this->getById($id)) {
             return false;
         }
         return $this->db->delete($this->table, $id);
+    }
+
+    public function getAdditionalConditions(string $context = 'normal', string $deleteType = 'hardDelete', array $options = []): array
+    {
+        $additionalConditions = [];
+
+        // conditions by context
+        if ($context === 'normal' && $deleteType === 'softDelete') {
+            // 通常記事（削除されておらず、公開中かつ有効期限内）
+            $additionalConditions['deleted_at'] = null;
+            $additionalConditions['published_at'] = ['operator' => '<=', 'value' => date('Y-m-d H:i:s')];
+            $additionalConditions['expired_at'] = [
+                'condition' => '(expired_at IS NULL OR expired_at > :current_time)',
+                'params' => [':current_time' => date('Y-m-d H:i:s')],
+            ];
+        } elseif ($context === 'trash') {
+            // trash
+            $additionalConditions['deleted_at'] = 'NOT NULL';
+        } elseif ($context === 'reserved') {
+            // 予約記事（削除されておらず、公開予定）
+            $additionalConditions['deleted_at'] = null;
+            $additionalConditions['published_at'] = ['operator' => '>', 'value' => date('Y-m-d H:i:s')];
+        } elseif ($context === 'expired') {
+            // 期限切れ記事
+            $additionalConditions['deleted_at'] = null;
+            $additionalConditions['expired_at'] = ['operator' => '<=', 'value' => date('Y-m-d H:i:s')];
+        }
+
+        // 単記事取得用の条件
+        if (!empty($options['id'])) {
+            $additionalConditions['id'] = $options['id'];
+        }
+        if (!empty($options['slug'])) {
+            $additionalConditions['slug'] = $options['slug'];
+        }
+
+        return $additionalConditions;
     }
 
     /**
@@ -201,80 +238,65 @@ abstract class BaseModel implements ModelInterface
         return $searchableColumns;
     }
 
-    public function countByKeyword(string $keyword): int
-    {
-        $conditions = $this->buildSearchConditions($keyword);
-        return $this->db->countAll($this->table, $conditions['where'], $conditions['params']);
-    }
-
-    /**
-     * Build search conditions and parameters for SQL queries.
-     *
-     * @param string $keyword Search keyword for filtering.
-     * @param array $customSearchableColumns Optional custom searchable columns.
-     * @return array An associative array with 'where' (SQL WHERE clause) and 'params' (parameters).
-     */
-    public function buildSearchConditions(string $keyword = '', array $customSearchableColumns = []): array
-    {
-        // 検索対象のカラムを取得
-        $searchableColumns = !empty($customSearchableColumns)
-            ? $customSearchableColumns
-            : $this->getSearchableColumns();
-
-        $whereClause = '';
+    public function buildSearchConditions(
+        string $keyword = '',
+        array $customSearchableColumns = [],
+        array $additionalConditions = []
+    ): array {
+        $whereClauses = [];
         $params = [];
 
-        if (!empty($keyword) && !empty($searchableColumns)) {
-            $conditions = [];
-            foreach ($searchableColumns as $column) {
-                $conditions[] = "{$column} LIKE :keyword";
-            }
-            $whereClause = " WHERE " . implode(' OR ', $conditions);
+        // キーワード条件
+        if (!empty($keyword)) {
+            $searchableColumns = $customSearchableColumns ?: $this->getSearchableColumns();
+            $keywordConditions = array_map(fn($col) => "{$col} LIKE :keyword", $searchableColumns);
+            $whereClauses[] = '(' . implode(' OR ', $keywordConditions) . ')';
             $params[':keyword'] = "%{$keyword}%";
         }
 
-        return ['where' => $whereClause, 'params' => $params];
+        // 追加条件
+        foreach ($additionalConditions as $field => $value) {
+            if (is_array($value) && isset($value['condition'], $value['params'])) {
+                // 複合条件
+                $whereClauses[] = $value['condition'];
+                $params = array_merge($params, $value['params']);
+            } else if (is_string($field)) {
+                // 単一フィールド条件
+                if (is_null($value)) {
+                    $whereClauses[] = "{$field} IS NULL";
+                } elseif (is_array($value) && isset($value['operator'], $value['value'])) {
+                    // 条件が配列形式（例: ['operator' => '>=', 'value' => '2024-12-29']）
+                    $whereClauses[] = "{$field} {$value['operator']} :{$field}";
+                    $params[":{$field}"] = $value['value'];
+                } elseif (is_string($value) && strtoupper($value) === 'NOT NULL') {
+                    // 特殊条件 'NOT NULL'
+                    $whereClauses[] = "{$field} IS NOT NULL";
+                } elseif (is_string($value) && strtoupper($value) === 'NULL') {
+                    // 特殊条件 'NULL'
+                    $whereClauses[] = "{$field} IS NULL";
+                } else {
+                    // 通常の '=' 条件
+                    $whereClauses[] = "{$field} = :{$field}";
+                    $params[":{$field}"] = $value;
+                }
+            }
+        }
+
+        // WHERE句の構築
+        $where = $whereClauses ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
+
+        return ['where' => $where, 'params' => $params];
     }
 
-    /**
-     * Get paginated data with optional keyword filtering and ordering.
-     *
-     * @param string $keyword Search keyword.
-     * @param int $offset SQL offset.
-     * @param int $limit SQL limit.
-     * @param array $customSearchableColumns Custom searchable columns.
-     * @param string|null $orderBy Column name to order by.
-     * @param string $orderDirection Sorting direction ('ASC' or 'DESC').
-     * @return array Fetched data.
-     */
-    public function search(
-        string $keyword = '',
-        int $offset = 0,
-        int $limit = 10,
-        array $customSearchableColumns = [],
-        ?string $orderBy = null,
-        string $orderDirection = 'ASC'
-    ): array {
-        $searchConditions = $this->buildSearchConditions($keyword, $customSearchableColumns);
+    public function countByConditions(string $where, array $params): int
+    {
+        return $this->db->countAll($this->table, $where, $params);
+    }
 
-        // Validate orderDirection
-        $orderDirection = strtoupper($orderDirection);
-        if (!in_array($orderDirection, ['ASC', 'DESC'], true)) {
-            throw new \InvalidArgumentException('Invalid order direction: must be ASC or DESC');
-        }
-
-        // Build ORDER BY clause if $orderBy is specified
-        $orderClause = '';
-        if ($orderBy) {
-            if (!in_array($orderBy, $this->db->getTableColumns($this->table), true)) {
-                throw new \InvalidArgumentException("Invalid column for ordering: {$orderBy}");
-            }
-            $orderClause = "ORDER BY {$orderBy} {$orderDirection}";
-        }
-
-        // Construct SQL query
-        $query = "SELECT * FROM {$this->table} {$searchConditions['where']} {$orderClause} LIMIT :limit OFFSET :offset";
-        $params = array_merge($searchConditions['params'], [
+    public function searchByConditions(string $where, array $params, int $offset, int $limit): array
+    {
+        $query = "SELECT * FROM {$this->table} {$where} LIMIT :limit OFFSET :offset";
+        $params = array_merge($params, [
             ':limit' => $limit,
             ':offset' => $offset,
         ]);

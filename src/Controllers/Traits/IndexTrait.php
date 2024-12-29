@@ -11,44 +11,82 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait IndexTrait
 {
-    /**
-     * Register routes for this trait.
-     *
-     * @param App $app
-     * @param string $basePath
-     * @param string $controllerClass
-     */
-    public static function registerRoutesForTrait(App $app, string $basePath, string $controllerClass): void
+    protected string $context;
+    protected string $deleteType;
+
+    public function normalIndex(Request $request, Response $response): Response
     {
-        $app->group($basePath, function (RouteCollectorProxy $group) use ($controllerClass) {
-            $group->get('/index', [$controllerClass, 'index'])->setName("{$basePath}_index");
-        });
+        $this->context = 'normal';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
+    }
+
+    public function trashIndex(Request $request, Response $response): Response
+    {
+        $this->context = 'trash';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
+    }
+
+    public function reservedIndex(Request $request, Response $response): Response
+    {
+        $this->context = 'reserved';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
+    }
+
+    public function expiredIndex(Request $request, Response $response): Response
+    {
+        $this->context = 'expired';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
+    }
+
+    protected function isUsesTrashRestoreTrait(): void
+    {
+        $usesTrashRestoreTrait = in_array(
+            TrashRestoreTrait::class,
+            class_uses($this)
+        );
+        $this->deleteType = $usesTrashRestoreTrait ? 'softDelete' : 'hardDelete';
     }
 
     public function index(Request $request, Response $response): Response
     {
-        $error = $this->flashManager->getData('errors', []);
-        $success = $this->flashManager->getData('success', []);
+        $additionalConditions = $this->model->getAdditionalConditions($this->context, $this->deleteType);
 
+        // set pagination
         $currentPage = (int)($request->getQueryParams()['paged'] ?? 1);
         $itemsPerPage = 10;
         $pagination = new Pagination($currentPage, $itemsPerPage);
 
         $keyword = $request->getQueryParams()['s'] ?? '';
-        $totalItems = $this->model->countByKeyword($keyword);
+        $conditions = $this->model->buildSearchConditions($keyword, [], $additionalConditions);
 
+        $totalItems = $this->model->countByConditions($conditions['where'], $conditions['params']);
         $pagination->setTotalItems($totalItems);
 
-        $data = $this->model->search($keyword, $pagination->getOffset(), $pagination->getLimit());
+        // get data
+        $data = $this->model->searchByConditions(
+            $conditions['where'],
+            $conditions['params'],
+            $pagination->getOffset(),
+            $pagination->getLimit()
+        );
 
-        $tableRenderer = new TableRenderer($this->model, $data, $this->view);
+        // render table
+        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context, $this->deleteType, $this->table);
         $content = $tableRenderer->render();
 
+        // set messages
+        $error = $this->flashManager->getData('errors', []);
+        $success = $this->flashManager->getData('success', []);
+
+        // render messages
         $tableHandler = new TableHandler();
         if (!empty($error)) {
             $content = $tableHandler->addErrors($content, $error, $this->model);
         }
-
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }

@@ -33,13 +33,24 @@ return [
     // placeholders
     'x_management' => ':nameの管理',
     'x_index' => ':nameの一覧',
+    'x_index_trash' => ':nameのごみ箱',
+    'x_index_reserved' => ':nameの予約項目',
+    'x_index_expired' => ':nameの期限切れ項目',
     'x_create' => ':nameの作成',
     'x_edit' => ':nameの編集',
     'x_save_success' => ':nameを保存しました',
-    'x_delete' => ':nameの削除',
-    "x_delete_confirm" => "本当に:nameを削除していいですか？",
-    "x_delete_success" => ":nameを削除しました",
-    "x_delete_failed" => ":nameの削除に失敗しました",
+    'x_delete' => ':nameを完全に削除',
+    "x_delete_confirm" => "本当に:nameを完全に削除していいですか？",
+    "x_delete_success" => ":nameを完全に削除しました",
+    "x_delete_failed" => ":nameの完全な削除に失敗しました",
+    'x_trash' => ':nameをごみ箱に',
+    "x_trash_confirm" => "本当に:nameをごみ箱に入れていいですか？",
+    "x_trash_success" => ":nameをごみ箱に入れました",
+    "x_trash_failed" => ":nameをごみ箱に入れることに失敗しました",
+    'x_restore' => ':nameを復元',
+    "x_restore_confirm" => "本当に:nameを復元していいですか？",
+    "x_restore_success" => ":nameを復元しました",
+    "x_restore_failed" => ":nameの復元に失敗しました",
     'error_at_x' => '「:name」にエラーがあります',
 
     // messages
@@ -59,6 +70,7 @@ return [
     'posts' => '記事',
     'slug' => 'スラッグ',
     'published_at' => '公開日時',
+    'expired_at' => '公開終了日時',
     'draft' => '下書き',
 
     // files
