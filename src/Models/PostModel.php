@@ -69,7 +69,11 @@ class PostModel extends BaseModel
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
                 'searchable' => true,
-                'rules' => ['required', ['lengthMin', 3]],
+                'rules' => [
+                  'required',
+                  'slug',
+                  ['lengthMin', 3]
+                ],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
                 'group' => 'main',

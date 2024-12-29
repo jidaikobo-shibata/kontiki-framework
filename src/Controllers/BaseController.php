@@ -113,7 +113,7 @@ abstract class BaseController
     ): ?Response {
         if (!$this->isCsrfTokenValid($data)) {
             $this->flashManager->addErrors([
-                __("csrf_invalid", 'Invalid CSRF token.'),
+                ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],
             ]);
             return $this->redirectResponse($request, $response, $redirectTarget);
         }
@@ -126,7 +126,9 @@ abstract class BaseController
     protected function validateCsrfForJson(array $data, Response $response): ?Response
     {
         if (!$this->isCsrfTokenValid($data)) {
-            $data = ['message' => __('csrf_invalid', 'Invalid CSRF token.')];
+            $this->flashManager->addErrors([
+                ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],
+            ]);
             return $this->jsonResponse($response, $data, 403);
         }
 
