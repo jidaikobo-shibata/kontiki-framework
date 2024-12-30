@@ -6,11 +6,8 @@ build:
     analysis:
       tests:
         override: [php-scrutinizer-run]
-
-tools:
-    php:
-        config:
-            composer: false
+    dependencies:
+        override: true
 
 filter:
   paths: ["src/*"]
