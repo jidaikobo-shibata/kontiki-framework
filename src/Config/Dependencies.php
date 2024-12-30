@@ -2,12 +2,13 @@
 
 namespace Jidaikobo\Kontiki\Config;
 
+use Aura\Session\SessionFactory;
+use Aura\Session\Session;
+use DI\Container;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\SidebarService;
 use Jidaikobo\Kontiki\Utils\Env;
-use Aura\Session\SessionFactory;
-use Aura\Session\Session;
 use Psr\Container\ContainerInterface;
 use PDO;
 use Slim\App;

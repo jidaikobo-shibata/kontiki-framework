@@ -25,7 +25,8 @@ class Bootstrap
         Utils\Env::loadConfigPath(KONTIKI_PROJECT_PATH . "/config/{$env}/");
 
         // Load default language on class load
-        Utils\Lang::setLanguage(Utils\Env::get('LANG'));
+        $language = Utils\Env::get('LANG') ?? 'en';
+        Utils\Lang::setLanguage($language);
 
         // Load Functions
         if ($env === 'development') {
@@ -40,7 +41,8 @@ class Bootstrap
         // Create a Slim application
         $app = AppFactory::create();
         $app->addErrorMiddleware(true, true, true);
-        $app->setBasePath(Utils\Env::get('BASEPATH'));
+        $basePath = Utils\Env::get('BASEPATH') ?? '/';
+        $app->setBasePath($basePath);
 
         // Add a header for security measures
         $app->add(Middleware\SecurityHeadersMiddleware::class);
