@@ -50,7 +50,7 @@ class Dependencies
         // Register PhpRenderer
         $container->set(
             PhpRenderer::class,
-            function (ContainerInterface $container) {
+            function () {
                 return new PhpRenderer(KONTIKI_PROJECT_PATH . '/src/Views');
             }
         );
@@ -58,10 +58,11 @@ class Dependencies
         // Register FileService
         $container->set(
             FileService::class,
-            function (ContainerInterface $container) {
+            function () {
                 $uploadDir = KONTIKI_PROJECT_PATH . Env::get('UPLOADDIR');
-                $allowedTypes = json_decode(Env::get('ALLOWED_MIME_TYPES'), true);
-                $maxSize = Env::get('MAXSIZE');
+                $allowedTypesJson = Env::get('ALLOWED_MIME_TYPES') ?? '[]';
+                $allowedTypes = json_decode($allowedTypesJson, true);
+                $maxSize = Env::get('MAXSIZE') ?? 5000000;
                 return new FileService($uploadDir, $allowedTypes, $maxSize);
             }
         );
@@ -69,7 +70,7 @@ class Dependencies
         // Set up Sidebar
         $container->set(
             SidebarService::class,
-            function ($container) {
+            function () {
                 return new SidebarService(
                     $this->app->getRouteCollector()->getRouteParser(),
                     $this->app->getRouteCollector()
