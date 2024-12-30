@@ -2,8 +2,6 @@ checks:
   php: true
 
 build:
-  dependencies:
-    override: true
   nodes:
     analysis:
       tests:

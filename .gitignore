@@ -1,6 +1,5 @@
 /app/Controllers/TestController.php
 /vendor/
-/composer.lock
 /logs/
 /public/
 /phpcs.xml
