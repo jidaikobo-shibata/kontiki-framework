@@ -8,14 +8,10 @@ use Slim\Factory\AppFactory;
 
 class Bootstrap
 {
-    public static function init()
+    public static function init(string $env = 'production')
     {
         // Set the error log handler
         Log::getInstance()->registerHandlers();
-
-        // Load .env (if .dev exists, it's the development environment)
-        $env = $env ?? 'production';
-        $env = file_exists(dirname(__DIR__) . '/.dev') ? 'development' : $env;
 
         // set project path
         $projectPath = $env === 'development' ? dirname(__DIR__) : dirname(__DIR__, 4);
