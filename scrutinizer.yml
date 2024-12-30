@@ -3,7 +3,7 @@ checks:
 
 build:
   dependencies:
-    commands: []
+    override: true
   nodes:
     analysis:
       tests:
