@@ -72,6 +72,7 @@ return [
     'published_at' => '公開日時',
     'expired_at' => '公開終了日時',
     'draft' => '下書き',
+    'x_index_draft' => ':nameの下書き項目',
 
     // files
     'files' => 'ファイル',

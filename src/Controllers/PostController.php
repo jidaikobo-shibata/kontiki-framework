@@ -15,6 +15,8 @@ use Slim\Views\PhpRenderer;
 class PostController extends BaseController
 {
     use Traits\IndexTrait;
+    use Traits\IndexExpiredTrait;
+    use Traits\IndexReservedTrait;
     use Traits\CreateEditTrait;
     use Traits\TrashRestoreTrait;
     use Traits\DeleteTrait;
@@ -32,11 +34,16 @@ class PostController extends BaseController
     {
         parent::registerRoutes($app, $basePath);
 
-        $controllerClass = static::class;
-
-        $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
-            $group->get('/index/reserved', [$controllerClass, 'reservedIndex'])->setName("{$basePath}_index_reserved");
-            $group->get('/index/expired', [$controllerClass, 'expiredIndex'])->setName("{$basePath}_index_expired");
+        $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($basePath) {
+            $group->get('/index/draft', [PostController::class, 'draftIndex'])->setName("{$basePath}_index_draft");
         })->add(AuthMiddleware::class);
+    }
+
+    public function draftIndex(Request $request, Response $response): Response
+    {
+        // see also PostModel::getAdditionalConditions()
+        $this->context = 'draft';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
     }
 }

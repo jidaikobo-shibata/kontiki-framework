@@ -21,27 +21,6 @@ trait IndexTrait
         return static::index($request, $response);
     }
 
-    public function trashIndex(Request $request, Response $response): Response
-    {
-        $this->context = 'trash';
-        self::isUsesTrashRestoreTrait();
-        return static::index($request, $response);
-    }
-
-    public function reservedIndex(Request $request, Response $response): Response
-    {
-        $this->context = 'reserved';
-        self::isUsesTrashRestoreTrait();
-        return static::index($request, $response);
-    }
-
-    public function expiredIndex(Request $request, Response $response): Response
-    {
-        $this->context = 'expired';
-        self::isUsesTrashRestoreTrait();
-        return static::index($request, $response);
-    }
-
     protected function isUsesTrashRestoreTrait(): void
     {
         $usesTrashRestoreTrait = in_array(
@@ -92,11 +71,18 @@ trait IndexTrait
         }
         $content .= $pagination->render(Env::get('BASEPATH') . "/admin/{$this->table}/index");
 
+        $title = 'x_index';
+        $title .= $this->context === 'normal' ? '' : '_' . $this->context ;
+        $title_placeholder = 'Index of :name';
+        $title_placeholder = $this->context === 'normal'
+          ? $title_placeholder
+          : $this->context . ' ' . $title_placeholder;
+
         return $this->view->render(
             $response,
             'layout.php',
             [
-                'pageTitle' => __("x_index", 'Index of :name', ['name' => __($this->table)]),
+                'pageTitle' => __($title, $title_placeholder, ['name' => __($this->table)]),
                 'content' => $content,
             ]
         );

@@ -140,4 +140,20 @@ class PostModel extends BaseModel
             ],
         ];
     }
+
+    public function getAdditionalConditions(string $context = 'normal', string $deleteType = 'hardDelete', array $options = []): array
+    {
+        // see also PostController::draftIndex()
+        $additionalConditions = parent::getAdditionalConditions($context, $deleteType, $options);
+
+        // conditions by context
+        if ($context === 'normal' && $deleteType === 'softDelete') {
+            $additionalConditions['is_draft'] = 0;
+        } elseif ($context === 'draft') {
+            $additionalConditions['is_draft'] = 1;
+        }
+
+        return $additionalConditions;
+    }
+
 }

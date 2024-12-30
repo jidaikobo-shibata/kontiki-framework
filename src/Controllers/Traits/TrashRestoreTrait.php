@@ -7,6 +7,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait TrashRestoreTrait
 {
+    public function trashIndex(Request $request, Response $response): Response
+    {
+        $this->context = 'trash';
+        self::isUsesTrashRestoreTrait();
+        return static::index($request, $response);
+    }
+
     public function processFieldForTrashRestore(array $data): array
     {
         foreach ($data as &$field) {
