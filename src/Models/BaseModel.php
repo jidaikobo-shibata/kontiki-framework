@@ -293,9 +293,20 @@ abstract class BaseModel implements ModelInterface
         return $this->db->countAll($this->table, $where, $params);
     }
 
-    public function searchByConditions(string $where, array $params, int $offset, int $limit): array
+    public function searchByConditions(string $where, array $params, int $offset, int $limit, string $orderBy = ''): array
     {
-        $query = "SELECT * FROM {$this->table} {$where} LIMIT :limit OFFSET :offset";
+        // Build the base query
+        $query = "SELECT * FROM {$this->table} {$where}";
+
+        // Add ORDER BY if specified
+        if (!empty($orderBy)) {
+            $query .= " ORDER BY {$orderBy}";
+        }
+
+        // Add LIMIT and OFFSET
+        $query .= " LIMIT :limit OFFSET :offset";
+
+        // Merge parameters
         $params = array_merge($params, [
             ':limit' => $limit,
             ':offset' => $offset,

@@ -248,12 +248,19 @@ class FileController extends BaseController
         $pagination = new Pagination($page, $itemsPerPage);
 
         $keyword = $request->getQueryParams()['s'] ?? '';
-        $totalItems = $this->fileModel->countByKeyword($keyword);
+        $conditions = $this->fileModel->buildSearchConditions($keyword);
+        $totalItems = $this->fileModel->countByConditions($conditions['where'], $conditions['params']);
 
         $pagination->setTotalItems($totalItems);
         $paginationHtml = $pagination->render(Env::get('BASEPATH') . "/admin/filelist");
+        $items = $this->fileModel->searchByConditions(
+            $conditions['where'],
+            $conditions['params'],
+            $pagination->getOffset(),
+            $pagination->getLimit(),
+            'created_at DESC'
+        );
 
-        $items = $this->fileModel->search($keyword, $pagination->getOffset(), $pagination->getLimit(), [], 'created_at', 'DESC');
         $items = $this->processItemsForList($request, $items);
 
         $content = $this->view->fetch(
