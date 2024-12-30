@@ -1,1 +1,2 @@
-<?= $fields_html; ?>
+<?php
+echo $fields_html;
