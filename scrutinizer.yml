@@ -3,7 +3,8 @@ checks:
 
 build:
   environment:
-    php_version: "8.1"
+    php:
+      version: "8.2"
   nodes:
     analysis:
       tests:
