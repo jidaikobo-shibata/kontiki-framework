@@ -2,6 +2,8 @@ checks:
   php: true
 
 build:
+  environment:
+    php_version: "8.1"
   nodes:
     analysis:
       tests:
