@@ -2,20 +2,20 @@
 
 namespace Jidaikobo\Kontiki\Services;
 
+use Illuminate\Database\Connection;
 use Valitron\Validator;
-use Jidaikobo\Kontiki\Database\DatabaseHandler;
 use Jidaikobo\Kontiki\Utils\Env;
 
 class ValidationService
 {
-    protected DatabaseHandler $db;
+    protected Connection $db;
 
     /**
      * ValidationService constructor.
      *
-     * @param DatabaseHandler $db Instance of DatabaseHandler for database operations.
+     * @param Connection $db Instance of Illuminate\Database\Connection
      */
-    public function __construct(DatabaseHandler $db)
+    public function __construct(Connection $db)
     {
         $this->db = $db;
 
@@ -79,17 +79,21 @@ class ValidationService
      * @param string $column The column name to check.
      * @param mixed $value The value to check for uniqueness.
      * @param int|null $excludeId The ID of the record to exclude from the check (used for updates).
+     *
      * @return bool True if the value is unique, false otherwise.
      */
     public function isUnique(string $table, string $column, mixed $value, ?int $excludeId = null): bool
     {
-        $whereClause = "$column = :value" . ($excludeId !== null ? " AND id != :excludeId" : '');
-        $params = ['value' => $value];
+        $query = $this->db->table($table)
+            ->where($column, '=', $value);
+
+        // exclude condition
         if ($excludeId !== null) {
-            $params['excludeId'] = $excludeId;
+            $query->where('id', '!=', $excludeId);
         }
 
-        $count = $this->db->countAll($table, "WHERE $whereClause", $params);
+        // fetch count
+        $count = $query->count();
 
         return $count === 0;
     }

@@ -2,9 +2,9 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
-use Jidaikobo\Kontiki\Database\DatabaseHandler;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Services\ValidationService;
-use Jidaikobo\Kontiki\Utils\Env;
 use Valitron\Validator;
 
 /**
@@ -13,17 +13,23 @@ use Valitron\Validator;
  */
 abstract class BaseModel implements ModelInterface
 {
-    protected DatabaseHandler $db;
+    protected Connection $db;
     protected ValidationService $validationService;
     protected string $table;
+    protected string $deleteType = 'hardDelete';
 
     /**
      * BaseModel constructor.
      */
-    public function __construct(DatabaseHandler $db, ValidationService $validationService)
+    public function __construct(Connection $db, ValidationService $validationService)
     {
         $this->db = $db;
         $this->validationService = $validationService;
+    }
+
+    public function getDeleteType(): string
+    {
+        return $this->deleteType;
     }
 
     public function getTableName(): string
@@ -52,6 +58,22 @@ abstract class BaseModel implements ModelInterface
         }
 
         return $fields;
+    }
+
+    /**
+     * Get searchable fields from the model's properties.
+     *
+     * @return array
+     */
+    protected function getSearchableFields(): array
+    {
+        $searchableColumns = [];
+        foreach ($this->getFieldDefinitions() as $column => $config) {
+            if (isset($config['searchable']) && $config['searchable'] === true) {
+                $searchableColumns[] = $column;
+            }
+        }
+        return $searchableColumns;
     }
 
     /**
@@ -91,13 +113,14 @@ abstract class BaseModel implements ModelInterface
             throw new \InvalidArgumentException('Field name cannot be empty.');
         }
 
-        $query = "SELECT id, {$fieldName} FROM {$this->table}";
-        $results = $this->db->executeQuery($query);
+        $results = $this->db->table($this->table)
+            ->select(['id', $fieldName])
+            ->get();
 
         $options = [];
         foreach ($results as $row) {
-            if (isset($row['id'], $row[$fieldName])) {
-                $options[$row['id']] = $row[$fieldName];
+            if (isset($row->id, $row->$fieldName)) {
+                $options[$row->id] = $row->$fieldName;
             }
         }
 
@@ -112,6 +135,7 @@ abstract class BaseModel implements ModelInterface
      * Filter the given data array to include only allowed fields.
      *
      * @param array $data The data to filter.
+     *
      * @return array The filtered data.
      */
     public function filterAllowedFields(array $data): array
@@ -122,26 +146,35 @@ abstract class BaseModel implements ModelInterface
 
     public function getById(int $id): ?array
     {
-        return $this->db->getById($this->table, $id);
+        $result = $this->db->table($this->table)
+            ->where('id', $id)
+            ->first();
+
+        return $result ? (array)$result : null;
     }
 
     public function getByField(string $field, mixed $value): ?array
     {
-        return $this->db->getByField($this->table, $field, $value);
+        $result = $this->db->table($this->table)
+            ->where($field, $value)
+            ->first();
+
+        return $result ? (array)$result : null;
     }
 
     /**
      * Create a new record in the table.
      *
      * @param array $data Key-value pairs of column names and values.
+     *
      * @return int|null The ID of the newly created record, or null if the operation failed.
      * @throws InvalidArgumentException If validation fails.
      */
     public function create(array $data): ?int
     {
         $filteredData = $this->filterAllowedFields($data);
-        $success = $this->db->insert($this->table, $filteredData);
-        return $success ? $this->db->getLastInsertId() : null;
+        $success = $this->db->table($this->table)->insert($filteredData);
+        return $success ? $this->db->getPdo()->lastInsertId() : null;
     }
 
     /**
@@ -149,169 +182,56 @@ abstract class BaseModel implements ModelInterface
      *
      * @param  int   $id   The ID of the record to update.
      * @param  array $data Key-value pairs of column names and values to update.
+     *
      * @return bool True if the record was updated, false otherwise.
      */
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data, bool $skipFieldFilter = false): bool
     {
-        $data = $this->filterAllowedFields($data);
-        return $this->db->update($this->table, $id, $data);
-    }
-
-    public function trash($id)
-    {
-        $data = $this->getById($id);
-        if (!$data) {
-            return false;
+        if (!$skipFieldFilter) {
+            $data = $this->filterAllowedFields($data);
         }
-        $data['deleted_at'] = date('Y-m-d H:i:s');
-        return $this->db->update($this->table, $id, $data);
+        return $this->db->table($this->table)
+            ->where('id', $id)
+            ->update($data);
     }
 
-    public function restore($id)
-    {
-        $data = $this->getById($id);
-        if (!$data) {
-            return false;
-        }
-        $data['deleted_at'] = null;
-        return $this->db->update($this->table, $id, $data);
-    }
-
+    /**
+     * Delte a record in the table by its ID.
+     *
+     * @param  int   $id   The ID of the record to update.
+     *
+     * @return bool True if the record was updated, false otherwise.
+     */
     public function delete(int $id): bool
     {
         if (!$this->getById($id)) {
             return false;
         }
-        return $this->db->delete($this->table, $id);
+        return (bool)$this->db->table($this->table)
+            ->where('id', $id)
+            ->delete();
     }
 
-    public function getAdditionalConditions(string $context = 'normal', string $deleteType = 'hardDelete', array $options = []): array
+    public function getAdditionalConditions(Builder $query, string $context = 'normal' ): Builder
     {
-        $additionalConditions = [];
-
-        // conditions by context
-        if ($context === 'normal' && $deleteType === 'softDelete') {
-            // 通常記事（削除されておらず、公開中かつ有効期限内）
-            $additionalConditions['deleted_at'] = null;
-            $additionalConditions['published_at'] = ['operator' => '<=', 'value' => date('Y-m-d H:i:s')];
-            $additionalConditions['expired_at'] = [
-                'condition' => '(expired_at IS NULL OR expired_at > :current_time)',
-                'params' => [':current_time' => date('Y-m-d H:i:s')],
-            ];
-        } elseif ($context === 'trash') {
-            // trash
-            $additionalConditions['deleted_at'] = 'NOT NULL';
-        } elseif ($context === 'reserved') {
-            // 予約記事（削除されておらず、公開予定）
-            $additionalConditions['deleted_at'] = null;
-            $additionalConditions['published_at'] = ['operator' => '>', 'value' => date('Y-m-d H:i:s')];
-        } elseif ($context === 'expired') {
-            // 期限切れ記事
-            $additionalConditions['deleted_at'] = null;
-            $additionalConditions['expired_at'] = ['operator' => '<=', 'value' => date('Y-m-d H:i:s')];
-        }
-
-        // 単記事取得用の条件
-        if (!empty($options['id'])) {
-            $additionalConditions['id'] = $options['id'];
-        }
-        if (!empty($options['slug'])) {
-            $additionalConditions['slug'] = $options['slug'];
-        }
-
-        return $additionalConditions;
+        return $query;
     }
 
-    /**
-     * Get searchable columns from the model's properties.
-     *
-     * @return array
-     */
-    protected function getSearchableColumns(): array
+    public function buildSearchConditions(string $keyword = ''): Builder
     {
-        $searchableColumns = [];
-        foreach ($this->getFieldDefinitions() as $column => $config) {
-            if (isset($config['searchable']) && $config['searchable'] === true) {
-                $searchableColumns[] = $column;
-            }
-        }
-        return $searchableColumns;
-    }
-
-    public function buildSearchConditions(
-        string $keyword = '',
-        array $customSearchableColumns = [],
-        array $additionalConditions = []
-    ): array {
-        $whereClauses = [];
-        $params = [];
+        $query = $this->db->table($this->table);
 
         // キーワード条件
         if (!empty($keyword)) {
-            $searchableColumns = $customSearchableColumns ?: $this->getSearchableColumns();
-            $keywordConditions = array_map(fn($col) => "{$col} LIKE :keyword", $searchableColumns);
-            $whereClauses[] = '(' . implode(' OR ', $keywordConditions) . ')';
-            $params[':keyword'] = "%{$keyword}%";
-        }
+            $searchableColumns = $this->getSearchableFields();
 
-        // 追加条件
-        foreach ($additionalConditions as $field => $value) {
-            if (is_array($value) && isset($value['condition'], $value['params'])) {
-                // 複合条件
-                $whereClauses[] = $value['condition'];
-                $params = array_merge($params, $value['params']);
-            } else if (is_string($field)) {
-                // 単一フィールド条件
-                if (is_null($value)) {
-                    $whereClauses[] = "{$field} IS NULL";
-                } elseif (is_array($value) && isset($value['operator'], $value['value'])) {
-                    // 条件が配列形式（例: ['operator' => '>=', 'value' => '2024-12-29']）
-                    $whereClauses[] = "{$field} {$value['operator']} :{$field}";
-                    $params[":{$field}"] = $value['value'];
-                } elseif (is_string($value) && strtoupper($value) === 'NOT NULL') {
-                    // 特殊条件 'NOT NULL'
-                    $whereClauses[] = "{$field} IS NOT NULL";
-                } elseif (is_string($value) && strtoupper($value) === 'NULL') {
-                    // 特殊条件 'NULL'
-                    $whereClauses[] = "{$field} IS NULL";
-                } else {
-                    // 通常の '=' 条件
-                    $whereClauses[] = "{$field} = :{$field}";
-                    $params[":{$field}"] = $value;
+            $query->where(function ($q) use ($keyword, $searchableColumns) {
+                foreach ($searchableColumns as $column) {
+                    $q->orWhere($column, 'LIKE', "%{$keyword}%");
                 }
-            }
+            });
         }
 
-        // WHERE句の構築
-        $where = $whereClauses ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
-
-        return ['where' => $where, 'params' => $params];
-    }
-
-    public function countByConditions(string $where, array $params): int
-    {
-        return $this->db->countAll($this->table, $where, $params);
-    }
-
-    public function searchByConditions(string $where, array $params, int $offset, int $limit, string $orderBy = ''): array
-    {
-        // Build the base query
-        $query = "SELECT * FROM {$this->table} {$where}";
-
-        // Add ORDER BY if specified
-        if (!empty($orderBy)) {
-            $query .= " ORDER BY {$orderBy}";
-        }
-
-        // Add LIMIT and OFFSET
-        $query .= " LIMIT :limit OFFSET :offset";
-
-        // Merge parameters
-        $params = array_merge($params, [
-            ':limit' => $limit,
-            ':offset' => $offset,
-        ]);
-
-        return $this->db->executeQuery($query, $params);
+        return $query;
     }
 }

@@ -4,13 +4,14 @@ namespace Jidaikobo\Kontiki\Config;
 
 use Aura\Session\SessionFactory;
 use Aura\Session\Session;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 use DI\Container;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\SidebarService;
 use Jidaikobo\Kontiki\Utils\Env;
 use Psr\Container\ContainerInterface;
-use PDO;
 use Slim\App;
 use Slim\Views\PhpRenderer;
 
@@ -27,14 +28,30 @@ class Dependencies
     {
         $container = $this->app->getContainer();
 
-        // Set up a PDO instance
+        // Set up a CakePHP Connection instance
         $container->set(
-            PDO::class,
+            Capsule::class,
             function () {
-                $pdo = new PDO('sqlite:' . KONTIKI_PROJECT_PATH . '/' . Env::get('DB_DATABASE'));
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-                return $pdo;
+                $capsule = new Capsule();
+
+                $capsule->addConnection([
+                    'driver' => 'sqlite',
+                    'database' => KONTIKI_PROJECT_PATH . '/' . Env::get('DB_DATABASE'),
+                    'charset' => 'utf8',
+                    'collation' => 'utf8_unicode_ci',
+                    'prefix' => '',
+                ]);
+
+                // Global access for Eloquent or Query Builder
+                $capsule->setAsGlobal();
+                return $capsule;
+            }
+        );
+
+        $container->set(
+            Connection::class,
+            function (Capsule $capsule) {
+                return $capsule->getConnection();
             }
         );
 

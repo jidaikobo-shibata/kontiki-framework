@@ -5,11 +5,11 @@ namespace Jidaikobo\Kontiki\Controllers\Traits;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-trait IndexReservedTrait
+trait IndexNormalTrait
 {
-    public function reservedIndex(Request $request, Response $response): Response
+    public function normalIndex(Request $request, Response $response): Response
     {
-        $this->context = 'reserved';
+        $this->context = 'normal';
         return static::index($request, $response);
     }
 }

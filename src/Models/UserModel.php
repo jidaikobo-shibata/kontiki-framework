@@ -68,7 +68,7 @@ class UserModel extends BaseModel
         return $fieldDefinitions;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data, bool $skipFieldFilter = false): bool
     {
         // Branching password processing
         if (isset($data['password'])) {

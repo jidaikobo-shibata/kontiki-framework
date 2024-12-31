@@ -2,19 +2,25 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
-use Aura\Session\Session;
-use Jidaikobo\Kontiki\Database\DatabaseHandler;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
+use Jidaikobo\Kontiki\Services\AuthService;
 use Jidaikobo\Kontiki\Services\ValidationService;
 
 class PostModel extends BaseModel
 {
-    protected string $table = 'posts';
-    private Session $session;
+    use Traits\SoftDeleteTrait;
+    use Traits\PublishedTrait;
+    use Traits\ExpiredTrait;
 
-    public function __construct(DatabaseHandler $db, ValidationService $validationService, Session $session)
+    protected string $table = 'posts';
+    protected string $deleteType = 'softDelete';
+    private AuthService $authService;
+
+    public function __construct(Connection $db, ValidationService $validationService, AuthService $authService)
     {
         parent::__construct($db, $validationService);
-        $this->session = $session;
+        $this->authService = $authService;
     }
 
     public function getDisplayFields(): array
@@ -25,8 +31,8 @@ class PostModel extends BaseModel
     public function getFieldDefinitions(array $params = []): array
     {
         $userModel = new UserModel($this->db, $this->validationService);
-        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-        $user = $segment->get('user');
+        $userOptions = $userModel->getOptions('username');
+        $user = $this->authService->getCurrentUser();
 
         return [
             'id' => [
@@ -123,7 +129,7 @@ class PostModel extends BaseModel
             'creator_id' => [
                 'label' => __('creator'),
                 'type' => 'select',
-                'options' => $userModel->getOptions('username'),
+                'options' => $userOptions,
                 'attributes' => ['class' => 'form-control form-select'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => $user['id'],
@@ -141,19 +147,36 @@ class PostModel extends BaseModel
         ];
     }
 
-    public function getAdditionalConditions(string $context = 'normal', string $deleteType = 'hardDelete', array $options = []): array
+    public function getAdditionalConditions(Builder $query, string $context = 'normal'): Builder
     {
-        // see also PostController::draftIndex()
-        $additionalConditions = parent::getAdditionalConditions($context, $deleteType, $options);
-
-        // conditions by context
-        if ($context === 'normal' && $deleteType === 'softDelete') {
-            $additionalConditions['is_draft'] = 0;
+        if ($context === 'normal') {
+            $query = $this->applyNotSoftDeletedConditions($query);
+            $query = $this->applyNotExpiredConditions($query);
+            $query = $this->applyPublisedConditions($query);
+            $query = $this->applyNotDraftConditions($query);
+        } elseif ($context === 'trash') {
+            $query = $this->applySoftDeletedConditions($query);
+        } elseif ($context === 'reserved') {
+            $query = $this->applyNotPublisedConditions($query);
+        } elseif ($context === 'expired') {
+            $query = $this->applyExpiredConditions($query);
         } elseif ($context === 'draft') {
-            $additionalConditions['is_draft'] = 1;
+            $query = $this->applyDraftConditions($query);
         }
 
-        return $additionalConditions;
+        // jlog($context);
+        // jlog($query->getBindings());
+
+        return $query;
     }
 
+    private function applyDraftConditions(Builder $query): Builder
+    {
+        return $query->where('is_draft', '=', 1);
+    }
+
+    private function applyNotDraftConditions(Builder $query): Builder
+    {
+        return $query->where('is_draft', '=', 0);
+    }
 }

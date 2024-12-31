@@ -10,7 +10,6 @@ trait IndexExpiredTrait
     public function expiredIndex(Request $request, Response $response): Response
     {
         $this->context = 'expired';
-        self::isUsesTrashRestoreTrait();
         return static::index($request, $response);
     }
 }

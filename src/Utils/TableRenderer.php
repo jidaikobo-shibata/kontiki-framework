@@ -15,11 +15,13 @@ class TableRenderer
     protected $context; // Context: "normal" or "trash"
     protected $deleteType; // Context: "hardDelete" or "softDelete"
 
-    public function __construct(BaseModel $model, array $data, PhpRenderer $view, string $context = 'normal', string $deleteType = 'hardDelete', string $table = '')
+    public function __construct(BaseModel $model, array $data, PhpRenderer $view, string $context = 'normal')
     {
         // Automatically retrieve field definitions and display fields from the model
         $fieldDefinitions = $model->getFieldDefinitions();
         $displayFields = $model->getDisplayFields();
+        $this->deleteType = $model->getDeleteType();
+        $this->table = $model->getTableName();;
 
         // Filter fields based on the display fields defined in the model
         $this->fields = array_filter($fieldDefinitions, function ($key) use ($displayFields) {
@@ -28,8 +30,6 @@ class TableRenderer
 
         $this->data = $data;
         $this->view = $view;
-        $this->table = $table;
-        $this->deleteType = $deleteType;
         $this->context = $context;
     }
 

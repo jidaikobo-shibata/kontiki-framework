@@ -15,6 +15,7 @@ use Slim\Views\PhpRenderer;
 class PostController extends BaseController
 {
     use Traits\IndexTrait;
+    use Traits\IndexNormalTrait;
     use Traits\IndexExpiredTrait;
     use Traits\IndexReservedTrait;
     use Traits\CreateEditTrait;
@@ -43,7 +44,6 @@ class PostController extends BaseController
     {
         // see also PostModel::getAdditionalConditions()
         $this->context = 'draft';
-        self::isUsesTrashRestoreTrait();
         return static::index($request, $response);
     }
 }

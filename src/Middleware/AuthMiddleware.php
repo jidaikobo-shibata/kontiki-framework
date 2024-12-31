@@ -2,9 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Middleware;
 
-use Aura\Session\Session;
-use Jidaikobo\Kontiki\Utils\Env;
-use jidaikobo\Log;
+use Jidaikobo\Kontiki\Services\AuthService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
@@ -13,27 +11,18 @@ use Slim\Views\PhpRenderer;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    private Session $session;
+    private AuthService $authService;
     private PhpRenderer $view;
 
-    public function __construct(Session $session, PhpRenderer $view)
+    public function __construct(AuthService $authService, PhpRenderer $view)
     {
-        $this->session = $session;
+        $this->authService = $authService;
         $this->view = $view;
     }
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        // セッションからユーザー情報を取得
-        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-        $user = $segment->get('user');
-
-        // 未ログインの場合は 404 ページを表示（詳細なエラーは返さない）
-        if (!$user) {
-            if (Env::get('APP_ENV') === 'development') {
-                Log::write('Unauthenticated user tried to access a restricted area.');
-            }
-
+        if (!$this->authService->isLoggedIn()) {
             $response = new \Slim\Psr7\Response();
             $content = $this->view->fetch('error/404.php');
             return $this->view->render(

@@ -10,7 +10,6 @@ trait TrashRestoreTrait
     public function trashIndex(Request $request, Response $response): Response
     {
         $this->context = 'trash';
-        self::isUsesTrashRestoreTrait();
         return static::index($request, $response);
     }
 

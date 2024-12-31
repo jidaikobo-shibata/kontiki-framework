@@ -106,11 +106,13 @@ abstract class BaseController
      * @return Response|null Returns a redirect response if invalid, or null if valid.
      */
     protected function validateCsrfToken(
-        array $data,
+        ?array $data,
         Request $request,
         Response $response,
         string $redirectTarget
     ): ?Response {
+        $data = $data ?? [];
+
         if (!$this->isCsrfTokenValid($data)) {
             $this->flashManager->addErrors([
                 ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],
@@ -123,8 +125,10 @@ abstract class BaseController
         return null;
     }
 
-    protected function validateCsrfForJson(array $data, Response $response): ?Response
+    protected function validateCsrfForJson(?array $data, Response $response): ?Response
     {
+        $data = $data ?? [];
+
         if (!$this->isCsrfTokenValid($data)) {
             $this->flashManager->addErrors([
                 ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],

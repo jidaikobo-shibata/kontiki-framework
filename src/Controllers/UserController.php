@@ -10,6 +10,7 @@ use Slim\Views\PhpRenderer;
 class UserController extends BaseController
 {
     use Traits\IndexTrait;
+    use Traits\IndexNormalTrait;
     use Traits\CreateEditTrait;
     use Traits\DeleteTrait;
 
