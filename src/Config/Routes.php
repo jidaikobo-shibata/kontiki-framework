@@ -8,7 +8,7 @@ use Slim\App;
 
 class Routes
 {
-    public function register(App $app, Container $container): void
+    public function register(App $app, Container $_container): void
     {
         Controllers\AuthController::registerRoutes($app);
         Controllers\DashboardController::registerRoutes($app);

@@ -45,7 +45,7 @@ trait IndexTrait
                   ->toArray();
 
         // render table
-        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context, $this->table);
+        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context);
         $content = $tableRenderer->render();
 
         // set messages

@@ -76,7 +76,6 @@ trait TrashRestoreTrait
 
     public function handleTrash(Request $request, Response $response, array $args): Response
     {
-      $data = $request->getParsedBody();
       $id = $args['id'];
       return static::executeTrashRestore($request, $response, $id, 'trash');
     }

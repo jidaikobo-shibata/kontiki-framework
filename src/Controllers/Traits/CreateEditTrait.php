@@ -145,11 +145,12 @@ trait CreateEditTrait
 
         try {
             $id = $this->saveData($actionType, $id, $data);
+            $redirectTo = "/admin/{$this->table}/edit/{$id}";
             $this->flashManager->addMessage(
                 'success',
                 __("x_save_success", ':name Saved successfully.', ['name' => __($this->table)])
             );
-            return $this->redirectResponse($request, $response, $defaultRedirect);
+            return $this->redirectResponse($request, $response, $redirectTo);
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $defaultRedirect);
