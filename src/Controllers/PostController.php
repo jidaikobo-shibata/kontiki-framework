@@ -24,11 +24,11 @@ class PostController extends BaseController
 
     public function __construct(
         PhpRenderer $view,
-        SidebarService $sidebarService,
         Session $session,
-        PostModel $model
+        PostModel $model,
+        SidebarService $sidebarService
     ) {
-        parent::__construct($view, $sidebarService, $session, $model);
+        parent::__construct($view, $session, $model, $sidebarService);
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void

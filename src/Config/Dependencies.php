@@ -68,7 +68,7 @@ class Dependencies
         $container->set(
             PhpRenderer::class,
             function () {
-                return new PhpRenderer(KONTIKI_PROJECT_PATH . '/src/Views');
+                return new PhpRenderer(KONTIKI_PROJECT_PATH . '/src/views');
             }
         );
 

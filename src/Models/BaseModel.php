@@ -5,7 +5,6 @@ namespace Jidaikobo\Kontiki\Models;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Services\ValidationService;
-use Valitron\Validator;
 
 /**
  * BaseModel provides common CRUD operations for database interactions.
@@ -89,12 +88,12 @@ abstract class BaseModel implements ModelInterface
         return $this->validationService->validate($data, $fieldDefinitions);
     }
 
-    public function processCreateFieldDefinitions(array $fieldDefinitions): array
+    public function processFieldDefinitionsForCreate(array $fieldDefinitions): array
     {
         return $fieldDefinitions;
     }
 
-    public function processEditFieldDefinitions(array $fieldDefinitions): array
+    public function processFieldDefinitionsForEdit(array $fieldDefinitions): array
     {
         return $fieldDefinitions;
     }
@@ -194,6 +193,12 @@ abstract class BaseModel implements ModelInterface
             ->where('id', $id)
             ->update($data);
     }
+/*
+$skipFieldFilterでなくコールバック関数を渡すのがいいのでは？
+createも
+UserModelで
+*/
+
 
     /**
      * Delte a record in the table by its ID.

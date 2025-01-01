@@ -7,17 +7,23 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait CreateEditTrait
 {
-    public function prepareCreateEditData(array $default = []): array
+    public function prepareDataForRenderForm(array $default = []): array
     {
         return $this->flashManager->getData('data', $default);
     }
 
-    public function create(Request $request, Response $response): Response
+    public function processDataForRenderForm(string $actionType, array $data): array
     {
-        $data = $this->prepareCreateEditData([]);
+        return $data;
+    }
+
+    public function renderCreateForm(Request $request, Response $response): Response
+    {
+        $data = $this->prepareDataForRenderForm();
+        $data = $this->processDataForRenderForm('create', $data);
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processCreateFieldDefinitions($fields);
+        $fields = $this->model->processFieldDefinitionsForCreate($fields);
 
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/create",
@@ -34,17 +40,18 @@ trait CreateEditTrait
         );
     }
 
-    public function edit(Request $request, Response $response, array $args): Response
+    public function renderEditForm(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
-        $data = $this->prepareCreateEditData($this->model->getById($id));
+        $data = $this->prepareDataForRenderForm($this->model->getById($id));
+        $data = $this->processDataForRenderForm('edit', $data);
 
         if (!$data) {
             return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
         }
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processEditFieldDefinitions($fields);
+        $fields = $this->model->processFieldDefinitionsForEdit($fields);
 
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/edit/{$id}",
@@ -72,14 +79,55 @@ trait CreateEditTrait
         return $this->handleSave($request, $response, 'edit', $id);
     }
 
+    public function processDataForSave(string $actionType, array $data): array
+    {
+        return $data;
+    }
+
+    protected function getDefaultRedirect(string $actionType, ?int $id = null): string
+    {
+        return $actionType === 'create'
+            ? "/admin/{$this->table}/create"
+            : "/admin/{$this->table}/edit/{$id}";
+    }
+
+    protected function getFieldDefinitionsForAction(string $actionType, ?int $id = null): array
+    {
+        $fields = $actionType === 'create'
+            ? $this->model->getFieldDefinitions()
+            : $this->model->getFieldDefinitions(['id' => $id]);
+
+        return $actionType === 'create'
+            ? $this->model->processFieldDefinitionsForCreate($fields)
+            : $this->model->processFieldDefinitionsForEdit($fields);
+    }
+
+    protected function saveData(string $actionType, ?int $id, array $data): int
+    {
+        $data = $this->processDataForSave($actionType, $data);
+
+        if ($actionType === 'create') {
+            $newId = $this->model->create($data);
+            if ($newId === null) {
+                throw new \RuntimeException('Failed to create record. No ID returned.');
+            }
+            return $newId;
+        }
+
+        if ($actionType === 'edit' && $id !== null) {
+            $this->model->update($id, $data);
+            return $id;
+        }
+
+        throw new \InvalidArgumentException('Invalid action type or missing ID.');
+    }
+
     protected function handleSave(Request $request, Response $response, string $actionType, ?int $id = null): Response
     {
         $data = $request->getParsedBody();
         $this->flashManager->setData('data', $data);
 
-        $defaultRedirect = $actionType === 'create'
-            ? "/admin/{$this->table}/create"
-            : "/admin/{$this->table}/edit/{$id}";
+        $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
 
         // validate csrf token
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $defaultRedirect);
@@ -88,12 +136,7 @@ trait CreateEditTrait
         }
 
         // field definition
-        $fields = $actionType === 'create'
-            ? $this->model->getFieldDefinitions()
-            : $this->model->getFieldDefinitions(['id' => $id]);
-        $fields = $actionType === 'create'
-            ? $this->model->processCreateFieldDefinitions($fields)
-            : $this->model->processEditFieldDefinitions($fields);
+        $fields = $this->getFieldDefinitionsForAction($actionType, $id);
 
         // Validate post data
         $validationResult = $this->model->validateByFields($data, $fields);
@@ -103,20 +146,11 @@ trait CreateEditTrait
         }
 
         try {
-            if ($actionType === 'create') {
-                $id = $this->model->create($data);
-                if ($id === null) {
-                    throw new \RuntimeException('Failed to create record. No ID returned.');
-                }
-            } elseif ($actionType === 'edit' && $id !== null) {
-                $this->model->update($id, $data);
-            }
-
+            $id = $this->saveData($actionType, $id, $data);
             $this->flashManager->addMessage(
                 'success',
                 __("x_save_success", ':name Saved successfully.', ['name' => __($this->table)])
             );
-
             return $this->redirectResponse($request, $response, $defaultRedirect);
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);

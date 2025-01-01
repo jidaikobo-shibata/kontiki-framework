@@ -4,31 +4,34 @@ namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Services\FormService;
+use Jidaikobo\Kontiki\Services\AuthService;
+use Jidaikobo\Kontiki\Utils\CsrfManager;
+use Jidaikobo\Kontiki\Utils\FlashManager;
 use Jidaikobo\Kontiki\Utils\FormHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
-use Slim\Routing\RouteContext;
 use Slim\Views\PhpRenderer;
 use Valitron\Validator;
 
-class AuthController
+class AuthController extends BaseController
 {
-    private Session $session;
-    private PhpRenderer $view;
-    private UserModel $userModel;
+    private AuthService $authService;
 
-    public function __construct(Session $session, PhpRenderer $view, UserModel $userModel)
-    {
-        $this->session = $session;
-        $this->view = $view;
-        $this->userModel = $userModel;
+    public function __construct(
+        PhpRenderer $view,
+        Session $session,
+        UserModel $userModel,
+        AuthService $authService
+    ) {
+        parent::__construct($view, $session, $userModel);
+        $this->authService = $authService;
     }
 
-    public static function registerRoutes(App $app): void
+    public static function registerRoutes(App $app, string $basePath = ''): void
     {
-        $app->get('/login', [AuthController::class, 'showLoginForm'])
-            ->setName('login');
+        $app->get('/login',  [AuthController::class, 'showLoginForm'])->setName('login');
         $app->post('/login', [AuthController::class, 'processLogin']);
         $app->get('/logout', [AuthController::class, 'logout']);
     }
@@ -42,40 +45,17 @@ class AuthController
      */
     public function showLoginForm(Request $request, Response $response): Response
     {
-        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-        $error = $segment->get('error', []);
-        $input = $segment->get(
-            'input',
-            [
-                'username' => '',
-                'password' => '',
-            ]
-        );
-        $segment->clear();
+        $data = $this->flashManager->getData('data', ['username' => '']);
 
-        $data = [
-            'input' => $input,
-        ];
-
-        // ログインフォームをレンダリング
         $content = $this->view->fetch('auth/login.php', $data);
+        $content = $this->formService->processFormHtml($content);
 
-        // エラーがある場合にDOMを加工
-        if (!empty($error)) {
-            $formHandler = new FormHandler($content, $this->userModel);
-            $formHandler->addErrors($error);
-            $content = $formHandler->getHtml();
-        }
-
-        return $this->view->render(
+        return $this->renderResponse(
             $response,
-            'layout-simple.php',
-            [
-                'pageTitle' => __('login', 'Login'),
-                'content' => $content
-            ]
+            __('login', 'Login'),
+            $content,
+            'layout-simple.php'
         );
-        ;
     }
 
     /**
@@ -87,51 +67,26 @@ class AuthController
      */
     public function processLogin(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
+        $data = $request->getParsedBody() ?? [];
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
-        $routeContext = RouteContext::fromRequest($request);
 
-        // ログイン検証
-        $user = $this->userModel->getByField('username', $username);
-        $stored_password = $user['password'] ?? null ;
-
-        if ($stored_password !== null && password_verify($password, $stored_password)) {
-            // セッションにユーザー情報を保存
-            $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-            $segment->set('user', $user);
-
-            $dashboardUrl = $routeContext->getRouteParser()->urlFor('dashboard');
-            return $response
-                ->withHeader('Location', $dashboardUrl)
-                ->withStatus(302);
+        // Validate Login
+        if ($this->authService->login($username, $password)) {
+            return $this->redirectResponse($request, $response, 'dashboard');
         }
 
-        // ログイン失敗
-        $segment = $this->session->getSegment('jidaikobo\kontiki\auth');
-        $segment->set('error', [[__('wrong_username_or_password', 'Incorrect username or password')]]);
-        $segment->set(
-            'input',
-            [
-            'username' => $username,
-            'password' => '', // パスワードは再入力を促すため空にする
-            ]
-        );
-
-        $loginUrl = $routeContext->getRouteParser()->urlFor('login');
-        return $response
-            ->withHeader('Location', $loginUrl)
-            ->withStatus(302);
+        // Login Failed
+        $this->flashManager->addErrors([
+            ['messages' => [__('wrong_username_or_password', 'Incorrect username or password')]],
+        ]);
+        $this->flashManager->setData('data', ['username' => $username]); // not keep password
+        return $this->redirectResponse($request, $response, 'login');
     }
 
     public function logout(Request $request, Response $response): Response
     {
         $this->session->destroy();
-
-        $routeContext = RouteContext::fromRequest($request);
-        $loginUrl = $routeContext->getRouteParser()->urlFor('login');
-        return $response
-            ->withHeader('Location', $loginUrl)
-            ->withStatus(302);
+        return $this->redirectResponse($request, $response, 'login');
     }
 }

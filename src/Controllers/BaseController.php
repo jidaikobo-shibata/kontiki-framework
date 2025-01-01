@@ -40,9 +40,9 @@ abstract class BaseController
      */
     public function __construct(
         PhpRenderer $view,
-        SidebarService $sidebarService,
         Session $session,
-        ModelInterface $model
+        ModelInterface $model,
+        ?SidebarService $sidebarService = null
     ) {
         $this->csrfManager = new CsrfManager($session);
         $this->flashManager = new FlashManager($session);
@@ -51,7 +51,9 @@ abstract class BaseController
         $this->table = $this->model->getTableName();
         $this->session = $session;
         $this->view = $view;
-        $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
+        if ($sidebarService) {
+            $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
+        }
     }
 
     /**
@@ -160,14 +162,14 @@ abstract class BaseController
     protected function redirectResponse(Request $request, Response $response, string $target, array $routeData = [], int $status = 302): Response
     {
         if (strpos($target, '/') === 0 || filter_var($target, FILTER_VALIDATE_URL)) {
-            $redirectUrl = $target;
+            $redirectUrl = Env::get('BASEPATH') . $target;
         } else {
             $routeParser = RouteContext::fromRequest($request)->getRouteParser();
             $redirectUrl = $routeParser->urlFor($target, $routeData);
         }
 
         return $response
-            ->withHeader('Location', Env::get('BASEPATH') . $redirectUrl)
+            ->withHeader('Location', $redirectUrl)
             ->withStatus($status);
     }
 

@@ -56,9 +56,10 @@ class UserModel extends BaseModel
         ];
     }
 
-    public function processEditFieldDefinitions(array $fieldDefinitions): array
+    public function processFieldDefinitionsForEdit(array $fieldDefinitions): array
     {
-        // Exclude `required` password rules
+        // Exclude `required` from password's rules
+        // No password specified means no change
         if (isset($fieldDefinitions['password']['rules'])) {
             $fieldDefinitions['password']['rules'] = array_filter(
                 $fieldDefinitions['password']['rules'],
@@ -66,19 +67,5 @@ class UserModel extends BaseModel
             );
         }
         return $fieldDefinitions;
-    }
-
-    public function update(int $id, array $data, bool $skipFieldFilter = false): bool
-    {
-        // Branching password processing
-        if (isset($data['password'])) {
-            if (trim($data['password']) === '') {
-                unset($data['password']);
-            } else {
-                $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
-            }
-        }
-
-        return parent::update($id, $data);
     }
 }
