@@ -204,7 +204,7 @@ class FileController extends BaseController
             $data = $this->fileModel->getById($fileId);
 
             if (!$data) {
-                $mesage = $this->getMessages()['file_not_found'];
+                $message = $this->getMessages()['file_not_found'];
                 return $this->messageResponse($response, $message, 405);
             }
 
@@ -215,10 +215,10 @@ class FileController extends BaseController
             $result = $this->update($data, $fileId);
 
             if ($result['success']) {
-                $mesage = $this->getMessages()['update_success'];
-                return $this->messageResponse($response, $mesage, 200);
+                $message = $this->getMessages()['update_success'];
+                return $this->messageResponse($response, $message, 200);
             } else {
-                $mesage = MessageUtils::errorHtml($result['errors'], $this->fileModel);
+                $message = MessageUtils::errorHtml($result['errors'], $this->fileModel);
                 return $this->messageResponse($response, $message, 405);
             }
         } catch (\Exception $e) {
@@ -332,7 +332,7 @@ class FileController extends BaseController
             $data = $this->fileModel->getById($fileId);
 
             if (!$data) {
-                $mesage = $this->getMessages()['file_not_found'];
+                $message = $this->getMessages()['file_not_found'];
                 return $this->messageResponse($response, $message, 405);
             }
 
@@ -343,7 +343,7 @@ class FileController extends BaseController
                 if (unlink($filePath)) {
                     Log::write("File deleted: " . $filePath);
                 } else {
-                    $mesage = $this->getMessages()['file_delete_failed'];
+                    $message = $this->getMessages()['file_delete_failed'];
                     return $this->messageResponse($response, $message, 500);
                 }
             }
@@ -351,19 +351,19 @@ class FileController extends BaseController
             // Remove the file record from the database
             $deleteSuccess = $this->fileModel->delete($fileId);
             if (!$deleteSuccess) {
-                $mesage = $this->getMessages()['db_update_failed'];
+                $message = $this->getMessages()['db_update_failed'];
                 return $this->messageResponse($response, $message, 500);
             }
 
             // Send a success response back
-            $mesage = $this->getMessages()['file_delete_success'];
+            $message = $this->getMessages()['file_delete_success'];
             return $this->messageResponse($response, $message, 500);
         } catch (\Exception $e) {
             // Log the exception details for debugging
             Log::write('Unexpected error in ajaxHandleFileDelete: ' . $e->getMessage(), 'ERROR');
 
             // Send a generic error response to the user
-            $mesage = $this->getMessages()['unexpected_error'];
+            $message = $this->getMessages()['unexpected_error'];
             return $this->messageResponse($response, $message, 500);
         }
     }
