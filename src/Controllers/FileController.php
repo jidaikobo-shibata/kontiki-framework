@@ -104,7 +104,7 @@ class FileController extends BaseController
      * This method processes the uploaded file, moves it to the specified directory,
      * and returns a JSON response indicating the result of the operation.
      *
-     * @return void
+     * @return Response
      *
      * @throws Exception If there is an issue with moving the uploaded file or invalid request method.
      */
@@ -268,7 +268,7 @@ class FileController extends BaseController
      * This method retrieves a list of files from the model, applies security headers
      * to the response, and then renders a view to display the file list.
      *
-     * @return void
+     * @return Response
      */
     public function filelist(Request $request, Response $response): Response
     {
@@ -313,7 +313,7 @@ class FileController extends BaseController
      * and updates the database to remove the file record.
      * If any of these steps fail, an appropriate error message is returned as a JSON response.
      *
-     * @return void
+     * @return Response
      * @throws ResponseException If there is an error during the deletion process.
      */
     public function handleDelete(Request $request, Response $response): Response
@@ -371,7 +371,7 @@ class FileController extends BaseController
     /**
      * Serve the requested JavaScript file.
      *
-     * @return void
+     * @return Response
      */
     public function serveJs(Request $request, Response $response): Response
     {
@@ -398,7 +398,7 @@ class FileController extends BaseController
     /**
      * Serve the requested JavaScript file.
      *
-     * @return void
+     * @return Response
      */
     public function serveInstanceJs(Request $request, Response $response): Response
     {
