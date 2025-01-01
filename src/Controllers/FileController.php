@@ -19,7 +19,6 @@ use Slim\Views\PhpRenderer;
 
 class FileController extends BaseController
 {
-    protected Session $session;
     protected PhpRenderer $view;
     protected FileModel $fileModel;
     protected FileService $fileService;
@@ -28,7 +27,6 @@ class FileController extends BaseController
     public function __construct(Session $session, PhpRenderer $view, FileModel $fileModel, FileService $fileService)
     {
         $this->csrfManager = new CsrfManager($session);
-        $this->session = $session;
         $this->view = $view;
         $this->fileModel = $fileModel;
         $this->fileService = $fileService;
@@ -77,6 +75,30 @@ class FileController extends BaseController
         return $this->jsonResponse($response, $data);
     }
 
+    protected function messageResponse(Response $response, string $message, int $status): Response
+    {
+        $data = ['message' => $message];
+        return $this->jsonResponse($response, $data, $status);
+    }
+
+    protected function errorResponse(Response $response, string $message, int $status): Response
+    {
+        return $this->messageResponse(
+          $response,
+          MessageUtils::alertHtml($message, 'warning'),
+          $status
+        );
+    }
+
+    protected function successResponse(Response $response, string $message): Response
+    {
+        return $this->messageResponse(
+          $response,
+          MessageUtils::alertHtml($message),
+          200
+        );
+    }
+
     /**
      * Handles file upload via an AJAX request.
      * This method processes the uploaded file, moves it to the specified directory,
@@ -90,63 +112,73 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
-            if ($csrfValidationResponse) {
-                return $csrfValidationResponse;
+            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($errorResponse) {
+                return $errorResponse;
             }
 
             // prepare file
-            $uploadedFiles = $request->getUploadedFiles();
-            $uploadedFile = $uploadedFiles['attachment'] ?? null;
-
-            if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-                $fileInfo = [
-                    'name' => $uploadedFile->getClientFilename(),
-                    'type' => $uploadedFile->getClientMediaType(),
-                    'tmp_name' => $uploadedFile->getStream()->getMetadata('uri'),
-                    'size' => $uploadedFile->getSize(),
-                ];
-
-                // file upload
-                $result = $this->fileService->upload($fileInfo);
-
-                if ($result['success']) {
-                    $data['path'] = $result['path'];
-                    $data['description'] = $request->getParsedBody()['description'];
-
-                    $fields = $this->fileModel->getFieldDefinitions();
-                    $fields = $this->fileModel->processFieldDefinitionsForCreate($fields);
-                    $result = $this->fileModel->validateByFields($data, $fields);
-
-                    if ($result['valid'] !== true) {
-                        $data = ['message' => MessageUtils::errorHtml($result['errors'], $this->fileModel)];
-                        return $this->jsonResponse($response, $data, 405);
-                    }
-
-                    $isDbUpdate = $this->fileModel->create($data);
-
-                    if ($isDbUpdate) {
-                        $data = ['message' => MessageUtils::alertHtml($this->getMessages()['upload_success'])];
-                        return $this->jsonResponse($response, $data);
-                    } else {
-                        $data = ['message' => MessageUtils::alertHtml($this->getMessages()['database_update_failed'], 'error')];
-                        return $this->jsonResponse($response, $data, 500);
-                    }
-                } else {
-                    $data = ['message' => MessageUtils::alertHtml($this->getMessages()['upload_error'], 'error')];
-                    return $this->jsonResponse($response, $data, 500);
-                }
-            } else {
-                // アップロードに失敗した場合
-                $data = ['message' => MessageUtils::alertHtml($this->getMessages()['file_missing'], 'error')];
-                return $this->jsonResponse($response, $data, 400);
+            $uploadedFile = $this->prepareUploadedFile($request);
+            if (!$uploadedFile) {
+                return $this->errorResponse($response, $this->getMessages()['file_missing'], 400);
             }
+
+            // upload file
+            $uploadResult = $this->fileService->upload($uploadedFile);
+            if (!$uploadResult['success']) {
+                return $this->errorResponse($response, $this->getMessages()['upload_error'], 500);
+            }
+
+            // validation
+            $fileData = $this->prepareFileData($request, $uploadResult['path']);
+            $fields = $this->fileModel->getFieldDefinitions();
+            $fields = $this->fileModel->processFieldDefinitions('create', $fields);
+            $validationResult = $this->fileModel->validateByFields($fileData, $fields);
+            if (!$validationResult['valid']) {
+                return $this->messageResponse(
+                  $response,
+                  MessageUtils::errorHtml($validationResult['errors'], $this->fileModel),
+                  405
+                );
+            }
+
+            // update database
+            $isDbUpdate = $this->fileModel->create($fileData);
+            if (!$isDbUpdate) {
+                return $this->errorResponse($response, $this->getMessages()['database_update_failed'], 500);
+            }
+
+            // success
+            return $this->successResponse($response, $this->getMessages()['upload_success']);
         } catch (\Exception $e) {
-            // 例外処理とエラーログ
-            Log::write('Unexpected error in ajaxHandleFileUpload: ' . $e->getMessage(), 'ERROR');
-            $data = ['message' => $this->getMessages()['invalid_request']];
-            return $this->jsonResponse($response, $data, 500);
+            Log::write('Unexpected error in handleFileUpload: ' . $e->getMessage(), 'ERROR');
+            return $this->errorResponse($response, $this->getMessages()['invalid_request'], 500);
         }
+    }
+
+    protected function prepareUploadedFile(Request $request): ?array
+    {
+        $uploadedFiles = $request->getUploadedFiles();
+        $uploadedFile = $uploadedFiles['attachment'] ?? null;
+
+        if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            return [
+                'name' => $uploadedFile->getClientFilename(),
+                'type' => $uploadedFile->getClientMediaType(),
+                'tmp_name' => $uploadedFile->getStream()->getMetadata('uri'),
+                'size' => $uploadedFile->getSize(),
+            ];
+        }
+
+        return null;
+    }
+
+    protected function prepareFileData(Request $request, string $filePath): array
+    {
+        return [
+            'path' => $filePath,
+            'description' => $request->getParsedBody()['description'] ?? '',
+        ];
     }
 
     /**
@@ -160,9 +192,9 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
-            if ($csrfValidationResponse) {
-                return $csrfValidationResponse;
+            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($errorResponse) {
+                return $errorResponse;
             }
 
             // Get the file ID from the POST request
@@ -172,8 +204,8 @@ class FileController extends BaseController
             $data = $this->fileModel->getById($fileId);
 
             if (!$data) {
-                $data = ['message' => $this->getMessages()['file_not_found']];
-                return $this->jsonResponse($response, $data, 405);
+                $mesage = $this->getMessages()['file_not_found'];
+                return $this->messageResponse($response, $message, 405);
             }
 
             // Update the description field
@@ -183,17 +215,16 @@ class FileController extends BaseController
             $result = $this->update($data, $fileId);
 
             if ($result['success']) {
-                $data = ['message' => $this->getMessages()['update_success']];
-                return $this->jsonResponse($response, $data, 200);
+                $mesage = $this->getMessages()['update_success'];
+                return $this->messageResponse($response, $mesage, 200);
             } else {
-                $data = ['message' => MessageUtils::errorHtml($result['errors'], $this->fileModel)];
-                return $this->jsonResponse($response, $data, 405);
+                $mesage = MessageUtils::errorHtml($result['errors'], $this->fileModel);
+                return $this->messageResponse($response, $message, 405);
             }
         } catch (\Exception $e) {
             // Log unexpected errors and return a generic error message
             Log::write('Unexpected error in ajaxHandleFileUpdate: ' . $e->getMessage(), 'ERROR');
-            $data = ['message' => 'Unexpected error'];
-            return $this->jsonResponse($response, $data, 405);
+            return $this->messageResponse($response, 'Unexpected error', 200);
         }
     }
 
@@ -207,8 +238,7 @@ class FileController extends BaseController
     protected function update(array $data, int $id = null)
     {
         $fields = $this->fileModel->getFieldDefinitions();
-        $fields = $this->fileModel->processFieldDefinitionsForCreate($fields);
-
+        $fields = $this->fileModel->processFieldDefinitions('edit', $fields);
         $results = $this->fileModel->validateByFields($data, $fields);
 
         if ($results['valid'] !== true) {
@@ -248,18 +278,18 @@ class FileController extends BaseController
         $pagination = new Pagination($page, $itemsPerPage);
 
         $keyword = $request->getQueryParams()['s'] ?? '';
-        $conditions = $this->fileModel->buildSearchConditions($keyword);
-        $totalItems = $this->fileModel->countByConditions($conditions['where'], $conditions['params']);
+        $query = $this->fileModel->buildSearchConditions($keyword);
+        $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);
         $paginationHtml = $pagination->render(Env::get('BASEPATH') . "/admin/filelist");
-        $items = $this->fileModel->searchByConditions(
-            $conditions['where'],
-            $conditions['params'],
-            $pagination->getOffset(),
-            $pagination->getLimit(),
-            'created_at DESC'
-        );
+
+        $items = $query->limit($pagination->getLimit())
+                  ->offset($pagination->getOffset())
+                  ->orderBy('created_at', 'desc')
+                  ->get()
+                  ->map(fn($item) => (array) $item)
+                  ->toArray();
 
         $items = $this->processItemsForList($request, $items);
 
@@ -290,9 +320,9 @@ class FileController extends BaseController
     {
         try {
             // CSRF Token validation
-            $csrfValidationResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
-            if ($csrfValidationResponse) {
-                return $csrfValidationResponse;
+            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            if ($errorResponse) {
+                return $errorResponse;
             }
 
             // Get the file ID from the POST request
@@ -302,8 +332,8 @@ class FileController extends BaseController
             $data = $this->fileModel->getById($fileId);
 
             if (!$data) {
-                $data = ['message' => $this->getMessages()['file_not_found']];
-                return $this->jsonResponse($response, $data, 405);
+                $mesage = $this->getMessages()['file_not_found'];
+                return $this->messageResponse($response, $message, 405);
             }
 
             // Delete the file from the server
@@ -313,28 +343,28 @@ class FileController extends BaseController
                 if (unlink($filePath)) {
                     Log::write("File deleted: " . $filePath);
                 } else {
-                    $data = ['message' => $this->getMessages()['file_delete_failed']];
-                    return $this->jsonResponse($response, $data, 500);
+                    $mesage = $this->getMessages()['file_delete_failed'];
+                    return $this->messageResponse($response, $message, 500);
                 }
             }
 
             // Remove the file record from the database
             $deleteSuccess = $this->fileModel->delete($fileId);
             if (!$deleteSuccess) {
-                $data = ['message' => $this->getMessages()['db_update_failed']];
-                return $this->jsonResponse($response, $data, 500);
+                $mesage = $this->getMessages()['db_update_failed'];
+                return $this->messageResponse($response, $message, 500);
             }
 
             // Send a success response back
-            $data = ['message' => $this->getMessages()['file_delete_success']];
-            return $this->jsonResponse($response, $data);
+            $mesage = $this->getMessages()['file_delete_success'];
+            return $this->messageResponse($response, $message, 500);
         } catch (\Exception $e) {
             // Log the exception details for debugging
             Log::write('Unexpected error in ajaxHandleFileDelete: ' . $e->getMessage(), 'ERROR');
 
             // Send a generic error response to the user
-            $data = ['message' => $this->getMessages()['unexpected_error']];
-            return $this->jsonResponse($response, $data, 500);
+            $mesage = $this->getMessages()['unexpected_error'];
+            return $this->messageResponse($response, $message, 500);
         }
     }
 

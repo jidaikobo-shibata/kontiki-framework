@@ -41,7 +41,9 @@ class FileModel extends BaseModel
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
                 'searchable' => true,
-                'rules' => [],
+                'rules' => [
+                    ['lengthMin', 3]
+                ],
                 'filter' => FILTER_UNSAFE_RAW,
                 'template' => 'default',
                 'group' => 'main',

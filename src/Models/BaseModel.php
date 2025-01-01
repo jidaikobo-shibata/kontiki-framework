@@ -88,12 +88,7 @@ abstract class BaseModel implements ModelInterface
         return $this->validationService->validate($data, $fieldDefinitions);
     }
 
-    public function processFieldDefinitionsForCreate(array $fieldDefinitions): array
-    {
-        return $fieldDefinitions;
-    }
-
-    public function processFieldDefinitionsForEdit(array $fieldDefinitions): array
+    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
     {
         return $fieldDefinitions;
     }
@@ -169,10 +164,12 @@ abstract class BaseModel implements ModelInterface
      * @return int|null The ID of the newly created record, or null if the operation failed.
      * @throws InvalidArgumentException If validation fails.
      */
-    public function create(array $data): ?int
+    public function create(array $data, bool $skipFieldFilter = false): ?int
     {
-        $filteredData = $this->filterAllowedFields($data);
-        $success = $this->db->table($this->table)->insert($filteredData);
+        if (!$skipFieldFilter) {
+            $data = $this->filterAllowedFields($data);
+        }
+        $success = $this->db->table($this->table)->insert($data);
         return $success ? $this->db->getPdo()->lastInsertId() : null;
     }
 
@@ -193,12 +190,6 @@ abstract class BaseModel implements ModelInterface
             ->where('id', $id)
             ->update($data);
     }
-/*
-$skipFieldFilterでなくコールバック関数を渡すのがいいのでは？
-createも
-UserModelで
-*/
-
 
     /**
      * Delte a record in the table by its ID.

@@ -56,8 +56,12 @@ class UserModel extends BaseModel
         ];
     }
 
-    public function processFieldDefinitionsForEdit(array $fieldDefinitions): array
+    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
     {
+        if ($context == 'create') {
+            return $fieldDefinitions;
+        }
+
         // Exclude `required` from password's rules
         // No password specified means no change
         if (isset($fieldDefinitions['password']['rules'])) {

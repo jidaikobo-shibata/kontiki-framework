@@ -23,7 +23,7 @@ trait CreateEditTrait
         $data = $this->processDataForRenderForm('create', $data);
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitionsForCreate($fields);
+        $fields = $this->model->processFieldDefinitions('create', $fields);
 
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/create",
@@ -51,7 +51,7 @@ trait CreateEditTrait
         }
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitionsForEdit($fields);
+        $fields = $this->model->processFieldDefinitions('edit', $fields);
 
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/edit/{$id}",
@@ -97,9 +97,7 @@ trait CreateEditTrait
             ? $this->model->getFieldDefinitions()
             : $this->model->getFieldDefinitions(['id' => $id]);
 
-        return $actionType === 'create'
-            ? $this->model->processFieldDefinitionsForCreate($fields)
-            : $this->model->processFieldDefinitionsForEdit($fields);
+        return $this->model->processFieldDefinitions($actionType, $fields);
     }
 
     protected function saveData(string $actionType, ?int $id, array $data): int
@@ -130,9 +128,9 @@ trait CreateEditTrait
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
 
         // validate csrf token
-        $redirectResponse = $this->validateCsrfToken($data, $request, $response, $defaultRedirect);
-        if ($redirectResponse) {
-            return $redirectResponse;
+        $errorResponse = $this->validateCsrfToken($data, $request, $response, $defaultRedirect);
+        if ($errorResponse) {
+            return $errorResponse;
         }
 
         // field definition
