@@ -29,7 +29,7 @@ class UserModel extends BaseModel
                 'rules' => [
                     'required',
                     ['lengthMin', 3],
-                    ['unique', 'users', 'username', $id]
+                    ['unique', $this->table, 'username', $id]
                 ],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',

@@ -34,6 +34,8 @@ class PostModel extends BaseModel
         $userOptions = $userModel->getOptions('username');
         $user = $this->authService->getCurrentUser();
 
+        $id = $params['id'] ?? null;
+
         return [
             'id' => [
                 'label' => 'ID',
@@ -56,8 +58,8 @@ class PostModel extends BaseModel
                 'description' => '',
                 'type' => 'textarea',
                 'attributes' => [
-                  'class' => 'form-control',
-                  'rows' => '10'
+                    'class' => 'form-control',
+                    'rows' => '10'
                 ],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
@@ -76,9 +78,10 @@ class PostModel extends BaseModel
                 'default' => '',
                 'searchable' => true,
                 'rules' => [
-                  'required',
-                  'slug',
-                  ['lengthMin', 3]
+                    'required',
+                    'slug',
+                    ['lengthMin', 3],
+                    ['unique', $this->table, 'slug', $id]
                 ],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
