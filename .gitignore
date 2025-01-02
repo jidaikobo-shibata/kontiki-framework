@@ -10,3 +10,4 @@
 /bin/phpcs
 /bin/phpstan
 /bin/phpstan.phar
+/db/migrations/20250101000001_create_informations_table.php
