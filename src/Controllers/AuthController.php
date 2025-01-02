@@ -49,7 +49,7 @@ class AuthController extends BaseController
 
         $content = $this->view->fetch('auth/login.php', $data);
         $content = $this->formService->addMessages(
-            $formHtml,
+            $content,
             $this->flashManager->getData('errors', [])
         );
 
