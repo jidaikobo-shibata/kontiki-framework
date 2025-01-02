@@ -333,13 +333,11 @@ class FileController extends BaseController
         // Delete the file from the server
         $filePath = $data['path'];
 
-        if (file_exists($filePath)) {
-            if (unlink($filePath)) {
-                Log::write("File deleted: " . $filePath);
-            } else {
-                $message = $this->getMessages()['file_delete_failed'];
-                return $this->messageResponse($response, $message, 500);
-            }
+        if ($this->deleteFileFromSystem($filePath)) {
+            Log::write("File deleted: " . $filePath);
+        } else {
+            $message = $this->getMessages()['file_delete_failed'];
+            return $this->messageResponse($response, $message, 500);
         }
 
         // Remove the file record from the database
@@ -351,7 +349,15 @@ class FileController extends BaseController
 
         // Send a success response back
         $message = $this->getMessages()['file_delete_success'];
-        return $this->messageResponse($response, $message, 500);
+        return $this->messageResponse($response, $message, 200);
+    }
+
+    private function deleteFileFromSystem(string $filePath): bool
+    {
+        if (file_exists($filePath)) {
+            return unlink($filePath);
+        }
+        return false;
     }
 
     /**
