@@ -128,23 +128,10 @@ class FileController extends BaseController
             return $this->errorResponse($response, $this->getMessages()['upload_error'], 500);
         }
 
-        // validation
-        $fileData = ['path' => $uploadResult['path']];
-        $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processFieldDefinitions('create', $fields);
-        $validationResult = $this->model->validateByFields($fileData, $fields);
-        if (!$validationResult['valid']) {
-            return $this->messageResponse(
-                $response,
-                MessageUtils::errorHtml($validationResult['errors'], $this->model),
-                405
-            );
-        }
-
         // update database
-        $isDbUpdate = $this->model->create($fileData);
-        if (!$isDbUpdate) {
-            return $this->errorResponse($response, $this->getMessages()['database_update_failed'], 500);
+        $fileData = ['path' => $uploadResult['path']];
+        if ($validationError = $this->validateAndSave($fileData, $response)) {
+            return $validationError;
         }
 
         // success
@@ -165,6 +152,29 @@ class FileController extends BaseController
             ];
         }
 
+        return null;
+    }
+
+    private function validateAndSave(array $fileData, Response $response): ?Response
+    {
+        $fields = $this->model->getFieldDefinitions();
+        $fields = $this->model->processFieldDefinitions('create', $fields);
+        $validationResult = $this->model->validateByFields($fileData, $fields);
+
+        if (!$validationResult['valid']) {
+            return $this->messageResponse(
+                $response,
+                MessageUtils::errorHtml($validationResult['errors'], $this->model),
+                405
+            );
+        }
+        if (!$this->model->create($fileData)) {
+            return $this->errorResponse(
+                $response,
+                $this->getMessages()['database_update_failed'],
+                500
+            );
+        }
         return null;
     }
 
@@ -303,54 +313,45 @@ class FileController extends BaseController
     {
         $parsedBody = $request->getParsedBody() ?? [];
 
-        try {
-            // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
-            if ($errorResponse) {
-                return $errorResponse;
-            }
+        // CSRF Token validation
+        $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
-            // Get the file ID from the POST request
-            $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
+        // Get the file ID from the POST request
+        $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
 
-            // Retrieve the file details from the database using the file ID
-            $data = $this->model->getById($fileId);
+        // Retrieve the file details from the database using the file ID
+        $data = $this->model->getById($fileId);
 
-            if (!$data) {
-                $message = $this->getMessages()['file_not_found'];
-                return $this->messageResponse($response, $message, 405);
-            }
+        if (!$data) {
+            $message = $this->getMessages()['file_not_found'];
+            return $this->messageResponse($response, $message, 405);
+        }
 
-            // Delete the file from the server
-            $filePath = $data['path'];
+        // Delete the file from the server
+        $filePath = $data['path'];
 
-            if (file_exists($filePath)) {
-                if (unlink($filePath)) {
-                    Log::write("File deleted: " . $filePath);
-                } else {
-                    $message = $this->getMessages()['file_delete_failed'];
-                    return $this->messageResponse($response, $message, 500);
-                }
-            }
-
-            // Remove the file record from the database
-            $deleteSuccess = $this->model->delete($fileId);
-            if (!$deleteSuccess) {
-                $message = $this->getMessages()['db_update_failed'];
+        if (file_exists($filePath)) {
+            if (unlink($filePath)) {
+                Log::write("File deleted: " . $filePath);
+            } else {
+                $message = $this->getMessages()['file_delete_failed'];
                 return $this->messageResponse($response, $message, 500);
             }
+        }
 
-            // Send a success response back
-            $message = $this->getMessages()['file_delete_success'];
-            return $this->messageResponse($response, $message, 500);
-        } catch (\Exception $e) {
-            // Log the exception details for debugging
-            Log::write('Unexpected error in ajaxHandleFileDelete: ' . $e->getMessage(), 'ERROR');
-
-            // Send a generic error response to the user
-            $message = $this->getMessages()['unexpected_error'];
+        // Remove the file record from the database
+        $deleteSuccess = $this->model->delete($fileId);
+        if (!$deleteSuccess) {
+            $message = $this->getMessages()['db_update_failed'];
             return $this->messageResponse($response, $message, 500);
         }
+
+        // Send a success response back
+        $message = $this->getMessages()['file_delete_success'];
+        return $this->messageResponse($response, $message, 500);
     }
 
     /**
