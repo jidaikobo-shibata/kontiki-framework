@@ -74,12 +74,6 @@ class KontikiFileManager {
                     $('#fileAttachment').val('');
                     $('#fileAttachment').focus();
 
-                    // Reset the input field's error state
-                    $('#description').removeAttr('aria-invalid');
-                    $('#description').removeAttr('aria-errormessage');
-                    $('#description').removeClass('is-invalid');
-                    $('#description').val('');
-
                     this.updateCsrfToken();
                 },
                 error: (xhr, status, error) => {
@@ -88,21 +82,11 @@ class KontikiFileManager {
 
                     // Check if the response contains a message
                     if (response && response.message) {
-                        // reset
-                        $('#description').removeAttr('aria-invalid');
-                        $('#description').removeAttr('aria-errormessage');
-                        $('#description').removeClass('is-invalid');
-
-                        // Add aria-invalid and aria-errormessage to input#description
-                        if (response.message.includes('errormessage_description')) {
-                            $('#description').attr('aria-invalid', 'true');
-                            $('#description').attr('aria-errormessage', 'errormessage_text');
-                            $('#description').addClass('is-invalid');
-                        }
-
-                        $('#fileUploadStatus').html(response.message); // Display the error message from response
+                        // Display the error message from response
+                        $('#fileUploadStatus').html(response.message);
                     } else {
-                        $('#fileUploadStatus').text('<?= $couldnt_upload ?>'); // Default error message
+                        // Default error message
+                        $('#fileUploadStatus').text('<?= $couldnt_upload ?>');
                     }
                     this.updateCsrfToken();
                 }

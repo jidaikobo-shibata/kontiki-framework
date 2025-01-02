@@ -40,6 +40,16 @@ class AuthService
     }
 
     /**
+     * Handles user logout.
+     *
+     * @return void
+     */
+    public function logout(): void
+    {
+        $this->session->destroy();
+    }
+
+    /**
      * Retrieves the current user's information.
      *
      * @return array|null Returns the logged-in user's information, or null if not logged in.

@@ -21,7 +21,6 @@ abstract class BaseController
 {
     protected ModelInterface $model;
     protected PhpRenderer $view;
-    protected Session $session;
     protected SidebarService $sidebarService;
     protected FormService $formService;
     protected string $table;
@@ -49,7 +48,6 @@ abstract class BaseController
         $this->formService = new FormService($view, $model, $this->flashManager, $this->csrfManager);
         $this->model = $model;
         $this->table = $this->model->getTableName();
-        $this->session = $session;
         $this->view = $view;
         if ($sidebarService) {
             $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
@@ -95,6 +93,21 @@ abstract class BaseController
     {
         $traitName = (new \ReflectionClass($trait))->getShortName();
         return "Jidaikobo\\Kontiki\\Controllers\\Routes\\" . str_replace('Trait', 'Routes', $traitName);
+    }
+
+    /**
+     * Retrieves the parsed body from the request.
+     *
+     * Ensures that the returned value is always an array,
+     * converting null or invalid types to an empty array.
+     *
+     * @param Request $request The HTTP request.
+     * @return array The parsed body as an array.
+     */
+    protected function getParsedBody(Request $request): array
+    {
+        $parsedBody = $request->getParsedBody();
+        return is_array($parsedBody) ? $parsedBody : [];
     }
 
     /**

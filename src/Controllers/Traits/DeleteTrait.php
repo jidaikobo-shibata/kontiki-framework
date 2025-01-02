@@ -60,7 +60,7 @@ trait DeleteTrait
     public function handleDelete(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
-        $data = $request->getParsedBody();
+        $data = $this->getParsedBody($request);
 
         // validate csrf token
         $redirectTo = "/admin/{$this->table}/delete/{$id}";

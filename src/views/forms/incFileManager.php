@@ -28,13 +28,6 @@
                   <small id="attachmentHelp" class="form-text text-muted"><?= __('multi_bytes_warn', 'Multi-Bytes characters will be changed or deleted.') ?></small>
                 </div>
               </div>
-              <div class="mb-3 row">
-                <label for="fileDescription" class="col-sm-3 col-form-label text-end"><?= __('description') ?></label>
-                <div class="col-sm-8">
-                  <input type="text" name="description" id="description" class="form-control fs-5" aria-describedby="textHelp">
-                  <small id="textHelp" class="form-text text-muted"><?= __('desc_for_description', 'For images, it is used as the <code>alt attribute value</code>, and for PDFs, etc., it is used as the <code>link text</code>.') ?></small>
-                </div>
-              </div>
               <input type="hidden" name="_csrf_value" id="file_manager_csrf_token" value="">
               <div class="text-center">
                 <button type="submit" class="btn btn-info"><?= __('submit') ?></button>

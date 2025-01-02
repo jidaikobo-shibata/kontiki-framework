@@ -67,7 +67,7 @@ class AuthController extends BaseController
      */
     public function processLogin(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody() ?? [];
+        $data = $this->getParsedBody($request);
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
 
@@ -86,7 +86,7 @@ class AuthController extends BaseController
 
     public function logout(Request $request, Response $response): Response
     {
-        $this->session->destroy();
+        $this->authService->logout();
         return $this->redirectResponse($request, $response, 'login');
     }
 }

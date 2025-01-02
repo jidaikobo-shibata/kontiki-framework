@@ -26,9 +26,7 @@ class FileController extends BaseController
 
     public function __construct(Session $session, PhpRenderer $view, FileModel $fileModel, FileService $fileService)
     {
-        $this->csrfManager = new CsrfManager($session);
-        $this->view = $view;
-        $this->fileModel = $fileModel;
+        parent::__construct($view, $session, $fileModel);
         $this->fileService = $fileService;
     }
 
@@ -110,9 +108,11 @@ class FileController extends BaseController
      */
     public function handleFileUpload(Request $request, Response $response): Response
     {
+        $parsedBody = $this->getParsedBody($request);
+
         try {
             // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
             if ($errorResponse) {
                 return $errorResponse;
             }
@@ -130,20 +130,20 @@ class FileController extends BaseController
             }
 
             // validation
-            $fileData = $this->prepareFileData($request, $uploadResult['path']);
-            $fields = $this->fileModel->getFieldDefinitions();
-            $fields = $this->fileModel->processFieldDefinitions('create', $fields);
-            $validationResult = $this->fileModel->validateByFields($fileData, $fields);
+            $fileData = ['path' => $uploadResult['path']];
+            $fields = $this->model->getFieldDefinitions();
+            $fields = $this->model->processFieldDefinitions('create', $fields);
+            $validationResult = $this->model->validateByFields($fileData, $fields);
             if (!$validationResult['valid']) {
                 return $this->messageResponse(
                   $response,
-                  MessageUtils::errorHtml($validationResult['errors'], $this->fileModel),
+                  MessageUtils::errorHtml($validationResult['errors'], $this->model),
                   405
                 );
             }
 
             // update database
-            $isDbUpdate = $this->fileModel->create($fileData);
+            $isDbUpdate = $this->model->create($fileData);
             if (!$isDbUpdate) {
                 return $this->errorResponse($response, $this->getMessages()['database_update_failed'], 500);
             }
@@ -173,14 +173,6 @@ class FileController extends BaseController
         return null;
     }
 
-    protected function prepareFileData(Request $request, string $filePath): array
-    {
-        return [
-            'path' => $filePath,
-            'description' => $request->getParsedBody()['description'] ?? '',
-        ];
-    }
-
     /**
      * Handles the AJAX request to update a file's data in the database.
      * Validates the CSRF token, retrieves the file details by ID,
@@ -190,18 +182,20 @@ class FileController extends BaseController
      */
     public function handleUpdate(Request $request, Response $response): Response
     {
+        $parsedBody = $this->getParsedBody($request);
+
         try {
             // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
             if ($errorResponse) {
                 return $errorResponse;
             }
 
             // Get the file ID from the POST request
-            $fileId = $request->getParsedBody()['id'] ?? 0; // Default to 0 if no ID is provided
+            $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
 
             // Retrieve the file details from the database using the file ID
-            $data = $this->fileModel->getById($fileId);
+            $data = $this->model->getById($fileId);
 
             if (!$data) {
                 $message = $this->getMessages()['file_not_found'];
@@ -209,7 +203,7 @@ class FileController extends BaseController
             }
 
             // Update the description field
-            $data['description'] = $request->getParsedBody()['description'] ?? $data['description'];
+            $data['description'] = $parsedBody['description'] ?? $data['description'];
 
             // Update the main item
             $result = $this->update($data, $fileId);
@@ -218,7 +212,7 @@ class FileController extends BaseController
                 $message = $this->getMessages()['update_success'];
                 return $this->messageResponse($response, $message, 200);
             } else {
-                $message = MessageUtils::errorHtml($result['errors'], $this->fileModel);
+                $message = MessageUtils::errorHtml($result['errors'], $this->model);
                 return $this->messageResponse($response, $message, 405);
             }
         } catch (\Exception $e) {
@@ -237,9 +231,9 @@ class FileController extends BaseController
      */
     protected function update(array $data, int $id = null)
     {
-        $fields = $this->fileModel->getFieldDefinitions();
-        $fields = $this->fileModel->processFieldDefinitions('edit', $fields);
-        $results = $this->fileModel->validateByFields($data, $fields);
+        $fields = $this->model->getFieldDefinitions();
+        $fields = $this->model->processFieldDefinitions('edit', $fields);
+        $results = $this->model->validateByFields($data, $fields);
 
         if ($results['valid'] !== true) {
             if (isset($results['errors']['description'])) {
@@ -254,7 +248,7 @@ class FileController extends BaseController
         }
 
         // Process if valid
-        $success = $this->fileModel->update($id, $data);
+        $success = $this->model->update($id, $data);
 
         return [
             'success' => $success,
@@ -278,7 +272,7 @@ class FileController extends BaseController
         $pagination = new Pagination($page, $itemsPerPage);
 
         $keyword = $request->getQueryParams()['s'] ?? '';
-        $query = $this->fileModel->buildSearchConditions($keyword);
+        $query = $this->model->buildSearchConditions($keyword);
         $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);
@@ -318,18 +312,20 @@ class FileController extends BaseController
      */
     public function handleDelete(Request $request, Response $response): Response
     {
+        $parsedBody = $this->getParsedBody($request);
+
         try {
             // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($request->getParsedBody(), $response);
+            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
             if ($errorResponse) {
                 return $errorResponse;
             }
 
             // Get the file ID from the POST request
-            $fileId = $request->getParsedBody()['id'] ?? 0; // Default to 0 if no ID is provided
+            $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
 
             // Retrieve the file details from the database using the file ID
-            $data = $this->fileModel->getById($fileId);
+            $data = $this->model->getById($fileId);
 
             if (!$data) {
                 $message = $this->getMessages()['file_not_found'];
@@ -349,7 +345,7 @@ class FileController extends BaseController
             }
 
             // Remove the file record from the database
-            $deleteSuccess = $this->fileModel->delete($fileId);
+            $deleteSuccess = $this->model->delete($fileId);
             if (!$deleteSuccess) {
                 $message = $this->getMessages()['db_update_failed'];
                 return $this->messageResponse($response, $message, 500);
