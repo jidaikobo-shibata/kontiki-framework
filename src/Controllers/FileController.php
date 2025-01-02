@@ -108,7 +108,7 @@ class FileController extends BaseController
      */
     public function handleFileUpload(Request $request, Response $response): Response
     {
-        $parsedBody = $this->getParsedBody($request);
+        $parsedBody = $request->getParsedBody() ?? [];
 
         try {
             // CSRF Token validation
@@ -182,7 +182,7 @@ class FileController extends BaseController
      */
     public function handleUpdate(Request $request, Response $response): Response
     {
-        $parsedBody = $this->getParsedBody($request);
+        $parsedBody = $request->getParsedBody() ?? [];
 
         try {
             // CSRF Token validation
@@ -312,7 +312,7 @@ class FileController extends BaseController
      */
     public function handleDelete(Request $request, Response $response): Response
     {
-        $parsedBody = $this->getParsedBody($request);
+        $parsedBody = $request->getParsedBody() ?? [];
 
         try {
             // CSRF Token validation

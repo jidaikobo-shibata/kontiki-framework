@@ -96,21 +96,6 @@ abstract class BaseController
     }
 
     /**
-     * Retrieves the parsed body from the request.
-     *
-     * Ensures that the returned value is always an array,
-     * converting null or invalid types to an empty array.
-     *
-     * @param Request $request The HTTP request.
-     * @return array The parsed body as an array.
-     */
-    protected function getParsedBody(Request $request): array
-    {
-        $parsedBody = $request->getParsedBody();
-        return is_array($parsedBody) ? $parsedBody : [];
-    }
-
-    /**
      * Validate the CSRF token and handle errors if invalid.
      *
      * @param array    $data            The request data (e.g., POST body).

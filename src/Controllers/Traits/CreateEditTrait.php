@@ -122,7 +122,7 @@ trait CreateEditTrait
 
     protected function handleSave(Request $request, Response $response, string $actionType, ?int $id = null): Response
     {
-        $data = $this->getParsedBody($request);
+        $data = $request->getParsedBody() ?? [];
         $this->flashManager->setData('data', $data);
 
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);

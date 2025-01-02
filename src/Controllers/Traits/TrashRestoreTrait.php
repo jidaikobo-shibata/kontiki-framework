@@ -88,7 +88,7 @@ trait TrashRestoreTrait
 
     public function executeTrashRestore(Request $request, Response $response, int $id, string $actionType): Response
     {
-        $data = $this->getParsedBody($request);
+        $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
         $redirectTo = "/admin/{$this->table}/{$actionType}/{$id}";

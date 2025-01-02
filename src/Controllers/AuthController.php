@@ -67,7 +67,7 @@ class AuthController extends BaseController
      */
     public function processLogin(Request $request, Response $response): Response
     {
-        $data = $this->getParsedBody($request);
+        $data = $request->getParsedBody() ?? [];
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
 
