@@ -110,50 +110,45 @@ class FileController extends BaseController
     {
         $parsedBody = $request->getParsedBody() ?? [];
 
-        try {
-            // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
-            if ($errorResponse) {
-                return $errorResponse;
-            }
-
-            // prepare file
-            $uploadedFile = $this->prepareUploadedFile($request);
-            if (!$uploadedFile) {
-                return $this->errorResponse($response, $this->getMessages()['file_missing'], 400);
-            }
-
-            // upload file
-            $uploadResult = $this->fileService->upload($uploadedFile);
-            if (!$uploadResult['success']) {
-                return $this->errorResponse($response, $this->getMessages()['upload_error'], 500);
-            }
-
-            // validation
-            $fileData = ['path' => $uploadResult['path']];
-            $fields = $this->model->getFieldDefinitions();
-            $fields = $this->model->processFieldDefinitions('create', $fields);
-            $validationResult = $this->model->validateByFields($fileData, $fields);
-            if (!$validationResult['valid']) {
-                return $this->messageResponse(
-                  $response,
-                  MessageUtils::errorHtml($validationResult['errors'], $this->model),
-                  405
-                );
-            }
-
-            // update database
-            $isDbUpdate = $this->model->create($fileData);
-            if (!$isDbUpdate) {
-                return $this->errorResponse($response, $this->getMessages()['database_update_failed'], 500);
-            }
-
-            // success
-            return $this->successResponse($response, $this->getMessages()['upload_success']);
-        } catch (\Exception $e) {
-            Log::write('Unexpected error in handleFileUpload: ' . $e->getMessage(), 'ERROR');
-            return $this->errorResponse($response, $this->getMessages()['invalid_request'], 500);
+        // CSRF Token validation
+        $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
+        if ($errorResponse) {
+            return $errorResponse;
         }
+
+        // prepare file
+        $uploadedFile = $this->prepareUploadedFile($request);
+        if (!$uploadedFile) {
+            return $this->errorResponse($response, $this->getMessages()['file_missing'], 400);
+        }
+
+        // upload file
+        $uploadResult = $this->fileService->upload($uploadedFile);
+        if (!$uploadResult['success']) {
+            return $this->errorResponse($response, $this->getMessages()['upload_error'], 500);
+        }
+
+        // validation
+        $fileData = ['path' => $uploadResult['path']];
+        $fields = $this->model->getFieldDefinitions();
+        $fields = $this->model->processFieldDefinitions('create', $fields);
+        $validationResult = $this->model->validateByFields($fileData, $fields);
+        if (!$validationResult['valid']) {
+            return $this->messageResponse(
+                $response,
+                MessageUtils::errorHtml($validationResult['errors'], $this->model),
+                405
+            );
+        }
+
+        // update database
+        $isDbUpdate = $this->model->create($fileData);
+        if (!$isDbUpdate) {
+            return $this->errorResponse($response, $this->getMessages()['database_update_failed'], 500);
+        }
+
+        // success
+        return $this->successResponse($response, $this->getMessages()['upload_success']);
     }
 
     protected function prepareUploadedFile(Request $request): ?array
@@ -184,41 +179,35 @@ class FileController extends BaseController
     {
         $parsedBody = $request->getParsedBody() ?? [];
 
-        try {
-            // CSRF Token validation
-            $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
-            if ($errorResponse) {
-                return $errorResponse;
-            }
+        // CSRF Token validation
+        $errorResponse = $this->validateCsrfForJson($parsedBody, $response);
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
-            // Get the file ID from the POST request
-            $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
+        // Get the file ID from the POST request
+        $fileId = $parsedBody['id'] ?? 0; // Default to 0 if no ID is provided
 
-            // Retrieve the file details from the database using the file ID
-            $data = $this->model->getById($fileId);
+        // Retrieve the file details from the database using the file ID
+        $data = $this->model->getById($fileId);
 
-            if (!$data) {
-                $message = $this->getMessages()['file_not_found'];
-                return $this->messageResponse($response, $message, 405);
-            }
+        if (!$data) {
+            $message = $this->getMessages()['file_not_found'];
+            return $this->messageResponse($response, $message, 405);
+        }
 
-            // Update the description field
-            $data['description'] = $parsedBody['description'] ?? $data['description'];
+        // Update the description field
+        $data['description'] = $parsedBody['description'] ?? $data['description'];
 
-            // Update the main item
-            $result = $this->update($data, $fileId);
+        // Update the main item
+        $result = $this->update($data, $fileId);
 
-            if ($result['success']) {
-                $message = $this->getMessages()['update_success'];
-                return $this->messageResponse($response, $message, 200);
-            } else {
-                $message = MessageUtils::errorHtml($result['errors'], $this->model);
-                return $this->messageResponse($response, $message, 405);
-            }
-        } catch (\Exception $e) {
-            // Log unexpected errors and return a generic error message
-            Log::write('Unexpected error in ajaxHandleFileUpdate: ' . $e->getMessage(), 'ERROR');
-            return $this->messageResponse($response, 'Unexpected error', 200);
+        if ($result['success']) {
+            $message = $this->getMessages()['update_success'];
+            return $this->messageResponse($response, $message, 200);
+        } else {
+            $message = MessageUtils::errorHtml($result['errors'], $this->model);
+            return $this->messageResponse($response, $message, 405);
         }
     }
 
