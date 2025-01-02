@@ -59,6 +59,11 @@ abstract class BaseModel implements ModelInterface
         return $fields;
     }
 
+    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
+    {
+        return $fieldDefinitions;
+    }
+
     /**
      * Get searchable fields from the model's properties.
      *
@@ -86,11 +91,6 @@ abstract class BaseModel implements ModelInterface
     public function validateByFields(array $data, array $fieldDefinitions): array
     {
         return $this->validationService->validate($data, $fieldDefinitions);
-    }
-
-    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
-    {
-        return $fieldDefinitions;
     }
 
     /**

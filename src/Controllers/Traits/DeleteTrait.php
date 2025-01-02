@@ -37,6 +37,7 @@ trait DeleteTrait
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/delete/{$id}",
             $data,
+            $this->csrfManager->getToken(),
             __(
                 "x_delete_confirm",
                 "Are you sure you want to delete this :name?",
@@ -44,7 +45,10 @@ trait DeleteTrait
             ),
             __("delete", "Delete"),
         );
-        $formHtml = $this->formService->processFormHtml($formHtml);
+        $formHtml = $this->formService->addMessages(
+            $formHtml,
+            $this->flashManager->getData('errors', [])
+        );
 
         return $this->renderResponse(
             $response,

@@ -54,6 +54,7 @@ trait TrashRestoreTrait
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/{$actionType}/{$id}",
             $data,
+            $this->csrfManager->getToken(),
             __(
                 "x_{$actionType}_confirm",
                 "Are you sure you want to {$actionType} this :name?",
@@ -61,7 +62,10 @@ trait TrashRestoreTrait
             ),
             __($actionType),
         );
-        $formHtml = $this->formService->processFormHtml($formHtml);
+        $formHtml = $this->formService->addMessages(
+            $formHtml,
+            $this->flashManager->getData('errors', [])
+        );
 
         return $this->renderResponse(
             $response,

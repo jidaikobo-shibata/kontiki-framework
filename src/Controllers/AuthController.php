@@ -48,7 +48,10 @@ class AuthController extends BaseController
         $data = $this->flashManager->getData('data', ['username' => '']);
 
         $content = $this->view->fetch('auth/login.php', $data);
-        $content = $this->formService->processFormHtml($content);
+        $content = $this->formService->addMessages(
+            $formHtml,
+            $this->flashManager->getData('errors', [])
+        );
 
         return $this->renderResponse(
             $response,

@@ -28,10 +28,14 @@ trait CreateEditTrait
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/create",
             $fields,
+            $this->csrfManager->getToken(),
             '',
             __("create", 'Create'),
         );
-        $formHtml = $this->formService->processFormHtml($formHtml);
+        $formHtml = $this->formService->addMessages(
+            $formHtml,
+            $this->flashManager->getData('errors', [])
+        );
 
         return $this->renderResponse(
             $response,
@@ -56,10 +60,15 @@ trait CreateEditTrait
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->table}/edit/{$id}",
             $fields,
+            $this->csrfManager->getToken(),
             '',
             __("update", 'Update'),
         );
-        $formHtml = $this->formService->processFormHtml($formHtml);
+        $formHtml = $this->formService->addMessages(
+            $formHtml,
+            $this->flashManager->getData('errors', []),
+            $this->flashManager->getData('success', [])
+        );
 
         return $this->renderResponse(
             $response,

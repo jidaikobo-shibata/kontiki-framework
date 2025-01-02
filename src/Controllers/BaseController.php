@@ -21,7 +21,6 @@ abstract class BaseController
 {
     protected ModelInterface $model;
     protected PhpRenderer $view;
-    protected SidebarService $sidebarService;
     protected FormService $formService;
     protected string $table;
     protected CsrfManager $csrfManager;
@@ -45,7 +44,7 @@ abstract class BaseController
     ) {
         $this->csrfManager = new CsrfManager($session);
         $this->flashManager = new FlashManager($session);
-        $this->formService = new FormService($view, $model, $this->flashManager, $this->csrfManager);
+        $this->formService = new FormService($view, $model);
         $this->model = $model;
         $this->table = $this->model->getTableName();
         $this->view = $view;

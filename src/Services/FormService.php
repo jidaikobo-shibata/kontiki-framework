@@ -6,8 +6,6 @@ use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Utils\FormRenderer;
 use Jidaikobo\Kontiki\Utils\FormHandler;
-use Jidaikobo\Kontiki\Utils\FlashManager;
-use Jidaikobo\Kontiki\Utils\CsrfManager;
 use Slim\Views\PhpRenderer;
 
 /**
@@ -17,8 +15,6 @@ use Slim\Views\PhpRenderer;
  */
 class FormService
 {
-    private CsrfManager $csrfManager;
-    private FlashManager $flashManager;
     private ModelInterface $model;
     private PhpRenderer $view;
 
@@ -27,19 +23,13 @@ class FormService
      *
      * @param PhpRenderer     $view         The view renderer.
      * @param ModelInterface  $model        The associated model.
-     * @param FlashManager    $flashManager Handles flash messages.
-     * @param CsrfManager     $csrfManager  Manages CSRF tokens.
      */
     public function __construct(
         PhpRenderer $view,
-        ModelInterface $model,
-        FlashManager $flashManager,
-        CsrfManager $csrfManager
+        ModelInterface $model
     ) {
         $this->view = $view;
         $this->model = $model;
-        $this->flashManager = $flashManager;
-        $this->csrfManager = $csrfManager;
     }
 
     /**
@@ -47,6 +37,7 @@ class FormService
      *
      * @param string $action       The form action URL.
      * @param array  $fields       The form fields definitions.
+     * @param string $csrfToken    CSRF Token.
      * @param string $description  An optional description for the form.
      * @param string $buttonText   The text to display on the submit button.
      *
@@ -54,7 +45,8 @@ class FormService
      */
     public function formHtml(
         string $action,
-        array $fields,
+        array  $fields,
+        string $csrfToken,
         string $description = '',
         string $buttonText = 'Submit'
     ): string {
@@ -64,7 +56,7 @@ class FormService
             'forms/edit.php',
             [
                 'actionAttribute' => Env::get('BASEPATH') . $action,
-                'csrfToken' => $this->csrfManager->getToken(),
+                'csrfToken' => $csrfToken,
                 'formHtml' => $formRenderer->render(),
                 'description' => $description,
                 'buttonText' => $buttonText,
@@ -79,11 +71,11 @@ class FormService
      *
      * @return string The processed HTML with errors and success messages.
      */
-    public function processFormHtml(string $formHtml): string
+    public function addMessages(string $formHtml, array $errors, array $success = array()): string
     {
         $formHandler = new FormHandler($formHtml, $this->model);
-        $formHandler->addErrors($this->flashManager->getData('errors', []));
-        $formHandler->addSuccessMessages($this->flashManager->getData('success', []));
+        $formHandler->addErrors($errors);
+        $formHandler->addSuccessMessages($success);
 
         return $formHandler->getHtml();
     }
