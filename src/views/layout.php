@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= $_ENV['LANG'] ?? 'en' ?>">
+<html lang="<?= env('LANG', 'en') ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +16,8 @@
 
   <!-- Scripts -->
 <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
-  <script src="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/fileManager.js"></script>
-  <script src="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/fileManagerInstance.js"></script>
+  <script src="<?= env('BASEPATH', '') ?>/admin/fileManager.js"></script>
+  <script src="<?= env('BASEPATH', '') ?>/admin/fileManagerInstance.js"></script>
 <?php endif; ?>
 
   <title><?= e($pageTitle) ?></title>
@@ -30,7 +30,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= $_ENV['BASEPATH'] ?? '' ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
+    <a href="<?= env('BASEPATH', '') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->
@@ -55,7 +55,7 @@
 
   <!-- .main-footer -->
   <footer class="main-footer">
-    <?= $_ENV['COPYRIGHT'] ?? '' ?>
+    <?= env('COPYRIGHT', '') ?>
   </footer><!-- /.main-footer -->
 </div>
 </body>

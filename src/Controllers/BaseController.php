@@ -158,7 +158,7 @@ abstract class BaseController
     protected function redirectResponse(Request $request, Response $response, string $target, array $routeData = [], int $status = 302): Response
     {
         if (strpos($target, '/') === 0 || filter_var($target, FILTER_VALIDATE_URL)) {
-            $redirectUrl = $_ENV['BASEPATH'] ?? '' . $target;
+            $redirectUrl = env('BASEPATH', '') . $target;
         } else {
             $routeParser = RouteContext::fromRequest($request)->getRouteParser();
             $redirectUrl = $routeParser->urlFor($target, $routeData);

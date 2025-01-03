@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <a href="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/dashboard" class="brand-link">
-    <span class="brand-text font-weight-light"><?= $_ENV['COPYRIGHT'] ?? '' ?></span>
+  <a href="<?= env('BASEPATH', '') ?>/admin/dashboard" class="brand-link">
+    <span class="brand-text font-weight-light"><?= env('COPYRIGHT', '') ?></span>
   </a>
 
   <div class="sidebar">

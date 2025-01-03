@@ -1,6 +1,6 @@
 <div class="login-box">
   <div class="login-logo">
-    <?= $_ENV('COPYRIGHT') ?? '' ?>
+    <?= env('COPYRIGHT', '') ?>
   </div>
 
   <div class="card">

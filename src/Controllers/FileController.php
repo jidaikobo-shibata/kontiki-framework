@@ -274,7 +274,7 @@ class FileController extends BaseController
         $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);
-        $paginationHtml = $pagination->render($_ENV['BASEPATH'] ?? '' . "/admin/filelist");
+        $paginationHtml = $pagination->render(env('BASEPATH', '') . "/admin/filelist");
 
         $items = $query->limit($pagination->getLimit())
                   ->offset($pagination->getOffset())
@@ -396,7 +396,7 @@ class FileController extends BaseController
         $content = $this->view->fetch(
             'js/fileManagerInstance.js.php',
             [
-                'basepath' => $_ENV['BASEPATH'] ?? ''
+                'basepath' => env('BASEPATH', '')
             ]
         );
         $response->getBody()->write($content);

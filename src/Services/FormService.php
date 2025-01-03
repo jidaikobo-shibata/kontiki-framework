@@ -54,7 +54,7 @@ class FormService
         return $this->view->fetch(
             'forms/edit.php',
             [
-                'actionAttribute' => $_ENV['BASEPATH'] ?? '' . $action,
+                'actionAttribute' => env('BASEPATH', '') . $action,
                 'csrfToken' => $csrfToken,
                 'formHtml' => $formRenderer->render(),
                 'description' => $description,

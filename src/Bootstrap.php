@@ -22,19 +22,19 @@ class Bootstrap
         $dotenv = Dotenv::createImmutable(KONTIKI_PROJECT_PATH . "/config/{$env}/");
         $dotenv->load();
 
-        // Load default language on class load
-        $language = $_ENV['LANG'] ?? 'en';
-        Utils\Lang::setLanguage($language);
-
-        // Set Timezone
-        // $timezone = Utils\Env::get('TIMEZONE') ?? 'Asia/Tokyo';
-        // date_default_timezone_set($timezone);
-
         // Load Functions
         if ($env === 'development') {
             require __DIR__ . '/functions/dev/functions.php';
         }
         require __DIR__ . '/functions/functions.php';
+
+        // Load default language on class load
+        $language = env('LANG', 'en');
+        Utils\Lang::setLanguage($language);
+
+        // Set Timezone
+        // $timezone = Utils\Env::get('TIMEZONE') ?? 'Asia/Tokyo';
+        // date_default_timezone_set($timezone);
 
         // Configure a PHP-DI container
         $container = new Container();
@@ -43,7 +43,7 @@ class Bootstrap
         // Create a Slim application
         $app = AppFactory::create();
         $app->addErrorMiddleware(true, true, true);
-        $basePath = $_ENV['BASEPATH'] ?? '/';
+        $basePath = env('BASEPATH', '/');
         $app->setBasePath($basePath);
 
         // Add a header for security measures

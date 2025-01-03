@@ -49,7 +49,7 @@ class TableRenderer
     {
         $headerHtml = '';
         foreach ($this->fields as $name => $config) {
-            $label = e($config['label'];
+            $label = e($config['label']);
             $headerHtml .= sprintf('<th>%s</th>', $label);
         }
         $headerHtml .= '<th>' . __('actions') . '</th>'; // Add actions column
@@ -61,7 +61,7 @@ class TableRenderer
         $cellsHtml = '';
         foreach ($this->fields as $name => $config) {
             $value = $row[$name] ?? '';
-            $cellsHtml .= sprintf('<td>%s</td>', e($value);
+            $cellsHtml .= sprintf('<td>%s</td>', e($value));
         }
 
         // Render the actions column
@@ -74,7 +74,7 @@ class TableRenderer
     {
         $id = e($row['id']);
 
-        $uri = $_ENV['BASEPATH'] ?? '' . "/admin/{$this->table}/%s/%s";
+        $uri = env('BASEPATH', '') . "/admin/{$this->table}/%s/%s";
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
         $actions = [
             'edit' => sprintf($tpl, 'edit', $id, 'primary', __('edit')),

@@ -29,3 +29,28 @@ if (!function_exists('e')) {
         return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
     }
 }
+
+if (!function_exists('env')) {
+    /**
+     * Get an environment variable from $_SERVER or $_ENV, or return a default value.
+     *
+     * @param string $key The environment variable key.
+     * @param mixed $default The default value if the key does not exist.
+     * @return mixed
+     */
+    function env(string $key, $default = null)
+    {
+        // Check in $_SERVER
+        if (isset($_SERVER[$key])) {
+            return $_SERVER[$key];
+        }
+
+        // Check in $_ENV
+        if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+
+        // Fallback to default value
+        return $default;
+    }
+}

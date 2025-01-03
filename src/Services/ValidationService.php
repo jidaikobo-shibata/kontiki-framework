@@ -36,7 +36,7 @@ class ValidationService
      */
     public function validate(array $data, array $fieldDefinitions): array
     {
-        Validator::lang($_ENV['LANG'] ?? 'en');
+        Validator::lang(env('LANG', 'en'));
         $validator = new Validator($data);
         $validator->setPrependLabels(false);
 

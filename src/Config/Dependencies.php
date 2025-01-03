@@ -35,7 +35,7 @@ class Dependencies
 
                 $capsule->addConnection([
                     'driver' => 'sqlite',
-                    'database' => KONTIKI_PROJECT_PATH . '/' . $_ENV['DB_DATABASE'] ?? '',
+                    'database' => KONTIKI_PROJECT_PATH . '/' . env('DB_DATABASE', ''),
                     'charset' => 'utf8',
                     'collation' => 'utf8_unicode_ci',
                     'prefix' => '',
@@ -75,10 +75,10 @@ class Dependencies
         $container->set(
             FileService::class,
             function () {
-                $uploadDir = KONTIKI_PROJECT_PATH . $_ENV['UPLOADDIR'] ?? '';
-                $allowedTypesJson = $_ENV['ALLOWED_MIME_TYPES'] ?? '[]';
+                $uploadDir = KONTIKI_PROJECT_PATH . env('UPLOADDIR', '');
+                $allowedTypesJson = env('ALLOWED_MIME_TYPES', '[]');
                 $allowedTypes = json_decode($allowedTypesJson, true);
-                $maxSize = $_ENV['MAXSIZE'] ?? 5000000;
+                $maxSize = env('MAXSIZE', 5000000);
                 return new FileService($uploadDir, $allowedTypes, $maxSize);
             }
         );
