@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Services\AuthService;
@@ -28,13 +29,23 @@ class PostModel extends BaseModel
         return ['id', 'title', 'slug', 'created_at'];
     }
 
+    protected function getUtcFields(): array
+    {
+        return ['published_at', 'expired_at', 'created_at', 'updated_at'];
+    }
+
     public function getFieldDefinitions(array $params = []): array
     {
+        // Author
         $userModel = new UserModel($this->db, $this->validationService);
         $userOptions = $userModel->getOptions('username');
         $user = $this->authService->getCurrentUser();
 
+        // unique check
         $id = $params['id'] ?? null;
+
+        // current
+        $now = Carbon::now(env('TIMEZONE', 'UTC'));
 
         return [
             'id' => [
@@ -93,7 +104,7 @@ class PostModel extends BaseModel
                 'type' => 'datetime-local',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
-                'default' => date('Y-m-d\TH:i', time()),
+                'default' => $now,
                 'searchable' => true,
                 'rules' => ['required'],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -167,9 +178,9 @@ class PostModel extends BaseModel
             $query = $this->applyDraftConditions($query);
         }
 
-        // jlog($context);
-        // jlog($query->toSql());
-        // jlog($query->getBindings());
+        jlog($context);
+        jlog($query->toSql());
+        jlog($query->getBindings());
 
         return $query;
     }

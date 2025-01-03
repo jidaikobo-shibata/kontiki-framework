@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Models\Traits;
 
+use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 
 trait SoftDeleteTrait
@@ -20,11 +21,12 @@ trait SoftDeleteTrait
 
     public function trash($id): bool
     {
+        $currentTime = Carbon::now('UTC')->format('Y-m-d H:i:s');
         $data = $this->getById($id);
         if (!$data) {
             return false;
         }
-        return $this->update($id, [$this->softDeleteField => date('Y-m-d H:i:s')], true);
+        return $this->update($id, [$this->softDeleteField => $currentTime], true);
     }
 
     public function restore($id): bool

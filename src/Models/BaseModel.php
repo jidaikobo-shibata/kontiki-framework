@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Services\ValidationService;
@@ -36,6 +37,11 @@ abstract class BaseModel implements ModelInterface
         return $this->table;
     }
 
+    protected function getUtcFields(): array
+    {
+        return [];
+    }
+
     abstract public function getDisplayFields(): array;
 
     /**
@@ -62,6 +68,32 @@ abstract class BaseModel implements ModelInterface
     public function processFieldDefinitions(string $context, array $fieldDefinitions): array
     {
         return $fieldDefinitions;
+    }
+
+    public function processDataBeforeSave(array $data): array
+    {
+        foreach ($data as $field => $value) {
+            if (in_array($field, $this->getUtcFields())) {
+                if (empty($value)) {
+                    $data[$field] = null;
+                } else {
+                    $date = Carbon::parse($value, env('TIMEZONE', 'UTC'))->setTimezone('UTC');
+                    $data[$field] = $date->format('Y-m-d H:i:s');
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function processDataBeforeGet(array $data): array
+    {
+        foreach ($data as $field => $value) {
+            if (in_array($field, $this->getUtcFields()) && !empty($value)) {
+                $date = Carbon::parse($value, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
+                $data[$field] = $date->format('Y-m-d H:i:s');
+            }
+        }
+        return $data;
     }
 
     /**
@@ -112,9 +144,11 @@ abstract class BaseModel implements ModelInterface
             ->get();
 
         $options = [];
+
         foreach ($results as $row) {
             if (isset($row->id, $row->$fieldName)) {
-                $options[$row->id] = $row->$fieldName;
+                $processedRow = $this->processDataBeforeGet((array)$row);
+                $options[$row->id] = $processedRow[$fieldName];
             }
         }
 
@@ -144,6 +178,10 @@ abstract class BaseModel implements ModelInterface
             ->where('id', $id)
             ->first();
 
+        if (is_array($result)) {
+            $result = $this->processDataBeforeGet($result);
+        }
+
         return $result ? (array)$result : null;
     }
 
@@ -152,6 +190,10 @@ abstract class BaseModel implements ModelInterface
         $result = $this->db->table($this->table)
             ->where($field, $value)
             ->first();
+
+        if (is_array($result)) {
+            $result = $this->processDataBeforeGet($result);
+        }
 
         return $result ? (array)$result : null;
     }
@@ -169,6 +211,9 @@ abstract class BaseModel implements ModelInterface
         if (!$skipFieldFilter) {
             $data = $this->filterAllowedFields($data);
         }
+
+        $data = $this->processDataBeforeSave($data);
+
         $success = $this->db->table($this->table)->insert($data);
         return $success ? $this->db->getPdo()->lastInsertId() : null;
     }
@@ -186,6 +231,9 @@ abstract class BaseModel implements ModelInterface
         if (!$skipFieldFilter) {
             $data = $this->filterAllowedFields($data);
         }
+
+        $data = $this->processDataBeforeSave($data);
+
         return $this->db->table($this->table)
             ->where('id', $id)
             ->update($data);

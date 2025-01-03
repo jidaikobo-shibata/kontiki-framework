@@ -43,6 +43,11 @@ trait IndexTrait
                   ->map(fn($item) => (array) $item)
                   ->toArray();
 
+        $data = array_map(
+            fn($item) => $this->model->processDataBeforeGet($item),
+            $data
+        );
+
         // render table
         $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context);
         $content = $tableRenderer->render();
