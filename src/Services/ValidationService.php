@@ -4,7 +4,6 @@ namespace Jidaikobo\Kontiki\Services;
 
 use Illuminate\Database\Connection;
 use Valitron\Validator;
-use Jidaikobo\Kontiki\Utils\Env;
 
 class ValidationService
 {
@@ -37,7 +36,7 @@ class ValidationService
      */
     public function validate(array $data, array $fieldDefinitions): array
     {
-        Validator::lang(Env::get('LANG'));
+        Validator::lang($_ENV['LANG'] ?? 'en');
         $validator = new Validator($data);
         $validator->setPrependLabels(false);
 

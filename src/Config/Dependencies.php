@@ -10,7 +10,6 @@ use DI\Container;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\SidebarService;
-use Jidaikobo\Kontiki\Utils\Env;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Views\PhpRenderer;
@@ -36,7 +35,7 @@ class Dependencies
 
                 $capsule->addConnection([
                     'driver' => 'sqlite',
-                    'database' => KONTIKI_PROJECT_PATH . '/' . Env::get('DB_DATABASE'),
+                    'database' => KONTIKI_PROJECT_PATH . '/' . $_ENV['DB_DATABASE'] ?? '',
                     'charset' => 'utf8',
                     'collation' => 'utf8_unicode_ci',
                     'prefix' => '',
@@ -76,10 +75,10 @@ class Dependencies
         $container->set(
             FileService::class,
             function () {
-                $uploadDir = KONTIKI_PROJECT_PATH . Env::get('UPLOADDIR');
-                $allowedTypesJson = Env::get('ALLOWED_MIME_TYPES') ?? '[]';
+                $uploadDir = KONTIKI_PROJECT_PATH . $_ENV['UPLOADDIR'] ?? '';
+                $allowedTypesJson = $_ENV['ALLOWED_MIME_TYPES'] ?? '[]';
                 $allowedTypes = json_decode($allowedTypesJson, true);
-                $maxSize = Env::get('MAXSIZE') ?? 5000000;
+                $maxSize = $_ENV['MAXSIZE'] ?? 5000000;
                 return new FileService($uploadDir, $allowedTypes, $maxSize);
             }
         );

@@ -168,6 +168,7 @@ class PostModel extends BaseModel
         }
 
         // jlog($context);
+        // jlog($query->toSql());
         // jlog($query->getBindings());
 
         return $query;

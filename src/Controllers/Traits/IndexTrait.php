@@ -2,7 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
-use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Utils\Pagination;
 use Jidaikobo\Kontiki\Utils\TableHandler;
 use Jidaikobo\Kontiki\Utils\TableRenderer;
@@ -60,7 +59,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
-        $content .= $pagination->render(Env::get('BASEPATH') . "/admin/{$this->table}/index");
+        $content .= $pagination->render($_ENV['BASEPATH'] ?? '' . "/admin/{$this->table}/index");
 
         $title = 'x_index';
         $title .= $this->context === 'normal' ? '' : '_' . $this->context ;

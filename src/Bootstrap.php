@@ -3,6 +3,7 @@
 namespace Jidaikobo\Kontiki;
 
 use DI\Container;
+use Dotenv\Dotenv;
 use Jidaikobo\Log;
 use Slim\Factory\AppFactory;
 
@@ -18,11 +19,16 @@ class Bootstrap
         define('KONTIKI_PROJECT_PATH', $projectPath);
 
         // load config
-        Utils\Env::loadConfigPath(KONTIKI_PROJECT_PATH . "/config/{$env}/");
+        $dotenv = Dotenv::createImmutable(KONTIKI_PROJECT_PATH . "/config/{$env}/");
+        $dotenv->load();
 
         // Load default language on class load
-        $language = Utils\Env::get('LANG') ?? 'en';
+        $language = $_ENV['LANG'] ?? 'en';
         Utils\Lang::setLanguage($language);
+
+        // Set Timezone
+        // $timezone = Utils\Env::get('TIMEZONE') ?? 'Asia/Tokyo';
+        // date_default_timezone_set($timezone);
 
         // Load Functions
         if ($env === 'development') {
@@ -37,7 +43,7 @@ class Bootstrap
         // Create a Slim application
         $app = AppFactory::create();
         $app->addErrorMiddleware(true, true, true);
-        $basePath = Utils\Env::get('BASEPATH') ?? '/';
+        $basePath = $_ENV['BASEPATH'] ?? '/';
         $app->setBasePath($basePath);
 
         // Add a header for security measures

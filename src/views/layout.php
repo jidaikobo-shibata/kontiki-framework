@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= \Jidaikobo\Kontiki\Utils\Env::get('LANG') ?>">
+<html lang="<?= $_ENV['LANG'] ?? 'en' ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +16,8 @@
 
   <!-- Scripts -->
 <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
-  <script src="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManager.js"></script>
-  <script src="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/admin/fileManagerInstance.js"></script>
+  <script src="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/fileManager.js"></script>
+  <script src="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/fileManagerInstance.js"></script>
 <?php endif; ?>
 
   <title><?= htmlspecialchars($pageTitle) ?></title>
@@ -30,7 +30,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= \Jidaikobo\Kontiki\Utils\Env::get('BASEPATH') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
+    <a href="<?= $_ENV['BASEPATH'] ?? '' ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->
@@ -55,7 +55,7 @@
 
   <!-- .main-footer -->
   <footer class="main-footer">
-    <?= \Jidaikobo\Kontiki\Utils\Env::get('COPYRIGHT') ?>
+    <?= $_ENV['COPYRIGHT'] ?? '' ?>
   </footer><!-- /.main-footer -->
 </div>
 </body>

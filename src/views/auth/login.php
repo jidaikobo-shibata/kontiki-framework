@@ -1,6 +1,6 @@
 <div class="login-box">
   <div class="login-logo">
-    <?php echo \Jidaikobo\Kontiki\Utils\Env::get('COPYRIGHT') ?>
+    <?= $_ENV('COPYRIGHT') ?? '' ?>
   </div>
 
   <div class="card">

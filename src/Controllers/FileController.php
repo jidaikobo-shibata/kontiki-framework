@@ -7,7 +7,6 @@ use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Utils\CsrfManager;
-use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Utils\MessageUtils;
 use Jidaikobo\Kontiki\Utils\Pagination;
 use Jidaikobo\Log;
@@ -275,7 +274,7 @@ class FileController extends BaseController
         $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);
-        $paginationHtml = $pagination->render(Env::get('BASEPATH') . "/admin/filelist");
+        $paginationHtml = $pagination->render($_ENV['BASEPATH'] ?? '' . "/admin/filelist");
 
         $items = $query->limit($pagination->getLimit())
                   ->offset($pagination->getOffset())
@@ -397,7 +396,7 @@ class FileController extends BaseController
         $content = $this->view->fetch(
             'js/fileManagerInstance.js.php',
             [
-                'basepath' => Env::get('BASEPATH')
+                'basepath' => $_ENV['BASEPATH'] ?? ''
             ]
         );
         $response->getBody()->write($content);

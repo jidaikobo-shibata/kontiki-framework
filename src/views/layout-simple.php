@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?php echo \Jidaikobo\Kontiki\Utils\Env::get('LANG') ?>">
+<html lang="<?= $_ENV['LANG'] ?? 'en' ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

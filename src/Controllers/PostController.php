@@ -35,9 +35,14 @@ class PostController extends BaseController
     {
         parent::registerRoutes($app, $basePath);
 
-        $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($basePath) {
-            $group->get('/index/draft', [PostController::class, 'draftIndex'])->setName("{$basePath}_index_draft");
-        })->add(AuthMiddleware::class);
+        $controllerClass = static::class;
+
+        $app->group(
+            '/admin/' . $basePath,
+            function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
+                $group->get('/index/draft', [$controllerClass, 'draftIndex'])->setName("{$basePath}_index_draft");
+            }
+        )->add(AuthMiddleware::class);
     }
 
     public function draftIndex(Request $request, Response $response): Response

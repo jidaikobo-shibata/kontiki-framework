@@ -7,7 +7,6 @@ use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Services\SidebarService;
 use Jidaikobo\Kontiki\Services\FormService;
-use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Utils\CsrfManager;
 use Jidaikobo\Kontiki\Utils\FlashManager;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -159,7 +158,7 @@ abstract class BaseController
     protected function redirectResponse(Request $request, Response $response, string $target, array $routeData = [], int $status = 302): Response
     {
         if (strpos($target, '/') === 0 || filter_var($target, FILTER_VALIDATE_URL)) {
-            $redirectUrl = Env::get('BASEPATH') . $target;
+            $redirectUrl = $_ENV['BASEPATH'] ?? '' . $target;
         } else {
             $routeParser = RouteContext::fromRequest($request)->getRouteParser();
             $redirectUrl = $routeParser->urlFor($target, $routeData);

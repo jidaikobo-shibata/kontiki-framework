@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Utils;
 
 use Slim\Views\PhpRenderer;
-use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Models\BaseModel;
 
 class TableRenderer
@@ -75,7 +74,7 @@ class TableRenderer
     {
         $id = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
 
-        $uri = Env::get('BASEPATH') . "/admin/{$this->table}/%s/%s";
+        $uri = $_ENV['BASEPATH'] ?? '' . "/admin/{$this->table}/%s/%s";
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
         $actions = [
             'edit' => sprintf($tpl, 'edit', $id, 'primary', __('edit')),

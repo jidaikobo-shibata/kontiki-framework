@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Services;
 
 use Jidaikobo\Kontiki\Models\ModelInterface;
-use Jidaikobo\Kontiki\Utils\Env;
 use Jidaikobo\Kontiki\Utils\FormRenderer;
 use Jidaikobo\Kontiki\Utils\FormHandler;
 use Slim\Views\PhpRenderer;
@@ -55,7 +54,7 @@ class FormService
         return $this->view->fetch(
             'forms/edit.php',
             [
-                'actionAttribute' => Env::get('BASEPATH') . $action,
+                'actionAttribute' => $_ENV['BASEPATH'] ?? '' . $action,
                 'csrfToken' => $csrfToken,
                 'formHtml' => $formRenderer->render(),
                 'description' => $description,
