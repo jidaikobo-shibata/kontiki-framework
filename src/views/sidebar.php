@@ -11,16 +11,16 @@
             <a href="#" class="nav-link" aria-expanded="false">
               <i class="nav-icon fas fa-folder"></i>
               <p>
-                <?php echo htmlspecialchars($sidebarItems['groupNames'][$group]) ?>
+                <?= e($sidebarItems['groupNames'][$group]) ?>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
                 <?php foreach ($links as $link) : ?>
                 <li class="nav-item">
-                  <a href="<?php echo htmlspecialchars($link['url']) ?>" class="nav-link">
-                    <i class="nav-icon fas <?php echo htmlspecialchars($link['icon'] ?? 'fa-circle') ?>"></i>
-                    <p><?php echo __($link['name']) ?></p>
+                  <a href="<?= e($link['url']) ?>" class="nav-link">
+                    <i class="nav-icon fas <?= e($link['icon'] ?? 'fa-circle') ?>"></i>
+                    <p><?= __($link['name']) ?></p>
                   </a>
                 </li>
                 <?php endforeach; ?>

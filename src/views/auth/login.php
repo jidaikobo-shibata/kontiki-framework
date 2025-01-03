@@ -8,9 +8,9 @@
 
       <form action="./login" method="post">
 
-        <label for="username"><?php echo __('username', 'Username') ?></label>
+        <label for="username"><?= __('username', 'Username') ?></label>
         <div class="input-group mb-3">
-          <input type="text" name="username" id="username" class="form-control" required value="<?php echo htmlspecialchars($data['username'], ENT_QUOTES) ?>">
+          <input type="text" name="username" id="username" class="form-control" required value="<?= e($data['username']) ?>">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <label for="password"><?php echo __('password', 'Password') ?></label>
+        <label for="password"><?= __('password', 'Password') ?></label>
         <div class="input-group mb-3">
           <input type="password" name="password" id="password" class="form-control" required>
           <div class="input-group-append">
@@ -29,7 +29,7 @@
         </div>
 
         <div class="col-4">
-          <button type="submit" class="btn btn-primary btn-block"><?php echo __('login', 'Login') ?></button>
+          <button type="submit" class="btn btn-primary btn-block"><?= __('login', 'Login') ?></button>
         </div>
 
       </form>

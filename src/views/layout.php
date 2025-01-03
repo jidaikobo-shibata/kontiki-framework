@@ -20,7 +20,7 @@
   <script src="<?= $_ENV['BASEPATH'] ?? '' ?>/admin/fileManagerInstance.js"></script>
 <?php endif; ?>
 
-  <title><?= htmlspecialchars($pageTitle) ?></title>
+  <title><?= e($pageTitle) ?></title>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -42,7 +42,7 @@
   <main class="content-wrapper">
     <section class="content-header">
       <div class="container-fluid">
-        <h1><?= htmlspecialchars($pageTitle) ?></h1>
+        <h1><?= e($pageTitle) ?></h1>
       </div>
     </section>
 

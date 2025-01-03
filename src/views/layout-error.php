@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title><?php echo htmlspecialchars($pageTitle) ?></title>
+    <title><?= e($pageTitle) ?></title>
 </head>
 
 <body class="bg-light">
@@ -12,7 +12,7 @@
 <!-- Main content -->
 <main class="container my-4">
 
-<?php echo $content ?>
+<?= $content ?>
 
 </main><!-- /Main content -->
 

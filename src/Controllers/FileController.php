@@ -429,13 +429,13 @@ class FileController extends BaseController
 
         if (isset($pathInfo['extension']) && in_array(strtolower($pathInfo['extension']), $imageExtensions)) {
           // Return an <img> tag for images
-            $descText = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
-            $imgSrc = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            $descText = e($desc);
+            $imgSrc = e($url);
             return '<img src="' . $imgSrc . '" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
         }
 
       // Otherwise, return an <a> tag for links
-        $linkHref = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $linkHref = e($url);
 
         $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : null;
 

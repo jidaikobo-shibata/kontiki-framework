@@ -2,7 +2,7 @@
 
 namespace App\Config;
 
-use App\Controller;
+use App\Controllers;
 use Jidaikobo\Kontiki\Config\Routes as DefalutRoutes;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use DI\Container;
@@ -13,9 +13,11 @@ class Routes extends DefalutRoutes
     public function register(App $app, Container $container): void
     {
         parent::register($app, $container);
-
-        $app->get('/test', [Controller\TestController::class, 'test'])
+/*
+        $app->get('/info', [Controller\TestController::class, 'test'])
             ->setName('test')
             ->add($container->get(AuthMiddleware::class));
+*/
+        Controllers\InformationController::registerRoutes($app, 'informations');
     }
 }

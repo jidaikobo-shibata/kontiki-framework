@@ -71,7 +71,7 @@ class FormRenderer
             'label' => sprintf(
                 '<label %s>%s</label>',
                 $labelAttributes,
-                htmlspecialchars($config['label'], ENT_QUOTES, 'UTF-8')
+                e($config['label'])
             ),
             'field' => $fieldHtml,
         ]);
@@ -104,7 +104,7 @@ class FormRenderer
             'id' => $id,
             'name' => $name,
             'type' => $config['type'],
-            'value' => htmlspecialchars($config['default'] ?? '', ENT_QUOTES, 'UTF-8'),
+            'value' => e($config['default'] ?? ''),
             'options' => $config['options'] ?? [],
             'attributes' => $renderedAttributes,
             'ariaDescribedby' => $ariaDescribedby,
@@ -123,11 +123,7 @@ class FormRenderer
     {
         $result = [];
         foreach ($attributes as $key => $value) {
-            $result[] = sprintf(
-                '%s="%s"',
-                htmlspecialchars($key, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-            );
+            $result[] = sprintf('%s="%s"', e($key), e($value));
         }
         return implode(' ', $result);
     }

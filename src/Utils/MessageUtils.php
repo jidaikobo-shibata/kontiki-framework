@@ -23,10 +23,7 @@ class MessageUtils
                 $html .= '<li class="pt-3">' . __('found_the_problem', 'Found the problem');
                 $html .= '<ul class="ps-3">';
                 foreach ($messages as $message) {
-                    $html .= sprintf(
-                        '<li class="pt-2">%s</li>',
-                        htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
-                    );
+                    $html .= sprintf('<li class="pt-2">%s</li>', e($message));
                 }
                 $html .= '</ul></li>';
                 continue;
@@ -35,17 +32,14 @@ class MessageUtils
             // フィールド固有のエラー
             $id = FormUtils::nameToId($htmlName);
 
-            $html .= sprintf(
-                '<li id="errormessage_%s" class="pt-3">',
-                htmlspecialchars($id, ENT_QUOTES, 'UTF-8')
-            );
+            $html .= sprintf('<li id="errormessage_%s" class="pt-3">', e($id));
 
             // モデルからラベルを取得
             $labelText = $fieldDefinitions[$field]['label'] ?? ucfirst($field);
 
             $html .= sprintf(
                 '<a href="#%s" class="alert-link">%s</a>',
-                htmlspecialchars($id, ENT_QUOTES, 'UTF-8'),
+                e($id),
                 __('error_at_x', 'Error at :name', ['name' => $labelText]),
             );
 
@@ -54,7 +48,7 @@ class MessageUtils
                 $html .= sprintf(
                     '<li class="pt-2">%s%s</li>',
                     $labelText,
-                    htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
+                    e($message)
                 );
             }
             $html .= '</ul></li>';
@@ -94,8 +88,8 @@ class MessageUtils
         }
 
         // Generate the HTML for the status section
-        $html = '<section class="' . htmlspecialchars($statusClass) . '" role="status">';
-        $html .= '<p class="mb-0">' . htmlspecialchars($message) . '</p>';
+        $html = '<section class="' . e($statusClass) . '" role="status">';
+        $html .= '<p class="mb-0">' . e($message) . '</p>';
         $html .= '</section>';
 
         return $html;
