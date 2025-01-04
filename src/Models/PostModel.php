@@ -178,9 +178,9 @@ class PostModel extends BaseModel
             $query = $this->applyDraftConditions($query);
         }
 
-        jlog($context);
-        jlog($query->toSql());
-        jlog($query->getBindings());
+        // jlog($context);
+        // jlog($query->toSql());
+        // jlog($query->getBindings());
 
         return $query;
     }
