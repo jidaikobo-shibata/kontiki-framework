@@ -130,20 +130,48 @@ class Pagination
 
         $html = '<nav aria-label="Page navigation">';
         $html .= '<ul class="pagination">';
+        $html .= $this->renderPreviousLink($baseUrl, $ajaxClass);
+        $html .= $this->renderPageLinks($baseUrl, $ajaxClass);
+        $html .= $this->renderNextLink($baseUrl, $ajaxClass);
+        $html .= '</ul>';
+        $html .= '</nav>';
 
-        // Previous link
+        return $html;
+    }
+
+    private function renderPreviousLink(string $baseUrl, string $ajaxClass): string
+    {
         if ($this->hasPreviousPage()) {
             $previousPage = $this->currentPage - 1;
+            $html = '';
             $html .= '<li class="page-item">';
             $html .= '<a class="page-link' . $ajaxClass . '" href="' . $baseUrl . '?paged=' . $previousPage . '" aria-label="Previous" data-page="' . $previousPage . '">';
             $html .= '<span aria-hidden="true">&laquo;</span>';
             $html .= '</a></li>';
-        } else {
-            $html .= '<li class="page-item disabled"><span class="page-link">&laquo;</span></li>';
+            return $html;
         }
+        return '<li class="page-item disabled"><span class="page-link">&laquo;</span></li>';
+    }
 
-        // Each page link
-        foreach ($pageLinks as $link) {
+    private function renderNextLink(string $baseUrl, string $ajaxClass): string
+    {
+        if ($this->hasNextPage()) {
+            $html = '';
+            $nextPage = $this->currentPage + 1;
+            $nextPage = $this->currentPage + 1;
+            $html .= '<li class="page-item">';
+            $html .= '<a class="page-link' . $ajaxClass . '" href="' . $baseUrl . '?paged=' . $nextPage . '" aria-label="Next" data-page="' . $nextPage . '">';
+            $html .= '<span aria-hidden="true">&raquo;</span>';
+            $html .= '</a></li>';
+            return $html;
+        }
+        return '<li class="page-item disabled"><span class="page-link">&raquo;</span></li>';
+    }
+
+    private function renderPageLinks(string $baseUrl, string $ajaxClass): string
+    {
+        $html = '';
+        foreach ($this->getPageLinks() as $link) {
             $eachPage = $link['page'];
             $activeClass = $link['isCurrent'] ? ' active' : '';
             $ariaCurrent = $link['isCurrent'] ? ' aria-current="page"' : '';
@@ -151,21 +179,6 @@ class Pagination
             $html .= '<a class="page-link' . $ajaxClass . '" href="' . $baseUrl . '?paged=' . $eachPage . '"' . $ariaCurrent . ' data-page="' . $eachPage . '">' . $eachPage . '</a>';
             $html .= '</li>';
         }
-
-        // Next link
-        if ($this->hasNextPage()) {
-            $nextPage = $this->currentPage + 1;
-            $html .= '<li class="page-item">';
-            $html .= '<a class="page-link' . $ajaxClass . '" href="' . $baseUrl . '?paged=' . $nextPage . '" aria-label="Next" data-page="' . $nextPage . '">';
-            $html .= '<span aria-hidden="true">&raquo;</span>';
-            $html .= '</a></li>';
-        } else {
-            $html .= '<li class="page-item disabled"><span class="page-link">&raquo;</span></li>';
-        }
-
-        $html .= '</ul>';
-        $html .= '</nav>';
-
         return $html;
     }
 }
