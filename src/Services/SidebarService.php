@@ -18,46 +18,83 @@ class SidebarService
 
     public function getLinks(): array
     {
-        // 名前付きルートを取得
         $routes = $this->routeCollector->getRoutes();
+
         $groupedLinks = [];
         $groupNames = [];
 
-        foreach ($routes as $route) {
+        foreach ($this->filterRoutes($routes) as $route) {
             $name = $route->getName();
             $pattern = $route->getPattern();
-
-            // 名前が "dashboard" または "login" のルートはスキップ
-            if (!$name || in_array($name, ['dashboard', 'login'])) {
-                continue;
-            }
-
-            // 名前が "." から始まるルートはメニュー用でない
-            if (!$name || strpos($name, '.') === 0) {
-                continue;
-            }
-
-            // グループの抽出
             $group = $this->extractGroupFromPattern($pattern);
 
             // グループ名を設定
             if (!isset($groupNames[$group])) {
-                $groupNames[$group] = __("x_management", ':name Management', ['name' => __($group)]);
+                $groupNames[$group] = $this->translateGroupName($group);
             }
 
             // グループごとにリンクを分類
-            $langLabel = preg_replace('/^[^_]+/', 'x', $name);
-            $groupedLinks[$group][] = [
-                'name' => __($langLabel, ':name index', ['name' => __($group)]),
-                'url' => $this->routeParser->urlFor($name),
-                'icon' => 'fa-' . strtolower($name) . '-alt',
-            ];
+            $groupedLinks[$group][] = $this->generateLink($name, $group);
         }
 
         return [
             'groupedLinks' => $groupedLinks,
             'groupNames' => $groupNames,
-          ];
+        ];
+    }
+
+    /**
+     * Filters the routes to exclude unnecessary ones.
+     *
+     * @param array $routes The list of routes to filter.
+     * @return array The filtered routes.
+     */
+    private function filterRoutes(array $routes): array
+    {
+        return array_filter($routes, function ($route) {
+            $name = $route->getName();
+
+            // 名前が "dashboard" または "login" のルートはスキップ
+            if (!$name || in_array($name, ['dashboard', 'login'])) {
+                return false;
+            }
+
+            // 名前が "." から始まるルートはスキップ
+            if (strpos($name, '.') === 0) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Translates the group name.
+     *
+     * @param string $group The group name.
+     * @return string The translated group name.
+     */
+    private function translateGroupName(string $group): string
+    {
+        return __("x_management", ':name Management', ['name' => __($group)]);
+    }
+
+    /**
+     * Generates a single link for the sidebar.
+     *
+     * @param string $name The route name.
+     * @param string $group The group name.
+     * @return array The generated link.
+     */
+    private function generateLink(string $name, string $group): array
+    {
+        $langLabel = preg_replace('/^[^_]+/', 'x', $name);
+
+        return [
+            'name' => __($langLabel, ':name index', ['name' => __($group)]),
+            'url' => $this->routeParser->urlFor($name),
+            'icon' => 'fa-' . strtolower($name) . '-alt',
+        ];
     }
 
     /**
