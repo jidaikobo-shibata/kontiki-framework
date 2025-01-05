@@ -18,6 +18,18 @@ class ValidationService
     {
         $this->db = $db;
 
+        $this->registerCustomRules();
+    }
+
+    /**
+     * Registers custom validation rules for Valitron\Validator.
+     *
+     * Currently registers the 'unique' rule for database uniqueness checks.
+     *
+     * @return void
+     */
+    public function registerCustomRules(): void
+    {
         Validator::addRule(
             'unique',
             function ($field, $value, array $params, array $fields) {
@@ -41,13 +53,12 @@ class ValidationService
         $validator->setPrependLabels(false);
 
         foreach ($fieldDefinitions as $field => $definition) {
-            if (isset($definition['rules'])) {
-                foreach ($definition['rules'] as $rule) {
-                    if (is_array($rule)) {
-                        $validator->rule($rule[0], $field, ...array_slice($rule, 1));
-                    } else {
-                        $validator->rule($rule, $field);
-                    }
+            $rules = $definition['rules'] ?? [];
+            foreach ($rules as $rule) {
+                if (is_array($rule)) {
+                    $validator->rule($rule[0], $field, ...array_slice($rule, 1));
+                } else {
+                    $validator->rule($rule, $field);
                 }
             }
         }
