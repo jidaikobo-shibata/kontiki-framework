@@ -6,7 +6,7 @@ class Lang
 {
     private static string $language = 'en'; // Default language
     private static array $messages = [];
-    private static string $langPath = __DIR__ . '/../../locale'; // Path to language files
+    private static string $langPath = __DIR__ . '/../locale'; // Path to language files
 
     /**
      * Set the language to use.
