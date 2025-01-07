@@ -58,21 +58,4 @@ class Lang
 
         return $message;
     }
-
-    /**
-     * Translate a message with placeholders.
-     *
-     * @param  string $key     The message key.
-     * @param  array  $replace Variables to replace in the message.
-     * @return string
-     */
-    public static function trans(string $key, array $replace = []): string
-    {
-        return self::get($key, $replace);
-    }
-
-    public static function mergeMessages(array $defaultMessages, array $additionalMessages): array
-    {
-        return array_merge($defaultMessages, $additionalMessages);
-    }
 }
