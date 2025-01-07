@@ -4,10 +4,10 @@ namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
+use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
-use Jidaikobo\Kontiki\Utils\CsrfManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

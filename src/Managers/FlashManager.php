@@ -1,6 +1,6 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Utils;
+namespace Jidaikobo\Kontiki\Managers;
 
 use Aura\Session\Session;
 

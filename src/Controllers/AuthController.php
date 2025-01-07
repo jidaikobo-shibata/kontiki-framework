@@ -3,11 +3,11 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
+use Jidaikobo\Kontiki\Managers\CsrfManager;
+use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\AuthService;
-use Jidaikobo\Kontiki\Utils\CsrfManager;
-use Jidaikobo\Kontiki\Utils\FlashManager;
 use Jidaikobo\Kontiki\Utils\FormHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
