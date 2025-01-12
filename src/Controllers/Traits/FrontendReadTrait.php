@@ -7,17 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait FrontendReadTrait
 {
-    protected string $deleteType;
-
-    protected function isUsesTrashRestoreTrait(): void
-    {
-        $usesTrashRestoreTrait = in_array(
-            TrashRestoreTrait::class,
-            class_uses($this)
-        );
-        $this->deleteType = $usesTrashRestoreTrait ? 'softDelete' : 'hardDelete';
-    }
-
     public function frontendReadBySlug(Request $request, Response $response, array $args): Response
     {
         $slug = $args['slug'];

@@ -21,8 +21,6 @@ trait IndexTrait
      */
     public function getIndexData(array $queryParams): array
     {
-        self::isUsesTrashRestoreTrait();
-
         // Build search conditions based on query parameters
         $query = $this->model->buildSearchConditions($queryParams['s'] ?? '', []);
         $query = $this->model->getAdditionalConditions($query, $this->context);
