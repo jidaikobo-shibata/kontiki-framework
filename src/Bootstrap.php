@@ -32,10 +32,6 @@ class Bootstrap
         $language = env('LANG', 'en');
         Utils\Lang::setLanguage($language);
 
-        // Set Timezone
-        // $timezone = Utils\Env::get('TIMEZONE') ?? 'Asia/Tokyo';
-        // date_default_timezone_set($timezone);
-
         // Configure a PHP-DI container
         $container = new Container();
         AppFactory::setContainer($container);

@@ -55,7 +55,7 @@ trait ListTrait
     private function processItemsForList(Request $request, array $items): array
     {
         foreach ($items as $key => $value) {
-            $url = $this->pathToUrl($request, $items[$key]['path']);
+            $url = $this->pathToUrl($items[$key]['path']);
             $items[$key]['imageOrLink'] = $this->renderImageOrLink($url, $items[$key]['description'] ?? '');
             $items[$key]['url'] = $url;
             $items[$key]['description'] = $items[$key]['description'] ?? ''; // don't use null
@@ -103,9 +103,16 @@ trait ListTrait
         return '<a href="' . $linkHref . '" target="_blank" aria-label="' . __('downlaod') . '" download class="bi ' . $class . ' display-3"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) . '</span></a>';
     }
 
-    protected function pathToUrl($request, $path)
+    protected function pathToUrl(string $filePath): string
     {
-        $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
-        return str_replace(dirname(__DIR__, 3), $baseUrl, $path);
+        $filePath = realpath($filePath);
+        $uploadDir = realpath(KONTIKI_PROJECT_PATH . env('UPLOADDIR'));
+        $uploadBaseUrl = rtrim(env('UPLOAD_BASE_URL'), '/');
+
+        if (strpos($filePath, $uploadDir) === 0) {
+            $relativePath = ltrim(str_replace($uploadDir, '', $filePath), '/');
+            return $uploadBaseUrl . '/' . $relativePath;
+        }
+        throw new InvalidArgumentException('The file path is not inside the upload directory.');
     }
 }
