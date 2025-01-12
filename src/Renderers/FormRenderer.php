@@ -1,6 +1,6 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Utils;
+namespace Jidaikobo\Kontiki\Renderers;
 
 use Jidaikobo\Kontiki\Utils\FormUtils;
 use Slim\Views\PhpRenderer;

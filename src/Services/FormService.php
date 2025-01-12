@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Services;
 
 use Jidaikobo\Kontiki\Models\ModelInterface;
-use Jidaikobo\Kontiki\Utils\FormRenderer;
-use Jidaikobo\Kontiki\Utils\FormHandler;
+use Jidaikobo\Kontiki\Renderers\FormRenderer;
+use Jidaikobo\Kontiki\Handlers\FormHandler;
 use Slim\Views\PhpRenderer;
 
 /**

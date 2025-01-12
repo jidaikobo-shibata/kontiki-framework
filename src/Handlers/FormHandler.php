@@ -1,9 +1,10 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Utils;
+namespace Jidaikobo\Kontiki\Handlers;
 
 use DOMDocument;
 use Jidaikobo\Kontiki\Models\BaseModel;
+use Jidaikobo\Kontiki\Utils\MessageUtils;
 
 class FormHandler
 {

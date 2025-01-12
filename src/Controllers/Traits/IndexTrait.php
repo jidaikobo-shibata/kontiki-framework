@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
 use Jidaikobo\Kontiki\Utils\Pagination;
-use Jidaikobo\Kontiki\Utils\TableHandler;
-use Jidaikobo\Kontiki\Utils\TableRenderer;
+use Jidaikobo\Kontiki\Handlers\TableHandler;
+use Jidaikobo\Kontiki\Renderers\TableRenderer;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 

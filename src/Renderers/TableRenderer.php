@@ -1,6 +1,6 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Utils;
+namespace Jidaikobo\Kontiki\Renderers;
 
 use Slim\Views\PhpRenderer;
 use Jidaikobo\Kontiki\Models\BaseModel;

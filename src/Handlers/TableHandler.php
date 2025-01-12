@@ -1,8 +1,9 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Utils;
+namespace Jidaikobo\Kontiki\Handlers;
 
 use Jidaikobo\Kontiki\Models\ModelInterface;
+use Jidaikobo\Kontiki\Utils\MessageUtils;
 
 class TableHandler
 {
