@@ -11,42 +11,41 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 trait IndexTrait
 {
     protected string $context;
-    protected string $deleteType;
+    protected Pagination $pagination;
 
-    protected function isUsesTrashRestoreTrait(): void
+    /**
+     * Retrieve data with pagination and additional conditions applied.
+     *
+     * @param array $queryParams Query parameters from the request.
+     * @return array Processed data array.
+     */
+    public function getIndexData(array $queryParams): array
     {
-        $usesTrashRestoreTrait = in_array(
-            TrashRestoreTrait::class,
-            class_uses($this)
-        );
-        $this->deleteType = $usesTrashRestoreTrait ? 'softDelete' : 'hardDelete';
+        self::isUsesTrashRestoreTrait();
+
+        // Build search conditions based on query parameters
+        $query = $this->model->buildSearchConditions($queryParams['s'] ?? '', []);
+        $query = $this->model->getAdditionalConditions($query, $this->context);
+
+        // Set up pagination
+        $totalItems = $query->count();
+        $this->pagination = new Pagination((int)($queryParams['paged'] ?? 1), 10);
+        $this->pagination->setTotalItems($totalItems);
+
+        // Fetch and process data
+        $data = $query->limit($this->pagination->getLimit())
+                      ->offset($this->pagination->getOffset())
+                      ->get()
+                      ->map(fn($item) => (array) $item)
+                      ->toArray();
+
+        return array_map(fn($item) => $this->model->processDataBeforeGet($item), $data);
     }
 
     public function index(Request $request, Response $response): Response
     {
-        self::isUsesTrashRestoreTrait();
-
-        $query = $this->model->buildSearchConditions(
-            $request->getQueryParams()['s'] ?? '',
-            []
-        );
-        $query = $this->model->getAdditionalConditions($query, $this->context, $this->deleteType);
-
-        $totalItems = $query->count();
-
-        $pagination = new Pagination((int)($request->getQueryParams()['paged'] ?? 1), 10);
-        $pagination->setTotalItems($totalItems);
-
-        $data = $query->limit($pagination->getLimit())
-                  ->offset($pagination->getOffset())
-                  ->get()
-                  ->map(fn($item) => (array) $item)
-                  ->toArray();
-
-        $data = array_map(
-            fn($item) => $this->model->processDataBeforeGet($item),
-            $data
-        );
+        // Get data using the new getData method
+        $data = $this->getIndexData($request->getQueryParams());
 
         // render table
         $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context);
@@ -64,7 +63,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
-        $content .= $pagination->render(env('BASEPATH', '') . "/admin/{$this->table}/index");
+        $content .= $this->pagination->render(env('BASEPATH', '') . "/admin/{$this->table}/index");
 
         $title = 'x_index';
         $title .= $this->context === 'normal' ? '' : '_' . $this->context ;

@@ -107,7 +107,7 @@ trait ListTrait
     {
         $filePath = realpath($filePath);
         $uploadDir = realpath(KONTIKI_PROJECT_PATH . env('UPLOADDIR'));
-        $uploadBaseUrl = rtrim(env('UPLOAD_BASE_URL'), '/');
+        $uploadBaseUrl = rtrim(env('BASEURL'), '/') . rtrim(env('BASEURL_UPLOAD_DIR'), '/');
 
         if (strpos($filePath, $uploadDir) === 0) {
             $relativePath = ltrim(str_replace($uploadDir, '', $filePath), '/');
