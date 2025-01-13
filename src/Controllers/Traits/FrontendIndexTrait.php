@@ -11,11 +11,10 @@ trait FrontendIndexTrait
     {
         $this->context = 'normal';
         $baseurl = env('BASEURL') . '/' . $this->table;
-
         $data = $this->getIndexData($request->getQueryParams());
         $data = [
             'body' => $data,
-            'pagination' => $this->pagination->render($baseurl . "/index"),
+            'pagination' => $this->pagination->render($baseurl),
         ];
         return $this->jsonResponse($response, $data);
     }

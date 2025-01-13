@@ -34,3 +34,10 @@ if (!function_exists('getData')) {
         }
     }
 }
+
+if (!function_exists('homeUrl')) {
+    function homeUrl(): string
+    {
+        return env('BASEURL');
+    }
+}

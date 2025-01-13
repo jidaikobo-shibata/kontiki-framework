@@ -9,7 +9,7 @@ use Slim\Factory\AppFactory;
 
 class Bootstrap
 {
-    public static function init(string $env = 'production')
+    public static function init(string $env = 'production', bool $frontend = FALSE)
     {
         // Set the error log handler
         Log::getInstance()->registerHandlers();
@@ -31,6 +31,10 @@ class Bootstrap
         // Load default language on class load
         $language = env('LANG', 'en');
         Utils\Lang::setLanguage($language);
+
+        if ($frontend) {
+            return;
+        }
 
         // Configure a PHP-DI container
         $container = new Container();
