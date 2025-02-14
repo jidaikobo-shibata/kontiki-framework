@@ -25,6 +25,14 @@ trait IndexTrait
         $query = $this->model->buildSearchConditions($queryParams['s'] ?? '', []);
         $query = $this->model->getAdditionalConditions($query, $this->context);
 
+        // Apply sorting if orderby and order are provided
+        if (!empty($queryParams['orderby']) && !empty($queryParams['order'])) {
+            $validColumns = ['id', 'name', 'created_at']; // いったんハードコーディング
+            $column = in_array($queryParams['orderby'], $validColumns, true) ? $queryParams['orderby'] : 'id';
+            $direction = strtoupper($queryParams['order']) === 'DESC' ? 'DESC' : 'ASC';
+            $query = $query->orderBy($column, $direction);
+        }
+
         // Set up pagination
         $totalItems = $query->count();
         $this->pagination = new Pagination((int)($queryParams['paged'] ?? 1), 10);

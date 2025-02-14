@@ -134,6 +134,11 @@ trait CreateEditTrait
         $data = $request->getParsedBody() ?? [];
         $this->flashManager->setData('data', $data);
 
+        // redirect preview
+        if (isset($data['preview']) && $data['preview'] === '1') {
+            return $this->redirectResponse($request, $response, "/admin/{$this->table}/preview");
+        }
+
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
 
         // validate csrf token
@@ -164,5 +169,29 @@ trait CreateEditTrait
             $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $defaultRedirect);
         }
+    }
+
+    public function preview(Request $request, Response $response): Response
+    {
+        $data = $this->prepareDataForRenderForm();
+
+        if (!isset($data['title']) || !isset($data['content'])) {
+            $content = $this->view->fetch('preview/content.php', [
+                'title' => __('cannot_preview_title', 'Cannot Render Preview'),
+                'content' => __('cannot_preview_desc', 'Preview cannot be reloaded. Please close the preview window and preview again.'),
+            ]);
+        } else {
+            $content = $this->view->fetch('preview/content.php', [
+                'title' => $data['title'],
+                'content' => $data['content'],
+            ]);
+        }
+
+        return $this->renderResponse(
+            $response,
+            __("preview"),
+            $content,
+            'preview/layout.php'
+        );
     }
 }
