@@ -69,7 +69,8 @@ class PostModel extends BaseModel
                 'description' => '',
                 'type' => 'textarea',
                 'attributes' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control font-monospace kontiki-file-upload',
+                    'data-button-class' => 'mt-2',
                     'rows' => '10'
                 ],
                 'label_attributes' => ['class' => 'form-label'],

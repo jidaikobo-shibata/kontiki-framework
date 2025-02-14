@@ -10,6 +10,7 @@ return [
     'submit' => '送信する',
     'create' => '作成する',
     'edit' => '編集する',
+    'preview' => 'プレビューする',
     'update' => '更新する',
     'trash' => 'ごみ箱へ',
     'restore' => '復活する',
@@ -61,6 +62,8 @@ return [
     'confirm_delete_message' => '項目は完全に削除されます。本当にこの項目を削除してもいいですか？',
     '404_text' => 'ページが見つかりませんでした。',
     'csrf_invalid' => 'セッションの有効期限が切れた可能性があります。再度操作を行ってください',
+    'cannot_preview_title' => 'プレビューできません',
+    'cannot_preview_desc' => 'プレビューは再読込できません。プレビューウィンドウを閉じて、再度、プレビューしてください。',
 
     // user
     'users' => 'ユーザ',
@@ -107,7 +110,7 @@ return [
 
     'invalid_request' => 'リクエストが無効です。もう一度お試しください。',
     'validation_failed' => 'データの検証に失敗しました。入力内容をご確認ください。',
-    'upload_success' => 'ファイルのアップロードに成功しました。',
+    'upload_success' => 'ファイルのアップロードに成功しました。<a href="#" class="link-primary" id="switchToViewTab">ファイルの一覧</a>を確認してください。',
     'upload_error' => 'ファイルをアップロードできませんでした。もう一度お試しください。',
     'database_update_failed' => 'データベースの更新に失敗しました。もう一度お試しください。',
     'file_missing' => 'ファイルがアップロードされていないか、ファイルが壊れています。',

@@ -52,7 +52,7 @@ trait CRUDTrait
         }
 
         // success
-        return $this->successResponse($response, $this->getMessages()['upload_success']);
+        return $this->successResponseHtml($response, $this->getMessages()['upload_success']);
     }
 
     protected function prepareUploadedFile(Request $request): ?array

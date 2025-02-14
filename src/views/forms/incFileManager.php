@@ -9,17 +9,17 @@
         <!-- Tab navigation -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="upload-tab" data-bs-toggle="tab" href="#upload" role="tab" aria-controls="upload" aria-selected="true"><?= __('file_upload') ?></a>
+            <a class="nav-link active" id="upload-tab" data-bs-toggle="tab" href="#upload-tab-panel" role="tab" aria-controls="upload" aria-selected="true"><?= __('file_upload') ?></a>
           </li>
           <li class="nav-item" role="presentation">
-            <a class="nav-link" id="view-tab" data-bs-toggle="tab" href="#view" role="tab" aria-controls="view" aria-selected="false"><?= __('x_index', ':name Index', ['name' => __('files')]) ?></a>
+            <a class="nav-link" id="view-tab" data-bs-toggle="tab" href="#view-tab-panel" role="tab" aria-controls="view" aria-selected="false"><?= __('x_index', ':name Index', ['name' => __('files')]) ?></a>
           </li>
         </ul>
 
         <!-- Tab content -->
         <div class="tab-content" id="myTabContent">
           <!-- Tab pane 1 -->
-          <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+          <div class="tab-pane fade show active" id="upload-tab-panel" role="tabpanel" aria-labelledby="upload-tab">
             <form class="pt-4 px-4 w-100" id="uploadForm" enctype="multipart/form-data">
               <div class="mt-4 mb-3 row">
                 <label for="fileAttachment" class="col-sm-3 col-form-label text-end"><?= __('file') ?></label>
@@ -38,7 +38,7 @@
           </div><!-- /Tab pane 1 -->
 
           <!-- Tab pane 2 -->
-          <div class="tab-pane fade" id="view" role="tabpanel" aria-labelledby="view-tab">
+          <div class="tab-pane fade" id="view-tab-panel" role="tabpanel" aria-labelledby="view-tab">
             <div id="file-list">
               <p role="status"><?= __('prepare_file_list', 'Preparing file list.') ?></p>
             </div>

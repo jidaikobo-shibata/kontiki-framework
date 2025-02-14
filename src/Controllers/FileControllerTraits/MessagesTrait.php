@@ -12,7 +12,7 @@ trait MessagesTrait
         return [
             'invalid_request' => __('invalid_request', 'Invalid request. Please try again.'),
             'validation_failed' => __('validation_failed', 'Data validation failed. Please check your input.'),
-            'upload_success' => __('upload_success', 'The file has been successfully uploaded.'),
+            'upload_success' => __('upload_success', 'The file has been successfully uploaded. check <a href="#" class="link-primary" id="switchToViewTab">Files Index</a>.'),
             'upload_error' => __('upload_error', 'The file could not be uploaded. Please try again.'),
             'database_update_failed' => __('database_update_failed', 'Failed to update the database. Please try again.'),
             'file_missing' => __('file_missing', 'No file uploaded or the file is corrupted.'),
@@ -48,6 +48,15 @@ trait MessagesTrait
         return $this->messageResponse(
           $response,
           MessageUtils::alertHtml($message),
+          200
+        );
+    }
+
+    protected function successResponseHtml(Response $response, string $message): Response
+    {
+        return $this->messageResponse(
+          $response,
+          MessageUtils::alertHtml($message, 'success', false),
           200
         );
     }

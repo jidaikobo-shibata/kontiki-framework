@@ -139,6 +139,8 @@ class KontikiFileManager {
         var fileListContainer = $('#file-list');
 
         fileListContainer.html('<p role="status"><?= $get_file_list ?></p>'); // Show loading message
+        // clear upload status
+        $('#fileUploadStatus').html('');
 
         // AJAX request to get the files
         $.ajax({
@@ -331,6 +333,9 @@ class KontikiFileManager {
 
             const deleteId = $(e.target).data('delete-id');
             const csrfToken = $(e.target).attr('data-csrf_token'); // Use attr() to get the latest value
+            if (!confirm("<?= $confirm_delete_message ?>")) {
+                return;
+            }
 
             // AJAX request to delete the file
             $.ajax({
@@ -442,6 +447,19 @@ class KontikiFileManager {
             // Display success status
             const codeElement = fileRow.find('td.text-break code');
             codeElement.after('<span role="status" class="ms-2 text-success"><?= $insert_success ?></span>');
+        });
+    }
+
+    /**
+     * Switch Tab
+     * @returns {void}
+     */
+    setupPagination() {
+        $(document).on('click', '#switchToViewTab', (event) => {
+            event.preventDefault();
+            var viewTab = new bootstrap.Tab(document.getElementById("view-tab"));
+            this.fetchFiles();
+            viewTab.show();
         });
     }
 }

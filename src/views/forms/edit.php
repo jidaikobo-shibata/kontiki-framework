@@ -7,8 +7,8 @@
 <form action="<?= e($actionAttribute) ?>" method="post">
   <input type="hidden" name="_csrf_value" value="<?= e($csrfToken) ?>">
   <?= $formHtml ?>
+  <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview"><?= __('preview') ?></button>
   <button type="submit" class="btn btn-primary"><?= $buttonText ?></button>
-  <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#uploadModal"><?= __('file_upload', 'File Upload') ?></button>
 </form>
 </div>
 

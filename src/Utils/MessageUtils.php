@@ -64,9 +64,10 @@ class MessageUtils
      *
      * @param string $message The message to display within the section.
      * @param string $status The status of the message
+     * @param string $escape escape message
      * @return string HTML output for the status section.
      */
-    public static function alertHtml(string $message, string $status = "success"): string
+    public static function alertHtml(string $message, string $status = "success", bool $escape = TRUE): string
     {
         // Define the CSS class based on the status
         $statusClass = '';
@@ -87,9 +88,10 @@ class MessageUtils
                 $statusClass = 'alert alert-secondary'; // Default class for undefined statuses
         }
 
+        $message = $escape ? e($message) : $message;
         // Generate the HTML for the status section
         $html = '<section class="' . e($statusClass) . '" role="status">';
-        $html .= '<p class="mb-0">' . e($message) . '</p>';
+        $html .= '<p class="mb-0">' . $message . '</p>';
         $html .= '</section>';
 
         return $html;

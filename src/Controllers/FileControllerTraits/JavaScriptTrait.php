@@ -20,6 +20,7 @@ trait JavaScriptTrait
                 'uploading' => __('uploading'),
                 'couldnt_upload' => __('couldnt_upload', "Could not upload"),
                 'get_file_list' => __('get_file_list'),
+                'confirm_delete_message' => __('confirm_delete_message', 'The item will be permanently deleted. Are you sure you want to delete this item?'),
                 'couldnt_find_file' => __('couldnt_find_file'),
                 'couldnt_get_file_list' => __('couldnt_get_file_list'),
                 'copied' => __('copied'),
