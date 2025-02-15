@@ -27,6 +27,11 @@ class Lang
      */
     private static function loadLanguage(): void
     {
+        if (self::$language == 'en') {
+            self::$messages = [];
+            return;
+        }
+
         $filePath = self::$langPath . '/' . self::$language . '/messages.php';
 
         if (!file_exists($filePath)) {
