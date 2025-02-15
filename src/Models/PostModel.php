@@ -66,7 +66,7 @@ class PostModel extends BaseModel
             ],
             'content' => [
                 'label' => __('content'),
-                'description' => '',
+                'description' => __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".'),
                 'type' => 'textarea',
                 'attributes' => [
                     'class' => 'form-control font-monospace kontiki-file-upload',
@@ -84,6 +84,7 @@ class PostModel extends BaseModel
             ],
             'slug' => [
                 'label' => __('slug'),
+                'description' => __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.'),
                 'type' => 'text',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -102,6 +103,7 @@ class PostModel extends BaseModel
             ],
             'published_at' => [
                 'label' => __('published_at'),
+                'description' => __('published_at_exp', 'If you enter a future date and time, it will be scheduled to post.'),
                 'type' => 'datetime-local',
                 'attributes' => ['class' => 'form-control'],
                 'label_attributes' => ['class' => 'form-label'],
@@ -129,7 +131,7 @@ class PostModel extends BaseModel
             'is_draft' => [
                 'label' => __('draft'),
                 'type' => 'select',
-                'options' => [0 => 'published', 1 => 'draft'],
+                'options' => [0 => __('published'), 1 => __('draft')],
                 'attributes' => ['class' => 'form-control form-select'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',

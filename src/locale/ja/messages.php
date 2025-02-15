@@ -20,6 +20,7 @@ return [
     'value' => '値',
     'title' => 'タイトル',
     'content' => '内容',
+    'content_exp' => '「内容」は<a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">マークダウン記法</a>で入力してください。「ファイルアップロード」でファイルを追加できます。',
     'description' => '説明',
     'search_str' => '検索文字',
     'search' => '検索する',
@@ -72,9 +73,12 @@ return [
     // post
     'posts' => '記事',
     'slug' => 'スラッグ',
+    'slug_exp' => '「スラッグ」はURLとして使います。半角英数字とハイフンが使えます。',
     'published_at' => '公開日時',
+    'published_at_exp' => '「公開日時」に未来の日時を入れると予約投稿になります。',
     'expired_at' => '公開終了日時',
     'draft' => '下書き',
+    'published' => '公開されています',
     'x_index_draft' => ':nameの下書き項目',
 
     // files

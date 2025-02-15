@@ -21,6 +21,7 @@ class PostController extends BaseController
     use Traits\CreateEditTrait;
     use Traits\TrashRestoreTrait;
     use Traits\DeleteTrait;
+    use Traits\MarkdownHelpTrait;
 
     public function __construct(
         PhpRenderer $view,
