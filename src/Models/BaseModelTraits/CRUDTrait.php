@@ -21,6 +21,16 @@ trait CRUDTrait
         return $data;
     }
 
+    public function setPosttypeBeforeSave(array $data): array
+    {
+        $post_type =$data['post_type'] ?? '';
+        if (!empty($post_type)) {
+            return $data;
+        }
+        $data['post_type'] = $this->postType;
+        return $data;
+    }
+
     public function processDataBeforeGet(array $data): array
     {
         foreach ($data as $field => $value) {
@@ -86,6 +96,7 @@ trait CRUDTrait
         }
 
         $data = $this->processDataBeforeSave($data);
+        $data = $this->setPosttypeBeforeSave($data);
 
         $success = $this->db->table($this->table)->insert($data);
         return $success ? $this->db->getPdo()->lastInsertId() : null;
@@ -106,6 +117,7 @@ trait CRUDTrait
         }
 
         $data = $this->processDataBeforeSave($data);
+        $data = $this->setPosttypeBeforeSave($data);
 
         return $this->db->table($this->table)
             ->where('id', $id)

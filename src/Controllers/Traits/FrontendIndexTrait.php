@@ -10,7 +10,7 @@ trait FrontendIndexTrait
     public function frontendIndex(Request $request, Response $response): Response
     {
         $this->context = 'normal';
-        $baseurl = env('BASEURL') . '/' . $this->table;
+        $baseurl = env('BASEURL') . '/' . $this->postType;
         $data = $this->getIndexData($request->getQueryParams());
         $data = [
             'body' => $data,

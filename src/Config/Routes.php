@@ -10,10 +10,11 @@ class Routes
 {
     public function register(App $app, Container $_container): void
     {
+        Controllers\AdminController::registerRoutes($app);
         Controllers\AuthController::registerRoutes($app);
         Controllers\DashboardController::registerRoutes($app);
         Controllers\FileController::registerRoutes($app);
-        Controllers\UserController::registerRoutes($app, 'users');
-        Controllers\PostController::registerRoutes($app, 'posts');
+        Controllers\UserController::registerRoutes($app, 'user');
+        Controllers\PostController::registerRoutes($app, 'post');
     }
 }

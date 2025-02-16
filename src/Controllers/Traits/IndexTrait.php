@@ -33,6 +33,9 @@ trait IndexTrait
             $query = $query->orderBy($column, $direction);
         }
 
+        // post_type
+        $query = $query->where('post_type', '=', $this->model->getPostType());
+
         // Set up pagination
         $totalItems = $query->count();
         $this->pagination = new Pagination((int)($queryParams['paged'] ?? 1), 10);
@@ -69,7 +72,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
-        $content .= $this->pagination->render(env('BASEPATH', '') . "/admin/{$this->table}/index");
+        $content .= $this->pagination->render(env('BASEPATH', '') . "/admin/{$this->postType}/index");
 
         $title = 'x_index';
         $title .= $this->context === 'normal' ? '' : '_' . $this->context ;
@@ -82,7 +85,7 @@ trait IndexTrait
             $response,
             'layout.php',
             [
-                'pageTitle' => __($title, $title_placeholder, ['name' => __($this->table)]),
+                'pageTitle' => __($title, $title_placeholder, ['name' => __($this->postType)]),
                 'content' => $content,
             ]
         );

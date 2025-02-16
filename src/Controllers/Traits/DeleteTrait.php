@@ -28,20 +28,20 @@ trait DeleteTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->table}_index");
+            return $this->redirectResponse($request, $response, "{$this->postType}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForDelete($data);
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->table}/delete/{$id}",
+            "/admin/{$this->postType}/delete/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
                 "x_delete_confirm",
                 "Are you sure you want to delete this :name?",
-                ['name' => __($this->table)]
+                ['name' => __($this->postType)]
             ),
             __("delete", "Delete"),
         );
@@ -55,7 +55,7 @@ trait DeleteTrait
             __(
                 "x_delete",
                 "Delete :name",
-                ['name' => __($this->table)]
+                ['name' => __($this->postType)]
             ),
             $formHtml
         );
@@ -67,7 +67,7 @@ trait DeleteTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->table}/delete/{$id}";
+        $redirectTo = "/admin/{$this->postType}/delete/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -81,18 +81,18 @@ trait DeleteTrait
                     __(
                         "x_delete_success",
                         ":name deleted successfully.",
-                        ['name' => __($this->table)]
+                        ['name' => __($this->postType)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
+                return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->table)])
+                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->postType)])
               ]);
         }
 
-        $redirectTo = "/admin/{$this->table}/edit/{$id}";
+        $redirectTo = "/admin/{$this->postType}/edit/{$id}";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

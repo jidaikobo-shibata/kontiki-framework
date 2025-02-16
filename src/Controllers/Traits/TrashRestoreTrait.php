@@ -45,20 +45,20 @@ trait TrashRestoreTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->table}_index");
+            return $this->redirectResponse($request, $response, "{$this->postType}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForTrashRestore($data);
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->table}/{$actionType}/{$id}",
+            "/admin/{$this->postType}/{$actionType}/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
                 "x_{$actionType}_confirm",
                 "Are you sure you want to {$actionType} this :name?",
-                ['name' => __($this->table)]
+                ['name' => __($this->postType)]
             ),
             __($actionType),
         );
@@ -72,7 +72,7 @@ trait TrashRestoreTrait
             __(
                 "x_{$actionType}",
                 "{$actionType} :name",
-                ['name' => __($this->table)]
+                ['name' => __($this->postType)]
             ),
             $formHtml
         );
@@ -95,7 +95,7 @@ trait TrashRestoreTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->table}/{$actionType}/{$id}";
+        $redirectTo = "/admin/{$this->postType}/{$actionType}/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -109,18 +109,18 @@ trait TrashRestoreTrait
                     __(
                         "x_{$actionType}_success",
                         ":name {$actionType} successfully.",
-                        ['name' => __($this->table)]
+                        ['name' => __($this->postType)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
+                return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->table)])
+                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->postType)])
               ]);
         }
 
-        $redirectTo = "/admin/{$this->table}/index";
+        $redirectTo = "/admin/{$this->postType}/index";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

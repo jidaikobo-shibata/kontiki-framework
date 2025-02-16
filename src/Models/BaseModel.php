@@ -20,8 +20,9 @@ abstract class BaseModel implements ModelInterface
 
     protected Connection $db;
     protected ValidationService $validationService;
-    protected string $table;
     protected string $deleteType = 'hardDelete';
+    protected string $postType = 'post';
+    protected string $table = 'posts';
 
     public function __construct(Connection $db, ValidationService $validationService)
     {
@@ -37,5 +38,10 @@ abstract class BaseModel implements ModelInterface
     public function getTableName(): string
     {
         return $this->table;
+    }
+
+    public function getPostType(): string
+    {
+        return $this->postType;
     }
 }

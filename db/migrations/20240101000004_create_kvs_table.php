@@ -13,9 +13,7 @@ final class CreateKvsTable extends AbstractMigration
         $table->addColumn('model', 'string', ['limit' => 255, 'null' => false])
               ->addColumn('model_id', 'integer', ['null' => false, 'comment' => 'ID of the model'])
               ->addColumn('key', 'string', ['limit' => 255, 'null' => false])
-              ->addColumn('value', 'text', ['null' => true])
-              ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => false])
-              ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP', 'null' => false]);
+              ->addColumn('value', 'text', ['null' => true]);
 
         // Add indexes
         $table->addIndex(['model', 'model_id', 'key'], [

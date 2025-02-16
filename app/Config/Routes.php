@@ -13,11 +13,6 @@ class Routes extends DefalutRoutes
     public function register(App $app, Container $container): void
     {
         parent::register($app, $container);
-/*
-        $app->get('/info', [Controller\TestController::class, 'test'])
-            ->setName('test')
-            ->add($container->get(AuthMiddleware::class));
-*/
-        Controllers\InformationController::registerRoutes($app, 'informations');
+        Controllers\SampleController::registerRoutes($app, 'sample');
     }
 }

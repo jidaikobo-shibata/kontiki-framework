@@ -12,9 +12,10 @@ class PostModel extends BaseModel
 {
     use Traits\SoftDeleteTrait;
     use Traits\PublishedTrait;
+    use Traits\DraftTrait;
     use Traits\ExpiredTrait;
 
-    protected string $table = 'posts';
+    protected string $post_type = 'post';
     protected string $deleteType = 'softDelete';
     private AuthService $authService;
 
@@ -43,6 +44,9 @@ class PostModel extends BaseModel
 
         // unique check
         $id = $params['id'] ?? null;
+
+        // parent_id
+        $parentOptions = $this->getOptions('title', TRUE, '', $id);
 
         // current
         $now = Carbon::now(env('TIMEZONE', 'UTC'));
@@ -101,6 +105,20 @@ class PostModel extends BaseModel
                 'group' => 'main',
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
+            'parent_id' => [
+                'label' => __('parent'),
+                'type' => 'select',
+                'options' => $parentOptions,
+                'attributes' => ['class' => 'form-control form-select'],
+                'label_attributes' => ['class' => 'form-label'],
+                'default' => 0,
+                'searchable' => true,
+                'rules' => [],
+                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'template' => 'default',
+                'group' => 'main',
+                'fieldset_template' => 'forms/fieldset/flat.php',
+            ],
             'published_at' => [
                 'label' => __('published_at'),
                 'description' => __('published_at_exp', 'If you enter a future date and time, it will be scheduled to post.'),
@@ -128,15 +146,18 @@ class PostModel extends BaseModel
                 'group' => 'main',
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
-            'is_draft' => [
+            'status' => [
                 'label' => __('draft'),
                 'type' => 'select',
-                'options' => [0 => __('published'), 1 => __('draft')],
+                'options' => [
+                    'draft' => __('draft'),
+                    'published' => __('published'),
+                    'pending' => __('pending'),
+                ],
                 'attributes' => ['class' => 'form-control form-select'],
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => '',
                 'searchable' => true,
-//                'rules' => ['required'], // violates the rules of HTML
                 'rules' => [],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
@@ -151,7 +172,6 @@ class PostModel extends BaseModel
                 'label_attributes' => ['class' => 'form-label'],
                 'default' => $user['id'],
                 'searchable' => true,
-//                'rules' => ['required'], // violates the rules of HTML
                 'rules' => [],
                 'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 'template' => 'default',
@@ -186,15 +206,5 @@ class PostModel extends BaseModel
         // jlog($query->getBindings());
 
         return $query;
-    }
-
-    private function applyDraftConditions(Builder $query): Builder
-    {
-        return $query->where('is_draft', '=', 1);
-    }
-
-    private function applyNotDraftConditions(Builder $query): Builder
-    {
-        return $query->where('is_draft', '=', 0);
     }
 }

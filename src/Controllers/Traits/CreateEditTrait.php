@@ -26,7 +26,7 @@ trait CreateEditTrait
         $fields = $this->model->processFieldDefinitions('create', $fields);
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->table}/create",
+            "/admin/{$this->postType}/create",
             $fields,
             $this->csrfManager->getToken(),
             '',
@@ -39,7 +39,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("{$this->table}_create", 'Create ' . ucfirst($this->table)),
+            __("{$this->postType}_create", 'Create ' . ucfirst($this->postType)),
             $formHtml
         );
     }
@@ -51,14 +51,14 @@ trait CreateEditTrait
         $data = $this->processDataForRenderForm('edit', $data);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "/admin/{$this->table}/index");
+            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
         }
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitions('edit', $fields);
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->table}/edit/{$id}",
+            "/admin/{$this->postType}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
             '',
@@ -72,7 +72,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("{$this->table}_edit", 'Edit ' . ucfirst($this->table)),
+            __("{$this->postType}_edit", 'Edit ' . ucfirst($this->postType)),
             $formHtml
         );
     }
@@ -96,8 +96,8 @@ trait CreateEditTrait
     protected function getDefaultRedirect(string $actionType, ?int $id = null): string
     {
         return $actionType === 'create'
-            ? "/admin/{$this->table}/create"
-            : "/admin/{$this->table}/edit/{$id}";
+            ? "/admin/{$this->postType}/create"
+            : "/admin/{$this->postType}/edit/{$id}";
     }
 
     protected function getFieldDefinitionsForAction(string $actionType, ?int $id = null): array
@@ -136,7 +136,7 @@ trait CreateEditTrait
 
         // redirect preview
         if (isset($data['preview']) && $data['preview'] === '1') {
-            return $this->redirectResponse($request, $response, "/admin/{$this->table}/preview");
+            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/preview");
         }
 
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
@@ -159,10 +159,10 @@ trait CreateEditTrait
 
         try {
             $id = $this->saveData($actionType, $id, $data);
-            $redirectTo = "/admin/{$this->table}/edit/{$id}";
+            $redirectTo = "/admin/{$this->postType}/edit/{$id}";
             $this->flashManager->addMessage(
                 'success',
-                __("x_save_success", ':name Saved successfully.', ['name' => __($this->table)])
+                __("x_save_success", ':name Saved successfully.', ['name' => __($this->postType)])
             );
             return $this->redirectResponse($request, $response, $redirectTo);
         } catch (\Exception $e) {

@@ -22,6 +22,7 @@ abstract class BaseController
     protected PhpRenderer $view;
     protected FormService $formService;
     protected string $table;
+    protected string $postType;
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
 
@@ -45,7 +46,8 @@ abstract class BaseController
         $this->flashManager = new FlashManager($session);
         $this->formService = new FormService($view, $model);
         $this->model = $model;
-        $this->table = $this->model->getTableName();
+//        $this->table = $this->model->getTableName();
+        $this->postType = $this->model->getPostType();
         $this->view = $view;
         if ($sidebarService) {
             $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
