@@ -21,7 +21,7 @@ abstract class BaseModel implements ModelInterface
     protected Connection $db;
     protected ValidationService $validationService;
     protected string $deleteType = 'hardDelete';
-    protected string $postType = 'post';
+    protected string $postType = '';
     protected string $table = 'posts';
 
     public function __construct(Connection $db, ValidationService $validationService)

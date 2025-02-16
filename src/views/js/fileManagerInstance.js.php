@@ -27,8 +27,6 @@ $(document).ready(function() {
                 delete fileManager;
             }
 
-console.log(targetTargetComponentId);
-
             fileManager = new KontikiFileManager('<?= $basepath ?>/admin/', targetTargetComponentId);
         }
     });

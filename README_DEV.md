@@ -46,16 +46,6 @@ see also PostModel::getAdditionalConditions()
 
 ## Add Controllers' Original Routes
 
-```Controller
-    public static function registerRoutes(App $app, string $basePath = ''): void
-    {
-        parent::registerRoutes($app, $basePath);
-        $controllerClass = static::class;
-        $app->get('/' . $basePath . '/index',  [$controllerClass, 'frontendIndex']);
-        $app->get('/' . $basePath . '/slug/{slug}',  [$controllerClass, 'frontendReadBySlug']);
-    }
-```
-
 direct add to Routes.php.
 ///
         $app->get('/info', [Controller\TestController::class, 'test'])

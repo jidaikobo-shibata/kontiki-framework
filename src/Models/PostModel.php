@@ -15,7 +15,7 @@ class PostModel extends BaseModel
     use Traits\DraftTrait;
     use Traits\ExpiredTrait;
 
-    protected string $post_type = 'post';
+    protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
     private AuthService $authService;
 

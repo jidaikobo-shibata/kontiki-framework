@@ -35,4 +35,15 @@ class PostController extends BaseController
     ) {
         parent::__construct($view, $session, $model, $sidebarService);
     }
+
+    public static function registerRoutes(App $app, string $basePath = ''): void
+    {
+        // set admin routes
+        parent::registerRoutes($app, $basePath);
+
+        // set frontend routes
+        $controllerClass = static::class;
+        $app->get('/' . $basePath . '/index',  [$controllerClass, 'frontendIndex']);
+        $app->get('/' . $basePath . '/slug/{slug}',  [$controllerClass, 'frontendReadBySlug']);
+    }
 }

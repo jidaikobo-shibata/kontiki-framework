@@ -23,11 +23,14 @@ trait CRUDTrait
 
     public function setPosttypeBeforeSave(array $data): array
     {
-        $post_type =$data['post_type'] ?? '';
+        $post_type = $data['post_type'] ?? '';
         if (!empty($post_type)) {
             return $data;
         }
-        $data['post_type'] = $this->postType;
+        if (!empty($this->postType)) {
+            $data['post_type'] = $this->postType;
+        }
+
         return $data;
     }
 
