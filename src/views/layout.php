@@ -18,6 +18,7 @@
 <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
   <script src="<?= env('BASEPATH', '') ?>/admin/fileManager.js"></script>
   <script src="<?= env('BASEPATH', '') ?>/admin/fileManagerInstance.js"></script>
+  <script src="<?= env('BASEPATH', '') ?>/admin/admin.js"></script>
 <?php endif; ?>
 
   <title><?= e($pageTitle) ?></title>
