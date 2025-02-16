@@ -6,8 +6,11 @@
   <div class="sidebar">
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <?php foreach ($sidebarItems['groupedLinks'] as $group => $links) : ?>
-          <li class="nav-item">
+      <?php
+          foreach ($sidebarItems['groupedLinks'] as $group => $links) :
+              $dataPath = env('BASEPATH') . '/admin/' . $group;
+      ?>
+          <li class="nav-item" data-path="<?= e($dataPath) ?>">
             <a href="#" class="nav-link" aria-expanded="false">
               <i class="nav-icon fas fa-folder"></i>
               <p>
