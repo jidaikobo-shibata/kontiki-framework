@@ -14,14 +14,18 @@ use Slim\Views\PhpRenderer;
 
 class PostController extends BaseController
 {
+    // use order affects the menu order...
+    use Traits\CreateEditTrait;
+    use Traits\DeleteTrait;
+    use Traits\FrontendIndexTrait;
+    use Traits\FrontendReadTrait;
     use Traits\IndexTrait;
     use Traits\IndexNormalTrait;
-    use Traits\IndexExpiredTrait;
+    use Traits\IndexDraftTrait;
     use Traits\IndexReservedTrait;
-    use Traits\CreateEditTrait;
-    use Traits\TrashRestoreTrait;
-    use Traits\DeleteTrait;
+    use Traits\IndexExpiredTrait;
     use Traits\MarkdownHelpTrait;
+    use Traits\TrashRestoreTrait;
 
     public function __construct(
         PhpRenderer $view,
@@ -30,26 +34,5 @@ class PostController extends BaseController
         SidebarService $sidebarService
     ) {
         parent::__construct($view, $session, $model, $sidebarService);
-    }
-
-    public static function registerRoutes(App $app, string $basePath = ''): void
-    {
-        parent::registerRoutes($app, $basePath);
-
-        $controllerClass = static::class;
-
-        $app->group(
-            '/admin/' . $basePath,
-            function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
-                $group->get('/index/draft', [$controllerClass, 'draftIndex'])->setName("{$basePath}_index_draft");
-            }
-        )->add(AuthMiddleware::class);
-    }
-
-    public function draftIndex(Request $request, Response $response): Response
-    {
-        // see also PostModel::getAdditionalConditions()
-        $this->context = 'draft';
-        return static::index($request, $response);
     }
 }
