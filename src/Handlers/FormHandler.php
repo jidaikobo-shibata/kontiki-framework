@@ -5,6 +5,7 @@ namespace Jidaikobo\Kontiki\Handlers;
 use DOMDocument;
 use Jidaikobo\Kontiki\Models\BaseModel;
 use Jidaikobo\Kontiki\Utils\MessageUtils;
+use Jidaikobo\Kontiki\Utils\FormUtils;
 
 class FormHandler
 {
