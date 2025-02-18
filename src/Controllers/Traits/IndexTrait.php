@@ -19,32 +19,9 @@ trait IndexTrait
         return static::index($request, $response);
     }
 
-    /**
-     * Retrieve data with pagination and additional conditions applied.
-     *
-     * @param array $queryParams Query parameters from the request.
-     * @return array Processed data array.
-     */
     public function getIndexData(array $queryParams): array
     {
-        // Build search conditions based on query parameters
-        $query = $this->model->buildSearchConditions($queryParams['s'] ?? '', []);
-        $query = $this->model->getAdditionalConditions($query, $this->context);
-
-        // Apply sorting if orderby and order are provided
-        if (!empty($queryParams['orderby']) && !empty($queryParams['order'])) {
-            $validColumns = ['id', 'name', 'created_at']; // いったんハードコーディング
-            $column = in_array($queryParams['orderby'], $validColumns, true) ? $queryParams['orderby'] : 'id';
-            $direction = strtoupper($queryParams['order']) === 'DESC' ? 'DESC' : 'ASC';
-            $query = $query->orderBy($column, $direction);
-        } else {
-            $query = $query->orderBy('id', 'DESC');
-        }
-
-        // post_type
-        if (!empty($this->model->getPostType())) {
-            $query = $query->where('post_type', '=', $this->model->getPostType());
-        }
+        $query = $this->applyFiltersToQuery($queryParams);
 
         // Set up pagination
         $totalItems = $query->count();
@@ -59,6 +36,56 @@ trait IndexTrait
                       ->toArray();
 
         return array_map(fn($item) => $this->model->processDataBeforeGet($item), $data);
+    }
+
+    /**
+     * Applies all filters and conditions to the query builder.
+     *
+     * @param array $queryParams The query parameters.
+     * @return \Illuminate\Database\Query\Builder The modified query.
+     */
+    private function applyFiltersToQuery(array $queryParams): \Illuminate\Database\Query\Builder
+    {
+        $query = $this->model->buildSearchConditions($queryParams['s'] ?? '', []);
+        $query = $this->model->getAdditionalConditions($query, $this->context);
+
+        $query = $this->applySorting($query, $queryParams);
+        $query = $this->applyPostTypeFilter($query);
+
+        return $query;
+    }
+
+    /**
+     * Applies sorting conditions to the query.
+     *
+     * @param \Illuminate\Database\Query\Builder $query The query builder instance.
+     * @param array $queryParams The query parameters containing sorting details.
+     * @return \Illuminate\Database\Query\Builder The modified query.
+     */
+    private function applySorting(\Illuminate\Database\Query\Builder $query, array $queryParams): \Illuminate\Database\Query\Builder
+    {
+        if (!empty($queryParams['orderby']) && !empty($queryParams['order'])) {
+            $validColumns = ['id', 'name', 'created_at']; // いったんハードコーディング
+            $column = in_array($queryParams['orderby'], $validColumns, true) ? $queryParams['orderby'] : 'id';
+            $direction = strtoupper($queryParams['order']) === 'DESC' ? 'DESC' : 'ASC';
+            return $query->orderBy($column, $direction);
+        }
+
+        return $query->orderBy('id', 'DESC');
+    }
+
+    /**
+     * Applies the post_type filter to the query.
+     *
+     * @param \Illuminate\Database\Query\Builder $query The query builder instance.
+     * @return \Illuminate\Database\Query\Builder The modified query.
+     */
+    private function applyPostTypeFilter(\Illuminate\Database\Query\Builder $query): \Illuminate\Database\Query\Builder
+    {
+        if (!empty($this->model->getPostType())) {
+            return $query->where('post_type', '=', $this->model->getPostType());
+        }
+        return $query;
     }
 
     public function index(Request $request, Response $response): Response
