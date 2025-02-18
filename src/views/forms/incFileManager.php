@@ -30,7 +30,7 @@
               </div>
               <input type="hidden" name="_csrf_value" id="file_manager_csrf_token" value="">
               <div class="text-center">
-                <button type="submit" class="btn btn-info"><?= __('submit') ?></button>
+                <button type="submit" class="btn btn-info"><?= __('upload') ?></button>
               </div>
             </form>
             <!-- Upload status -->

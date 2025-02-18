@@ -3,7 +3,7 @@ $(document).ready(function () {
      * open sidebar menu items
      */
     var currentUrl = window.location.pathname;
-    $(".nav-item").each(function () {
+    $(".sidebar .nav-item").each(function () {
         var menuPath = $(this).attr("data-path");
 
         if (menuPath && currentUrl.startsWith(menuPath)) {

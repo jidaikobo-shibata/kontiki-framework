@@ -12,6 +12,5 @@ class CreateEditRoutes
         $group->post('/create', [$controllerClass, 'handleCreate']);
         $group->get('/edit/{id}', [$controllerClass, 'renderEditForm']);
         $group->post('/edit/{id}', [$controllerClass, 'handleEdit']);
-        $group->get('/preview', [$controllerClass, 'preview']);
     }
 }

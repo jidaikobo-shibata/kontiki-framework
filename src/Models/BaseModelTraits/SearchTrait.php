@@ -22,8 +22,7 @@ trait SearchTrait
         return $searchableColumns;
     }
 
-
-    public function getAdditionalConditions(Builder $query, string $context = 'normal' ): Builder
+    public function getAdditionalConditions(Builder $query, string $context = 'all' ): Builder
     {
         return $query;
     }

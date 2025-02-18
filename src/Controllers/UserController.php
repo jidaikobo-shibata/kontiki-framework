@@ -4,13 +4,12 @@ namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Models\UserModel;
-use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Slim\Views\PhpRenderer;
 
 class UserController extends BaseController
 {
     use Traits\IndexTrait;
-    use Traits\IndexNormalTrait;
     use Traits\CreateEditTrait;
     use Traits\DeleteTrait;
 
@@ -18,9 +17,9 @@ class UserController extends BaseController
         PhpRenderer $view,
         Session $session,
         UserModel $model,
-        SidebarService $sidebarService
+        GetRoutesService $getRoutesService
     ) {
-        parent::__construct($view, $session, $model, $sidebarService);
+        parent::__construct($view, $session, $model, $getRoutesService);
     }
 
     private function hashPassword(string $password): string

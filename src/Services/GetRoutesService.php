@@ -5,7 +5,7 @@ namespace Jidaikobo\Kontiki\Services;
 use Slim\Routing\RouteCollector;
 use Slim\Routing\RouteParser;
 
-class SidebarService
+class GetRoutesService
 {
     private RouteParser $routeParser;
     private RouteCollector $routeCollector;
@@ -16,9 +16,37 @@ class SidebarService
         $this->routeCollector = $routeCollector;
     }
 
-    public function getLinks(): array
+    protected function getRoutes(): array
     {
-        $routes = $this->routeCollector->getRoutes();
+        return $this->routeCollector->getRoutes();
+    }
+
+    public function getLinks($controller = null): array
+    {
+        $routes = self::getRoutes();
+        $routeList = [];
+
+        foreach ($routes as $route) {
+            if (
+                !is_null($controller) &&
+                strpos($route->getPattern(), '/' . $controller . '/') === false
+            ) {
+                continue;
+            }
+
+            $routeList[] = [
+                'methods' => implode(', ', $route->getMethods()),
+                'path' => $route->getPattern(),
+                'name' => $route->getName() ?? 'Unnamed'
+            ];
+        }
+
+        return $routeList;
+    }
+
+    public function getSidebar(): array
+    {
+        $routes = self::getRoutes();
 
         $groupedLinks = [];
         $groupNames = [];

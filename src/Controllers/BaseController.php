@@ -7,7 +7,7 @@ use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\ModelInterface;
-use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -18,29 +18,31 @@ use Slim\Views\PhpRenderer;
 
 abstract class BaseController
 {
+    protected array $routes;
     protected ModelInterface $model;
     protected PhpRenderer $view;
     protected FormService $formService;
-    // protected string $table;
     protected string $postType;
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
+    protected ?PhpRenderer $previewRenderer = null;
+    // protected string $table;
 
     /**
      * Constructor
      *
      * Initializes the BaseController with its dependencies.
      *
-     * @param PhpRenderer     $view           The view renderer.
-     * @param SidebarService  $sidebarService The sidebar service.
-     * @param Session         $session        The session manager.
-     * @param ModelInterface  $model          The model instance.
+     * @param PhpRenderer       $view             The view renderer.
+     * @param Session           $session          The session manager.
+     * @param ModelInterface    $model            The model instance.
+     * @param GetRoutesService  $GetRoutesService The sidebar service.
      */
     public function __construct(
         PhpRenderer $view,
         Session $session,
         ModelInterface $model,
-        ?SidebarService $sidebarService = null
+        ?GetRoutesService $getRoutesService = null
     ) {
         $this->csrfManager = new CsrfManager($session);
         $this->flashManager = new FlashManager($session);
@@ -49,9 +51,15 @@ abstract class BaseController
         // $this->table = $this->model->getTableName();
         $this->postType = $this->model->getPostType();
         $this->view = $view;
-        if ($sidebarService) {
-            $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
+        if ($getRoutesService) {
+            $this->view->setAttributes(['sidebarItems' => $getRoutesService->getSidebar()]);
+            $this->routes = $getRoutesService->getLinks($this->postType);
         }
+    }
+
+    public function getRoutes(): Array
+    {
+        return $this->routes;
     }
 
     /**

@@ -51,6 +51,8 @@ trait TrashRestoreTrait
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForTrashRestore($data);
 
+        $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;
+
         $formHtml = $this->formService->formHtml(
             "/admin/{$this->postType}/{$actionType}/{$id}",
             $data,
@@ -60,7 +62,7 @@ trait TrashRestoreTrait
                 "Are you sure you want to {$actionType} this :name?",
                 ['name' => __($this->postType)]
             ),
-            __($actionType),
+            __($buttonText),
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,

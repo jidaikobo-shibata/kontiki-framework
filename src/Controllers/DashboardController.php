@@ -3,7 +3,7 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
-use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -18,10 +18,10 @@ class DashboardController
     private RouteParser $routeParser;
     private RouteCollector $routeCollector;
 
-    public function __construct(PhpRenderer $view, SidebarService $sidebarService)
+    public function __construct(PhpRenderer $view, GetRoutesService $getRoutesService)
     {
         $this->view = $view;
-        $this->view->setAttributes(['sidebarItems' => $sidebarService->getLinks()]);
+        $this->view->setAttributes(['sidebarItems' => $getRoutesService->getSidebar()]);
     }
 
     public static function registerRoutes(App $app): void

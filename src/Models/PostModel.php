@@ -27,7 +27,7 @@ class PostModel extends BaseModel
 
     public function getDisplayFields(): array
     {
-        return ['id', 'title', 'slug', 'created_at'];
+        return ['id', 'title', 'slug', 'created_at', 'status'];
     }
 
     protected function getUtcFields(): array
@@ -147,7 +147,7 @@ class PostModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
             'status' => [
-                'label' => __('draft'),
+                'label' => __('status'),
                 'type' => 'select',
                 'options' => [
                     'draft' => __('draft'),
@@ -184,9 +184,11 @@ class PostModel extends BaseModel
         ];
     }
 
-    public function getAdditionalConditions(Builder $query, string $context = 'normal'): Builder
+    public function getAdditionalConditions(Builder $query, string $context = 'all'): Builder
     {
-        if ($context === 'normal') {
+        if ($context === 'all') {
+            $query = $this->applyNotSoftDeletedConditions($query);
+        } elseif ($context === 'published') {
             $query = $this->applyNotSoftDeletedConditions($query);
             $query = $this->applyNotExpiredConditions($query);
             $query = $this->applyPublisedConditions($query);

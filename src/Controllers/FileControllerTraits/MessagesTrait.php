@@ -18,7 +18,7 @@ trait MessagesTrait
             'file_missing' => __('file_missing', 'No file uploaded or the file is corrupted.'),
             'method_not_allowed' => __('method_not_allowed', 'Method not allowed.'),
             'file_not_found' => __('file_not_found', 'File not found.'),
-            'update_success' => __('update_success', 'The database has been updated successfully.'),
+            'update_success' => __('update_success', 'Your file has been successfully uploaded. You can now insert it into your post or add a description in the <a href="#" class="link-primary" id="switchToViewTab">Files List</a>.'),
             'update_failed' => __('update_failed', 'Failed to update the database. Please try again.'),
             'file_id_required' => __('file_id_required', 'File ID is required.'),
             'file_delete_failed' => __('file_delete_failed', 'Failed to delete the file.'),

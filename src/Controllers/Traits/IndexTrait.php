@@ -13,6 +13,12 @@ trait IndexTrait
     protected string $context;
     protected Pagination $pagination;
 
+    public function allIndex(Request $request, Response $response): Response
+    {
+        $this->context = 'all';
+        return static::index($request, $response);
+    }
+
     /**
      * Retrieve data with pagination and additional conditions applied.
      *
@@ -31,10 +37,14 @@ trait IndexTrait
             $column = in_array($queryParams['orderby'], $validColumns, true) ? $queryParams['orderby'] : 'id';
             $direction = strtoupper($queryParams['order']) === 'DESC' ? 'DESC' : 'ASC';
             $query = $query->orderBy($column, $direction);
+        } else {
+            $query = $query->orderBy('id', 'DESC');
         }
 
         // post_type
-        $query = $query->where('post_type', '=', $this->model->getPostType());
+        if (!empty($this->model->getPostType())) {
+            $query = $query->where('post_type', '=', $this->model->getPostType());
+        }
 
         // Set up pagination
         $totalItems = $query->count();
@@ -57,7 +67,7 @@ trait IndexTrait
         $data = $this->getIndexData($request->getQueryParams());
 
         // render table
-        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context);
+        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->context, $this->getRoutes());
         $content = $tableRenderer->render();
 
         // set messages

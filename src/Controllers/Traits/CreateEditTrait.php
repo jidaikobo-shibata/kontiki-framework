@@ -170,28 +170,4 @@ trait CreateEditTrait
             return $this->redirectResponse($request, $response, $defaultRedirect);
         }
     }
-
-    public function preview(Request $request, Response $response): Response
-    {
-        $data = $this->prepareDataForRenderForm();
-
-        if (!isset($data['title']) || !isset($data['content'])) {
-            $content = $this->view->fetch('preview/content.php', [
-                'title' => __('cannot_preview_title', 'Cannot Render Preview'),
-                'content' => __('cannot_preview_desc', 'Preview cannot be reloaded. Please close the preview window and preview again.'),
-            ]);
-        } else {
-            $content = $this->view->fetch('preview/content.php', [
-                'title' => $data['title'],
-                'content' => $data['content'],
-            ]);
-        }
-
-        return $this->renderResponse(
-            $response,
-            __("preview"),
-            $content,
-            'preview/layout.php'
-        );
-    }
 }

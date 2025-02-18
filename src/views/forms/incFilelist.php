@@ -37,14 +37,14 @@
                         <td class="text-nowrap align-middle"><a href="#" class="fileCopyUrl"><?= __('copy_url') ?></a></td>
                     </tr>
                     <tr>
-                        <th class="align-middle" scope="row"><?= __('description') ?></th>
-                        <td class="text-break"><?= e($file['description']); ?></td>
-                        <td class="text-nowrap align-middle"><a href="#" class="fileEditBtn">編集する</a></td>
-                    </tr>
-                    <tr>
                         <th class="text-nowrap align-middle" scope="row"><?= __('code') ?></th>
                         <td class="text-break"><code>![<?= e($file['description']); ?>](<?= e($file['url']); ?>)</code></td>
                         <td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn"><?= __('insert') ?></a></td>
+                    </tr>
+                    <tr>
+                        <th class="align-middle" scope="row"><?= __('description') ?></th>
+                        <td class="text-break"><?= e($file['description']); ?></td>
+                        <td class="text-nowrap align-middle"><a href="#" class="fileEditBtn">編集する</a></td>
                     </tr>
                     </table>
 

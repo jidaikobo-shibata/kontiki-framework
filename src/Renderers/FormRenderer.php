@@ -67,11 +67,16 @@ class FormRenderer
         $fieldHtml = $this->renderField($name, $config);
         $fieldsetTemplate = $config['fieldset_template'] ?? 'forms/fieldset/flat.php';
 
+        $labelText = e($config['label']);
+        if (isset($config['rules']) && in_array('required', $config['rules'], true)) {
+            $labelText .= ' (' . __('required') . ')';
+        }
+
         return $this->view->fetch($fieldsetTemplate, [
             'label' => sprintf(
                 '<label %s>%s</label>',
                 $labelAttributes,
-                e($config['label'])
+                e($labelText)
             ),
             'field' => $fieldHtml,
         ]);

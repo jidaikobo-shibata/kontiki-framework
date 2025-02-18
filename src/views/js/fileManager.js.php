@@ -285,13 +285,16 @@ class KontikiFileManager {
             const textField = copyButton.closest('td').prev('td').find('.fileUrl');
             const textToCopy = textField.text().trim(); // Extract the text to copy
 
+            // Remove existing messages before adding a new one
+            textField.siblings('.copy-status').remove();
+
             // Use the Clipboard API to copy the text
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // Append a success message
-                textField.after('<span role="status" class="ms-2 text-success"><?= $copied ?></span>');
+                textField.after('<span role="status" class="copy-status ms-2 text-success"><?= $copied ?></span>');
             }).catch((error) => {
                 // Append an error message
-                textField.after('<span role="status" class="ms-2 text-danger"><?= $copy_failed ?></span>');
+                textField.after('<span role="status" class="copy-status ms-2 text-danger"><?= $copy_failed ?></span>');
             });
         });
     }
@@ -446,7 +449,8 @@ class KontikiFileManager {
 
             // Display success status
             const codeElement = fileRow.find('td.text-break code');
-            codeElement.after('<span role="status" class="ms-2 text-success"><?= $insert_success ?></span>');
+            fileRow.find('.insert-status').remove();
+            codeElement.after('<span role="status" class="insert-status ms-2 text-success"><?= $insert_success ?></span>');
         });
     }
 

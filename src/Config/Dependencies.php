@@ -9,7 +9,7 @@ use Illuminate\Database\Connection;
 use DI\Container;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\FileService;
-use Jidaikobo\Kontiki\Services\SidebarService;
+use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Views\PhpRenderer;
@@ -83,11 +83,11 @@ class Dependencies
             }
         );
 
-        // Set up Sidebar
+        // Set up getRoutes
         $container->set(
-            SidebarService::class,
+            GetRoutesService::class,
             function () {
-                return new SidebarService(
+                return new GetRoutesService(
                     $this->app->getRouteCollector()->getRouteParser(),
                     $this->app->getRouteCollector()
                 );

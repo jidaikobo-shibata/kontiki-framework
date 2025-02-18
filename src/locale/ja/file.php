@@ -9,6 +9,7 @@ return [
     'desc_for_description' => '「説明」は画像の場合は<code>alt属性</code>（画像の代替テキスト）、ファイルの場合は<code>リンク文字列</code>として使われます',
     'prepare_file_list' => 'ファイルの一覧を準備中です。',
 
+    'upload' => 'アップロードする',
     'file_desc_copy_url' => '<code>URLをコピー</code>でURLをコピーできます',
     'file_desc_edit' => '<code>編集する</code>で、「説明」を編集できます',
     'delete_it_completely' => '完全に削除する',
@@ -33,7 +34,7 @@ return [
 
     'invalid_request' => 'リクエストが無効です。もう一度お試しください。',
     'validation_failed' => 'データの検証に失敗しました。入力内容をご確認ください。',
-    'upload_success' => 'ファイルのアップロードに成功しました。<a href="#" class="link-primary" id="switchToViewTab">ファイルの一覧</a>を確認してください。',
+    'upload_success' => 'ファイルのアップロードに成功しました。<a href="#" class="link-primary" id="switchToViewTab">ファイルの一覧</a>で記事への挿入や説明の追加ができます。',
     'upload_error' => 'ファイルをアップロードできませんでした。もう一度お試しください。',
     'database_update_failed' => 'データベースの更新に失敗しました。もう一度お試しください。',
     'file_missing' => 'ファイルがアップロードされていないか、ファイルが壊れています。',
