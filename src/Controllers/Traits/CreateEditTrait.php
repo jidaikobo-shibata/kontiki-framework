@@ -147,27 +147,50 @@ trait CreateEditTrait
             return $errorResponse;
         }
 
-        // field definition
-        $fields = $this->getFieldDefinitionsForAction($actionType, $id);
-
         // Validate post data
-        $validationResult = $this->model->validateByFields($data, $fields);
-        if (!$validationResult['valid']) {
-            $this->flashManager->addErrors($validationResult['errors']);
+        if (!$this->isValidData($data, $actionType, $id)) {
             return $this->redirectResponse($request, $response, $defaultRedirect);
         }
 
+        return $this->processAndRedirect($request, $response, $actionType, $id, $data);
+    }
+
+    /**
+     * Validate input data against the field definitions.
+     */
+    private function isValidData(array $data, string $actionType, ?int $id): bool
+    {
+        $fields = $this->getFieldDefinitionsForAction($actionType, $id);
+        $validationResult = $this->model->validateByFields($data, $fields);
+
+        if (!$validationResult['valid']) {
+            $this->flashManager->addErrors($validationResult['errors']);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Process the save operation and handle redirection.
+     */
+    private function processAndRedirect(
+        Request $request,
+        Response $response,
+        string $actionType,
+        ?int $id,
+        array $data
+    ): Response {
         try {
             $id = $this->saveData($actionType, $id, $data);
-            $redirectTo = "/admin/{$this->postType}/edit/{$id}";
             $this->flashManager->addMessage(
                 'success',
                 __("x_save_success", ':name Saved successfully.', ['name' => __($this->postType)])
             );
-            return $this->redirectResponse($request, $response, $redirectTo);
+            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/edit/{$id}");
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);
-            return $this->redirectResponse($request, $response, $defaultRedirect);
+            return $this->redirectResponse($request, $response, $this->getDefaultRedirect($actionType, $id));
         }
     }
 }
