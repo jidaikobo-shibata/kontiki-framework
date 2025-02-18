@@ -6,7 +6,7 @@ $(document).ready(function() {
         const buttonClass = $(this).data("button-class") || "";
         const targetComponentId = $(this).attr("id") || "";
         const buttonHtml = `
-            <button type="button" class="btn btn-secondary ${buttonClass}" data-bs-toggle="modal" data-bs-target="#uploadModal" data-target-component-id="${targetComponentId}"><?= __('file_upload', 'File Upload') ?></button>
+            <button type="button" class="btn btn-secondary ${buttonClass}" data-bs-toggle="modal" data-bs-target="#uploadModal" data-target-component-id="${targetComponentId}"><?= __('file_upload_manage', 'File Upload / Manage') ?></button>
         `;
         $(this).after(buttonHtml);
     });

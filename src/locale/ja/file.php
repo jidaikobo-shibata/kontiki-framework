@@ -5,6 +5,7 @@ return [
     'file' => 'ファイル',
     'path' => '場所',
     'file_upload' => 'ファイルアップロード',
+    'file_upload_manage' => 'ファイルアップロード / 管理',
     'multi_bytes_warn' => '全角文字は変更か、削除されます。',
     'desc_for_description' => '「説明」は画像の場合は<code>alt属性</code>（画像の代替テキスト）、ファイルの場合は<code>リンク文字列</code>として使われます',
     'prepare_file_list' => 'ファイルの一覧を準備中です。',
