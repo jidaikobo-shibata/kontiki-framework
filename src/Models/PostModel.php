@@ -52,135 +52,140 @@ class PostModel extends BaseModel
         $now = Carbon::now(env('TIMEZONE', 'UTC'));
 
         return [
-            'id' => [
-                'label' => 'ID',
+            'id' => $this->getIdField(),
+            'title' => $this->getTextField('title', ['required']),
+            'content' => $this->getContentField(),
+            'slug' => $this->getSlugField($id),
+            'parent_id' => $this->getSelectField('parent', $parentOptions),
+            'published_at' => $this->getDateTimeField('published_at', $now, ['required']),
+            'expired_at' => $this->getDateTimeField('expired_at'),
+            'status' => $this->getStatusField(),
+            'creator_id' => $this->getSelectField('creator', $userOptions, $user['id']),
+            'created_at' => $this->getIdField(__('created_at', 'Created')),
+        ];
+    }
+
+    private function getIdField(string $label = 'ID'): array
+    {
+        return ['label' => $label];
+    }
+
+    private function getTextField(string $name, array $rules = []): array
+    {
+        return [
+            'label' => __($name),
+            'type' => 'text',
+            'attributes' => ['class' => 'form-control'],
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => '',
+            'searchable' => true,
+            'rules' => $rules,
+            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
+        ];
+    }
+
+    private function getContentField(): array
+    {
+        return [
+            'label' => __('content'),
+            'description' => __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".'),
+            'type' => 'textarea',
+            'attributes' => [
+                'class' => 'form-control font-monospace kontiki-file-upload',
+                'data-button-class' => 'mt-2',
+                'rows' => '10'
             ],
-            'title' => [
-                'label' => __('title'),
-                'type' => 'text',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => ['required'],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => '',
+            'searchable' => true,
+            'rules' => [],
+            'filter' => FILTER_UNSAFE_RAW,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
+        ];
+    }
+
+    private function getSlugField(?int $id): array
+    {
+        return [
+            'label' => __('slug'),
+            'description' => __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.'),
+            'type' => 'text',
+            'attributes' => ['class' => 'form-control'],
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => '',
+            'searchable' => true,
+            'rules' => [
+                'required',
+                'slug',
+                ['lengthMin', 3],
+                ['unique', $this->table, 'slug', $id]
             ],
-            'content' => [
-                'label' => __('content'),
-                'description' => __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".'),
-                'type' => 'textarea',
-                'attributes' => [
-                    'class' => 'form-control font-monospace kontiki-file-upload',
-                    'data-button-class' => 'mt-2',
-                    'rows' => '10'
-                ],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => [],
-                'filter' => FILTER_UNSAFE_RAW,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
+            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
+        ];
+    }
+
+    private function getSelectField(string $name, array $options, $default = ''): array
+    {
+        return [
+            'label' => __($name),
+            'type' => 'select',
+            'options' => $options,
+            'attributes' => ['class' => 'form-control form-select'],
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => $default,
+            'searchable' => true,
+            'rules' => [],
+            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
+        ];
+    }
+
+    private function getDateTimeField(string $name, $default = '', array $rules = []): array
+    {
+        return [
+            'label' => __($name),
+            'type' => 'datetime-local',
+            'attributes' => ['class' => 'form-control'],
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => $default,
+            'searchable' => true,
+            'rules' => $rules,
+            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
+        ];
+    }
+
+    private function getStatusField(): array
+    {
+        return [
+            'label' => __('status'),
+            'type' => 'select',
+            'options' => [
+                'draft' => __('draft'),
+                'published' => __('published'),
+                'pending' => __('pending'),
             ],
-            'slug' => [
-                'label' => __('slug'),
-                'description' => __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.'),
-                'type' => 'text',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => [
-                    'required',
-                    'slug',
-                    ['lengthMin', 3],
-                    ['unique', $this->table, 'slug', $id]
-                ],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'parent_id' => [
-                'label' => __('parent'),
-                'type' => 'select',
-                'options' => $parentOptions,
-                'attributes' => ['class' => 'form-control form-select'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => 0,
-                'searchable' => true,
-                'rules' => [],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'published_at' => [
-                'label' => __('published_at'),
-                'description' => __('published_at_exp', 'If you enter a future date and time, it will be scheduled to post.'),
-                'type' => 'datetime-local',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => $now,
-                'searchable' => true,
-                'rules' => ['required'],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'expired_at' => [
-                'label' => __('expired_at'),
-                'type' => 'datetime-local',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => [],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'status' => [
-                'label' => __('status'),
-                'type' => 'select',
-                'options' => [
-                    'draft' => __('draft'),
-                    'published' => __('published'),
-                    'pending' => __('pending'),
-                ],
-                'attributes' => ['class' => 'form-control form-select'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => [],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'creator_id' => [
-                'label' => __('creator'),
-                'type' => 'select',
-                'options' => $userOptions,
-                'attributes' => ['class' => 'form-control form-select'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => $user['id'],
-                'searchable' => true,
-                'rules' => [],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'created_at' => [
-                'label' => __('created_at', 'Created'),
-            ],
+            'attributes' => ['class' => 'form-control form-select'],
+            'label_attributes' => ['class' => 'form-label'],
+            'default' => '',
+            'searchable' => true,
+            'rules' => [],
+            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'template' => 'default',
+            'group' => 'main',
+            'fieldset_template' => 'forms/fieldset/flat.php',
         ];
     }
 
