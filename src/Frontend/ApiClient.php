@@ -44,36 +44,36 @@ class ApiClient
     private static function initializeCurl(string $url, string $method, ?array $data, array $headers)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30
+        ]);
 
-        // Set method-specific options
-        switch (strtoupper($method)) {
-            case 'POST':
-                curl_setopt($ch, CURLOPT_POST, true);
-                if ($data !== null) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-                }
-                break;
-            case 'GET':
-                if ($data !== null) {
-                    $url .= '?' . http_build_query($data);
-                }
-                break;
-            default:
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-                if ($data !== null) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-                }
+        $method = strtoupper($method);
+
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+        } elseif ($method !== 'GET') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         }
 
-        // Set headers
-        $defaultHeaders = [
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ];
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge($defaultHeaders, $headers));
+        if ($data !== null) {
+            $encodedData = json_encode($data);
+            if ($method === 'GET') {
+                $url .= '?' . http_build_query($data);
+            } else {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+            }
+        }
+
+        // Set headers and URL
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_HTTPHEADER => array_merge([
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ], $headers)
+        ]);
 
         return $ch;
     }
