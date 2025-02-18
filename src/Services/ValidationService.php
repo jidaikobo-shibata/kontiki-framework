@@ -65,21 +65,28 @@ class ValidationService
 
         $isValid = $validator->validate();
 
-        $errors = [];
-
-        if (!$isValid) {
-            foreach ($validator->errors() as $field => $messages) {
-                $errors[$field] = [
-                    'messages' => $messages,
-                    'htmlName' => $field,
-                ];
-            }
-        }
-
         return [
             'valid' => $isValid,
-            'errors' => $errors,
+            'errors' => $isValid ? [] : $this->extractValidationErrors($validator)
         ];
+    }
+
+    /**
+     * Extract validation errors from the validator instance.
+     *
+     * @param Validator $validator The validator instance.
+     * @return array The extracted errors formatted for response.
+     */
+    private function extractValidationErrors(Validator $validator): array
+    {
+        $errors = [];
+        foreach ($validator->errors() as $field => $messages) {
+            $errors[$field] = [
+                'messages' => $messages,
+                'htmlName' => $field,
+            ];
+        }
+        return $errors;
     }
 
     /**

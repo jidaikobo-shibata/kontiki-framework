@@ -63,37 +63,31 @@ class MessageUtils
      * Generates a section for displaying status messages with appropriate styling.
      *
      * @param string $message The message to display within the section.
-     * @param string $status The status of the message
-     * @param string $escape escape message
+     * @param string $status The status of the message.
+     * @param bool $escape Whether to escape the message.
      * @return string HTML output for the status section.
      */
-    public static function alertHtml(string $message, string $status = "success", bool $escape = TRUE): string
+    public static function alertHtml(string $message, string $status = "success", bool $escape = true): string
     {
-        // Define the CSS class based on the status
-        $statusClass = '';
-        switch ($status) {
-            case 'success':
-                $statusClass = 'alert alert-success';
-                break;
-            case 'info':
-                $statusClass = 'alert alert-info';
-                break;
-            case 'warning':
-                $statusClass = 'alert alert-warning';
-                break;
-            case 'danger':
-                $statusClass = 'alert alert-danger';
-                break;
-            default:
-                $statusClass = 'alert alert-secondary'; // Default class for undefined statuses
-        }
+        // Define a status-class mapping table
+        $statusClasses = [
+            'success' => 'alert alert-success',
+            'info'    => 'alert alert-info',
+            'warning' => 'alert alert-warning',
+            'danger'  => 'alert alert-danger',
+        ];
 
+        // Get the CSS class from the table, default to "alert-secondary"
+        $statusClass = $statusClasses[$status] ?? 'alert alert-secondary';
+
+        // Escape message if required
         $message = $escape ? e($message) : $message;
-        // Generate the HTML for the status section
-        $html = '<section class="' . e($statusClass) . '" role="status">';
-        $html .= '<p class="mb-0">' . $message . '</p>';
-        $html .= '</section>';
 
-        return $html;
+        // Generate and return the HTML
+        return sprintf(
+            '<section class="%s" role="status"><p class="mb-0">%s</p></section>',
+            e($statusClass),
+            $message
+        );
     }
 }
