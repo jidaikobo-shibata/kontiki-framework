@@ -191,21 +191,24 @@ class PostModel extends BaseModel
 
     public function getAdditionalConditions(Builder $query, string $context = 'all'): Builder
     {
-        if ($context === 'all') {
-            $query = $this->applyNotSoftDeletedConditions($query);
-        } elseif ($context === 'published') {
-            $query = $this->applyNotSoftDeletedConditions($query);
-            $query = $this->applyNotExpiredConditions($query);
-            $query = $this->applyPublisedConditions($query);
-            $query = $this->applyNotDraftConditions($query);
-        } elseif ($context === 'trash') {
-            $query = $this->applySoftDeletedConditions($query);
-        } elseif ($context === 'reserved') {
-            $query = $this->applyNotPublisedConditions($query);
-        } elseif ($context === 'expired') {
-            $query = $this->applyExpiredConditions($query);
-        } elseif ($context === 'draft') {
-            $query = $this->applyDraftConditions($query);
+        $contextConditions = [
+            'all'       => ['applyNotSoftDeletedConditions'],
+            'published' => [
+                'applyNotSoftDeletedConditions',
+                'applyNotExpiredConditions',
+                'applyPublisedConditions',
+                'applyNotDraftConditions'
+            ],
+            'trash'     => ['applySoftDeletedConditions'],
+            'reserved'  => ['applyNotPublisedConditions'],
+            'expired'   => ['applyExpiredConditions'],
+            'draft'     => ['applyDraftConditions'],
+        ];
+
+        if (isset($contextConditions[$context])) {
+            foreach ($contextConditions[$context] as $method) {
+                $query = $this->$method($query);
+            }
         }
 
         // jlog($context);
