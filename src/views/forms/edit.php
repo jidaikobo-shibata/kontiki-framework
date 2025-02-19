@@ -9,7 +9,9 @@
   <div class="row">
      <?= $formHtml ?>
   </div>
+  <?php if (strpos($actionAttribute, '/create') !== false || strpos($actionAttribute, '/edit') !== false): ?>
   <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview"><?= __('preview') ?></button>
+  <?php endif; ?>
   <button type="submit" class="btn btn-primary"><?= $buttonText ?></button>
 </form>
 </div>
