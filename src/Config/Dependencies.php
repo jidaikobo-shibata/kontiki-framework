@@ -58,6 +58,7 @@ class Dependencies
         $container->set(
             Session::class,
             function () {
+                session_cache_limiter('private_no_expire');
                 $sessionFactory = new SessionFactory();
                 return $sessionFactory->newInstance($_COOKIE);
             }
