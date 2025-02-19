@@ -37,30 +37,28 @@ class PostModel extends BaseModel
 
     public function getFieldDefinitions(array $params = []): array
     {
-        // Author
+        // defaults
         $userModel = new UserModel($this->db, $this->validationService);
         $userOptions = $userModel->getOptions('username');
         $user = $this->authService->getCurrentUser();
-
-        // unique check
         $id = $params['id'] ?? null;
-
-        // parent_id
         $parentOptions = $this->getOptions('title', TRUE, '', $id);
-
-        // current
         $now = Carbon::now(env('TIMEZONE', 'UTC'));
+
+        // env
+        $hide_parent = env('POST_HIDE_PARENT', false);
+        $hide_author = env('POST_HIDE_AUTHOR', false);
 
         return [
             'id' => $this->getIdField(),
             'title' => $this->getTextField('title', ['required']),
             'content' => $this->getContentField(),
             'slug' => $this->getSlugField($id),
-            'parent_id' => $this->getSelectField('parent', $parentOptions),
+            'parent_id' => $this->getSelectField('parent', $parentOptions, '', $hide_parent),
             'published_at' => $this->getDateTimeField('published_at', $now, ['required']),
             'expired_at' => $this->getDateTimeField('expired_at'),
             'status' => $this->getStatusField(),
-            'creator_id' => $this->getSelectField('creator', $userOptions, $user['id']),
+            'creator_id' => $this->getSelectField('creator', $userOptions, $user['id'], $hide_author),
             'created_at' => $this->getIdField(__('created_at', 'Created')),
         ];
     }
@@ -132,11 +130,12 @@ class PostModel extends BaseModel
         ];
     }
 
-    private function getSelectField(string $name, array $options, $default = ''): array
+    private function getSelectField(string $name, array $options, $default = '', $hide = false): array
     {
+        $type = $hide ? 'hidden' : 'select';
         return [
             'label' => __($name),
-            'type' => 'select',
+            'type' => $type,
             'options' => $options,
             'attributes' => ['class' => 'form-control form-select'],
             'label_attributes' => ['class' => 'form-label'],
@@ -145,7 +144,7 @@ class PostModel extends BaseModel
             'rules' => [],
             'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
             'template' => 'default',
-            'group' => 'main',
+            'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
         ];
     }
@@ -162,7 +161,7 @@ class PostModel extends BaseModel
             'rules' => $rules,
             'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
             'template' => 'default',
-            'group' => 'main',
+            'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
         ];
     }
@@ -184,7 +183,7 @@ class PostModel extends BaseModel
             'rules' => [],
             'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
             'template' => 'default',
-            'group' => 'main',
+            'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
         ];
     }

@@ -57,29 +57,38 @@ class FormRenderer
 
     protected function renderFieldset(string $name, array $config): string
     {
-        $id = FormUtils::nameToId($name);
+        $labelText = $this->generateLabelHtml($name, $config);
+        $fieldHtml = $this->renderField($name, $config);
+        $fieldsetTemplate = $config['fieldset_template'] ?? 'forms/fieldset/flat.php';
 
+        return $this->view->fetch($fieldsetTemplate, [
+            'label' => $labelText,
+            'field' => $fieldHtml,
+        ]);
+    }
+
+    private function generateLabelHtml(string $name, array $config): string
+    {
+        if ($config['type'] === 'hidden') {
+            return ''; // Hidden fields do not need labels
+        }
+
+        $id = FormUtils::nameToId($name);
         $labelAttributes = $this->renderAttributes(array_merge(
             $config['label_attributes'] ?? [],
             ['for' => $id]
         ));
 
-        $fieldHtml = $this->renderField($name, $config);
-        $fieldsetTemplate = $config['fieldset_template'] ?? 'forms/fieldset/flat.php';
-
         $labelText = e($config['label']);
-        if (isset($config['rules']) && in_array('required', $config['rules'], true)) {
+        if (!empty($config['rules']) && in_array('required', $config['rules'], true)) {
             $labelText .= ' (' . __('required') . ')';
         }
 
-        return $this->view->fetch($fieldsetTemplate, [
-            'label' => sprintf(
-                '<label %s>%s</label>',
-                $labelAttributes,
-                e($labelText)
-            ),
-            'field' => $fieldHtml,
-        ]);
+        return sprintf(
+            '<label %s>%s</label>',
+            $labelAttributes,
+            e($labelText)
+        );
     }
 
     protected function renderField(string $name, array $config): string
