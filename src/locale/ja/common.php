@@ -43,6 +43,7 @@ return [
     'reserved' => '予約',
     'expired' => '公開終了',
     'published' => '公開中',
+    'parent' => '親',
     'display_filter' => '表示フィルタ',
 
     'management_portal' => '管理画面',

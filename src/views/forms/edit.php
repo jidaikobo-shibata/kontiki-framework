@@ -6,7 +6,9 @@
 <div class="dontExpandForm">
 <form action="<?= e($actionAttribute) ?>" method="post">
   <input type="hidden" name="_csrf_value" value="<?= e($csrfToken) ?>">
-  <?= $formHtml ?>
+  <div class="row">
+     <?= $formHtml ?>
+  </div>
   <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview"><?= __('preview') ?></button>
   <button type="submit" class="btn btn-primary"><?= $buttonText ?></button>
 </form>
