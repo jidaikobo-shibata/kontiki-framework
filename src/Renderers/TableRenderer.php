@@ -14,6 +14,7 @@ class TableRenderer
     protected $table;
     protected $context;
     protected $routes;
+    protected $postType;
     protected $deleteType; // Context: "hardDelete" or "softDelete"
 
     public function __construct(

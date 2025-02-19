@@ -136,8 +136,8 @@ abstract class BaseController
     protected function validateCsrfForJson(?array $data, Response $response): ?Response
     {
         $data = $data ?? [];
-
         if (!$this->isCsrfTokenValid($data)) {
+
             $this->flashManager->addErrors([
                 ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],
             ]);
@@ -206,8 +206,22 @@ abstract class BaseController
             $additionalData
         );
 
-        // Render the view and return the response
-        return $this->view->render($response, $template, $data);
+        $response = $response->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                             ->withHeader('Pragma', 'no-cache')
+                             ->withHeader('Expires', '0');
+
+        // Output Buffering with Exception Handling
+        ob_start();
+        try {
+            $response = $this->view->render($response, $template, $data);
+            $output = ob_get_clean();
+        } catch (\Throwable $e) {
+            ob_end_clean(); // Ensure buffer is cleared on error
+            throw $e;
+        }
+
+        $response->getBody()->write($output);
+        return $response;
     }
 
     /**

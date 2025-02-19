@@ -30,7 +30,6 @@ trait CRUDTrait
         if (!empty($this->postType)) {
             $data['post_type'] = $this->postType;
         }
-
         return $data;
     }
 

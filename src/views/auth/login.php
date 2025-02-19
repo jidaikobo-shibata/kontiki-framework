@@ -13,7 +13,7 @@
           <input type="text" name="username" id="username" class="form-control" required value="<?= e($data['username']) ?>">
           <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
+              <span class="fas fa-user"></span>
             </div>
           </div>
         </div>

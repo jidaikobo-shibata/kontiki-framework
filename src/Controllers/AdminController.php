@@ -27,6 +27,7 @@ class AdminController
             '/admin',
             function (RouteCollectorProxy $group) {
                 $group->get('/admin.js', [AdminController::class, 'serveJs']);
+                $group->get('/favicon.ico', [AdminController::class, 'serveFavicon']);
             }
         )->add(AuthMiddleware::class);
     }
@@ -41,5 +42,21 @@ class AdminController
         $content = $this->view->fetch('js/admin.js.php');
         $response->getBody()->write($content);
         return $response->withHeader('Content-Type', 'application/javascript; charset=utf-8')->withStatus(200);
+    }
+
+    /**
+     * Serve the requested favicon file.
+     *
+     * @return Response
+     */
+    public function serveFavicon(Request $request, Response $response): Response
+    {
+        $faviconPath = KONTIKI_PROJECT_PATH . '/src/views/images/favicon.ico';
+        $content = file_get_contents($faviconPath);
+        $response->getBody()->write($content);
+        return $response
+            ->withHeader('Content-Type', 'image/x-icon')
+            ->withHeader('Cache-Control', 'public, max-age=86400') // 1日キャッシュ
+            ->withStatus(200);
     }
 }

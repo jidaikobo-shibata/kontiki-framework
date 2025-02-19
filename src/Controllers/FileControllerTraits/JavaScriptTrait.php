@@ -34,8 +34,6 @@ trait JavaScriptTrait
         $response->getBody()->write($content);
 
         return $response
-            ->withoutHeader('Pragma')
-            ->withHeader('Cache-Control', 'public, max-age=3600')
             ->withHeader('Content-Type', 'application/javascript; charset=utf-8')
             ->withStatus(200);
     }
@@ -55,8 +53,6 @@ trait JavaScriptTrait
         );
         $response->getBody()->write($content);
         return $response
-            ->withoutHeader('Pragma')
-            ->withHeader('Cache-Control', 'public, max-age=3600')
             ->withHeader('Content-Type', 'application/javascript; charset=utf-8')
             ->withStatus(200);
     }

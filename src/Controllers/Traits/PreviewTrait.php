@@ -23,15 +23,14 @@ trait PreviewTrait
     protected function renderPreview(Response $response, array $data): Response
     {
         if (!isset($data['title']) || !isset($data['content'])) {
-            $content = $this->view->render(
+            return $this->renderResponse(
                 $response,
-                'preview/content.php',
-                [
-                    'title' => __('cannot_preview_title', 'Cannot Render Preview'),
-                    'content' => __('cannot_preview_desc', 'Preview cannot be reloaded. Please close the preview window and preview again.'),
-                ]);
+                __('cannot_preview_title', 'Cannot Render Preview'),
+                __('cannot_preview_desc', 'Preview cannot be reloaded. Please close the preview window and preview again.'),
+                'preview/content.php'
+            );
         } else {
-            $content = $this->previewRenderer->render(
+            return $this->previewRenderer->render(
                 $response,
                 'preview.php',
                 [
@@ -39,7 +38,5 @@ trait PreviewTrait
                     'content' => $data['content'],
                 ]);
         }
-
-        return $content;
     }
 }

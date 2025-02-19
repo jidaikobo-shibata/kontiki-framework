@@ -118,13 +118,10 @@ trait IndexTrait
           ? $title_placeholder
           : $this->context . ' ' . $title_placeholder;
 
-        return $this->view->render(
+        return $this->renderResponse(
             $response,
-            'layout.php',
-            [
-                'pageTitle' => __($title, $title_placeholder, ['name' => __($this->postType)]),
-                'content' => $content,
-            ]
+            __($title, $title_placeholder, ['name' => __($this->postType)]),
+            $content
         );
     }
 }

@@ -13,6 +13,8 @@ trait DeleteTrait
             $field['attributes']['readonly'] = 'readonly';
 
             $existingClass = $field['attributes']['class'] ?? '';
+            $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
+
             $field['attributes']['class'] = trim($existingClass . ' form-control-plaintext p-2');
 
             $field['description'] = '';

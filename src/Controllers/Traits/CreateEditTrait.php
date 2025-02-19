@@ -30,7 +30,7 @@ trait CreateEditTrait
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("create", 'Create'),
+            __("x_save", 'Save :name', ['name' => __($this->postType)]),
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,
@@ -39,7 +39,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("{$this->postType}_create", 'Create ' . ucfirst($this->postType)),
+            __("x_create", 'Create :name', ['name' => __($this->postType)]),
             $formHtml
         );
     }
@@ -62,7 +62,7 @@ trait CreateEditTrait
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("update", 'Update'),
+            __("x_save", 'Save :name', ['name' => __($this->postType)]),
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,
@@ -72,7 +72,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("{$this->postType}_edit", 'Edit ' . ucfirst($this->postType)),
+            __("x_edit", 'Edit :name', ['name' => __($this->postType)]),
             $formHtml
         );
     }

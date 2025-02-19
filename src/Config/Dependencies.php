@@ -58,7 +58,15 @@ class Dependencies
         $container->set(
             Session::class,
             function () {
-                session_cache_limiter('private_no_expire');
+                // cache JavaScript and image
+                $request_uri = $_SERVER['REQUEST_URI'];
+                if (
+                    strpos($request_uri, '.js') !== false ||
+                    strpos($request_uri, '.ico') !== false
+                ) {
+                    session_cache_limiter('private_no_expire');
+                }
+
                 $sessionFactory = new SessionFactory();
                 return $sessionFactory->newInstance($_COOKIE);
             }

@@ -43,7 +43,7 @@ class PostModel extends BaseModel
         $user = $this->authService->getCurrentUser();
         $id = $params['id'] ?? null;
         $parentOptions = $this->getOptions('title', TRUE, '', $id);
-        $now = Carbon::now(env('TIMEZONE', 'UTC'));
+        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
 
         // env
         $hide_parent = env('POST_HIDE_PARENT', false);
@@ -55,8 +55,8 @@ class PostModel extends BaseModel
             'content' => $this->getContentField(),
             'slug' => $this->getSlugField($id),
             'parent_id' => $this->getSelectField('parent', $parentOptions, '', $hide_parent),
-            'published_at' => $this->getDateTimeField('published_at', $now, ['required']),
-            'expired_at' => $this->getDateTimeField('expired_at'),
+            'published_at' => $this->getDateTimeField('published_at', 'published_at_exp', $now),
+            'expired_at' => $this->getDateTimeField('expired_at', 'expired_at_exp'),
             'status' => $this->getStatusField(),
             'creator_id' => $this->getSelectField('creator', $userOptions, $user['id'], $hide_author),
             'created_at' => $this->getIdField(__('created_at', 'Created')),
@@ -149,10 +149,11 @@ class PostModel extends BaseModel
         ];
     }
 
-    private function getDateTimeField(string $name, $default = '', array $rules = []): array
+    private function getDateTimeField(string $name, string $description = '', $default = '', array $rules = []): array
     {
         return [
             'label' => __($name),
+            'description' => __($description),
             'type' => 'datetime-local',
             'attributes' => ['class' => 'form-control'],
             'label_attributes' => ['class' => 'form-label'],
