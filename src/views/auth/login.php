@@ -1,3 +1,8 @@
+<?php
+/**
+  * @var array $data
+  */
+?>
 <div class="login-box">
   <div class="login-logo">
     <?= env('COPYRIGHT', '') ?>

@@ -121,7 +121,7 @@ class TableRenderer
         $values = [];
 
         if ($name === 'status') {
-            $values[] = __($row[$name]) ?? '';
+            $values[] = __($row[$name]) ?: '';
 
             // Check for reserved (future publication)
             if (!empty($row['published_at'])) {

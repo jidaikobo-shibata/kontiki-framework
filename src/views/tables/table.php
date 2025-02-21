@@ -1,3 +1,10 @@
+<?php
+/**
+  * @var array $displayModes
+  * @var string $headers
+  * @var string $rows
+  */
+?>
 <nav class="navbar navbar-expand-lg bg-secondary-subtle" aria-label="<?= __('display_filter') ?>">
   <div class="container-fluid">
     <div class="collapse navbar-collapse">

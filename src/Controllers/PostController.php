@@ -36,9 +36,10 @@ class PostController extends BaseController
     ) {
         parent::__construct($view, $session, $model, $getRoutesService);
 
-        $previewPath = file_exists(KONTIKI_PROJECT_PATH . '/app/views/post') ?
-            KONTIKI_PROJECT_PATH . '/app/views/post' :
-            KONTIKI_PROJECT_PATH . '/src/views/post' ;
+        $projectPath = env('PROJECT_PATH', '');
+        $previewPath = file_exists($projectPath . '/app/views/post') ?
+            $projectPath . '/app/views/post' :
+            $projectPath . '/src/views/post' ;
         $this->previewRenderer = new PhpRenderer($previewPath);
     }
 

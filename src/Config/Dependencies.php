@@ -35,7 +35,7 @@ class Dependencies
 
                 $capsule->addConnection([
                     'driver' => 'sqlite',
-                    'database' => KONTIKI_PROJECT_PATH . '/' . env('DB_DATABASE', ''),
+                    'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
                     'charset' => 'utf8',
                     'collation' => 'utf8_unicode_ci',
                     'prefix' => '',
@@ -76,7 +76,7 @@ class Dependencies
         $container->set(
             PhpRenderer::class,
             function () {
-                return new PhpRenderer(KONTIKI_PROJECT_PATH . '/src/views');
+                return new PhpRenderer(env('PROJECT_PATH', '') . '/src/views');
             }
         );
 
@@ -84,7 +84,7 @@ class Dependencies
         $container->set(
             FileService::class,
             function () {
-                $uploadDir = KONTIKI_PROJECT_PATH . env('UPLOADDIR', '');
+                $uploadDir = env('PROJECT_PATH', '') . env('UPLOADDIR', '');
                 $allowedTypesJson = env('ALLOWED_MIME_TYPES', '[]');
                 $allowedTypes = json_decode($allowedTypesJson, true);
                 $maxSize = env('MAXSIZE', 5000000);

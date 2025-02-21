@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<?php
+/**
+  * @var string $pageTitle
+  * @var string $content
+  */
+?><!DOCTYPE html>
 <html lang="<?= env('LANG', 'en') ?>">
 <head>
   <meta charset="UTF-8">

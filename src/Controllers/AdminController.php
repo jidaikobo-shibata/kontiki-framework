@@ -51,7 +51,7 @@ class AdminController
      */
     public function serveFavicon(Request $request, Response $response): Response
     {
-        $faviconPath = KONTIKI_PROJECT_PATH . '/src/views/images/favicon.ico';
+        $faviconPath = env('PROJECT_PATH', '') . '/src/views/images/favicon.ico';
         $content = file_get_contents($faviconPath);
         $response->getBody()->write($content);
         return $response

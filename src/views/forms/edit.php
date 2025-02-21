@@ -1,3 +1,12 @@
+<?php
+/**
+  * @var string $actionAttribute
+  * @var string $csrfToken
+  * @var string $formHtml
+  * @var string $buttonText
+  */
+?>
+
 <?php if (!empty($description)) : ?>
 <p class="alert alert-primary"><?= e($description) ?></p>
 <?php endif; ?>

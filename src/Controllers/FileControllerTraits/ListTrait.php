@@ -106,13 +106,13 @@ trait ListTrait
     protected function pathToUrl(string $filePath): string
     {
         $filePath = realpath($filePath);
-        $uploadDir = realpath(KONTIKI_PROJECT_PATH . env('UPLOADDIR'));
+        $uploadDir = realpath(env('PROJECT_PATH', '') . env('UPLOADDIR'));
         $uploadBaseUrl = rtrim(env('BASEURL'), '/') . rtrim(env('BASEURL_UPLOAD_DIR'), '/');
 
         if (strpos($filePath, $uploadDir) === 0) {
             $relativePath = ltrim(str_replace($uploadDir, '', $filePath), '/');
             return $uploadBaseUrl . '/' . $relativePath;
         }
-        throw new InvalidArgumentException('The file path is not inside the upload directory.');
+        throw new \InvalidArgumentException('The file path is not inside the upload directory.');
     }
 }

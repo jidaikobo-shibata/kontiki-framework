@@ -18,12 +18,9 @@ class Bootstrap
         // Set the error log handler
         Log::getInstance()->registerHandlers();
 
-        // set project path
-        $projectPath = $env === 'development' ? dirname(__DIR__) : dirname(__DIR__, 4);
-        define('KONTIKI_PROJECT_PATH', $projectPath);
-
         // load config
-        $dotenv = Dotenv::createImmutable(KONTIKI_PROJECT_PATH . "/config/{$env}/");
+        $projectPath = $env === 'development' ? dirname(__DIR__) : dirname(__DIR__, 4);
+        $dotenv = Dotenv::createImmutable($projectPath . "/config/{$env}/");
         $dotenv->load();
 
         // Load Functions
@@ -31,6 +28,10 @@ class Bootstrap
             require __DIR__ . '/functions/dev/functions.php';
         }
         require __DIR__ . '/functions/functions.php';
+
+        // setenv
+        setenv('ENV', $env);
+        setenv('PROJECT_PATH', $projectPath);
 
         // Load default language on class load
         $language = env('LANG', 'en');

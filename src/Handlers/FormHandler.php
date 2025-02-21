@@ -3,16 +3,16 @@
 namespace Jidaikobo\Kontiki\Handlers;
 
 use DOMDocument;
-use Jidaikobo\Kontiki\Models\BaseModel;
+use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Utils\MessageUtils;
 use Jidaikobo\Kontiki\Utils\FormUtils;
 
 class FormHandler
 {
     private DOMDocument $dom;
-    private BaseModel $model;
+    private ModelInterface $model;
 
-    public function __construct(string $html, BaseModel $model)
+    public function __construct(string $html, ModelInterface $model)
     {
         $this->dom = new DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);

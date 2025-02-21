@@ -40,17 +40,49 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
+        static $cache = [];
+
+        if (array_key_exists($key, $cache)) {
+            return $cache[$key];
+        }
+
+        $value = $default;
+
         // Check in $_SERVER
-        if (isset($_SERVER[$key])) {
-            return $_SERVER[$key];
+        if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+            $value = $_SERVER[$key];
         }
 
         // Check in $_ENV
-        if (isset($_ENV[$key])) {
-            return $_ENV[$key];
+        if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+            $value = $_ENV[$key];
         }
 
-        // Fallback to default value
-        return $default;
+        $cache[$key] = $value;
+        return $value;
+    }
+}
+
+if (!function_exists('setenv')) {
+    /**
+     * Set an environment variable.
+     *
+     * @param string $key The environment variable key.
+     * @param mixed $value The value to set. If null, the variable will be removed.
+     * @return void
+     */
+    function setenv(string $key, $value): void
+    {
+        if ($value === null) {
+            unset($_SERVER[$key], $_ENV[$key]);
+            return;
+        }
+
+        if (!is_scalar($value)) {
+            throw new \InvalidArgumentException("setenv() only accepts scalar values (string, int, float, bool).");
+        }
+
+        $_SERVER[$key] = (string) $value;
+        $_ENV[$key] = (string) $value;
     }
 }

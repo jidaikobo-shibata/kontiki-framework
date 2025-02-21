@@ -1,3 +1,9 @@
+<?php
+/**
+  * @var string $pagination
+  * @var array $items
+  */
+?>
 <ul class="mt-4">
     <li><?= __('file_desc_copy_url', 'You can copy the URL by clicking <code>Copy URL</code>') ?></li>
     <li><?= __('file_desc_edit', 'You can edit the description by clicking <code>Edit</code>.') ?></li>

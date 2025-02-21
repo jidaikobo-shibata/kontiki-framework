@@ -1,4 +1,19 @@
-class KontikiFileManager {
+<?php
+/**
+  * @var string $uploading
+  * @var string $couldnt_upload
+  * @var string $get_file_list
+  * @var string $couldnt_find_file
+  * @var string $couldnt_get_file_list
+  * @var string $copied
+  * @var string $copy_failed
+  * @var string $close
+  * @var string $edit
+  * @var string $confirm_delete_message
+  * @var string $couldnt_delete_file
+  * @var string $insert_success
+  */
+?>class KontikiFileManager {
     /**
      * Initializes the FileManager instance.
      * @param {string} ajaxUrl The base URL for AJAX requests.

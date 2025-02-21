@@ -20,8 +20,8 @@ class FormService
     /**
      * Constructor
      *
-     * @param PhpRenderer     $view         The view renderer.
-     * @param ModelInterface  $model        The associated model.
+     * @param PhpRenderer     $view  The view renderer.
+     * @param ModelInterface  $model The associated model.
      */
     public function __construct(
         PhpRenderer $view,

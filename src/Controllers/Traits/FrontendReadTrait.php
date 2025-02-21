@@ -10,19 +10,10 @@ trait FrontendReadTrait
     public function frontendReadBySlug(Request $request, Response $response, array $args): Response
     {
         $slug = $args['slug'];
-        $this->context = 'normal';
-        $query = $this->model->buildSearchConditions();
-        $query = $this->model->getAdditionalConditions($query, $this->context);
-        $query->where('slug', '=', $slug);
-
-        $data = $query->get()
-                      ->map(fn($item) => (array) $item)
-                      ->toArray();
-
+        $postType = $args['postType'] ?? 'post';
         $data = [
-            'body' => $data[0],
+            'body' => $this->model->getByFieldWithCondtioned('slug', $slug, $postType, 'published')
         ];
-
         return $this->jsonResponse($response, $data);
     }
 }

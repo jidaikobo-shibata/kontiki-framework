@@ -63,7 +63,8 @@ trait CRUDTrait
             ->where('id', $id)
             ->first();
 
-        if (is_array($result)) {
+        if (is_object($result)) {
+            $result = (array)$result;
             $result = $this->processDataBeforeGet($result);
         }
 
@@ -76,7 +77,29 @@ trait CRUDTrait
             ->where($field, $value)
             ->first();
 
-        if (is_array($result)) {
+        if (is_object($result)) {
+            $result = (array)$result;
+            $result = $this->processDataBeforeGet($result);
+        }
+
+        return $result ? (array)$result : null;
+    }
+
+    public function getByFieldWithCondtioned(
+        string $field,
+        mixed $value,
+        string $postType = 'post',
+        string $context = 'published'
+    ): ?array {
+        $query = $this->buildSearchConditions();
+        $query = $this->getAdditionalConditions($query, $context);
+        $result = $query
+            ->where($field, $value)
+            ->where('post_type', $postType)
+            ->first();
+
+        if (is_object($result)) {
+            $result = (array)$result;
             $result = $this->processDataBeforeGet($result);
         }
 

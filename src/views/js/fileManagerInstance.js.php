@@ -1,4 +1,8 @@
-$(document).ready(function() {
+<?php
+/**
+  * @var string $basepath
+  */
+?>$(document).ready(function() {
     /**
      * add button when input||textarea has `kontiki-file-upload`
      */

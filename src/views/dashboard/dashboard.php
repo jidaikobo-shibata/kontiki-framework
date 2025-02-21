@@ -1,3 +1,10 @@
+<?php
+/**
+  * @var array $groupedLinks
+  * @var array $groupNames
+  */
+?>
+
 <?php foreach ($groupedLinks as $group => $links) : ?>
 <h2 class="fs-4"><?= e($groupNames[$group]) ?></h2>
 <ul>
