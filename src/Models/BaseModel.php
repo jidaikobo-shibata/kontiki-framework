@@ -22,6 +22,7 @@ abstract class BaseModel implements ModelInterface
     protected ValidationService $validationService;
     protected string $deleteType = 'hardDelete';
     protected string $postType = '';
+    protected string $psudoPostType = ''; // currently for user model only
     protected string $table = 'posts';
 
     public function __construct(Connection $db, ValidationService $validationService)
@@ -43,5 +44,10 @@ abstract class BaseModel implements ModelInterface
     public function getPostType(): string
     {
         return $this->postType;
+    }
+
+    public function getPsudoPostType(): string
+    {
+        return $this->psudoPostType;
     }
 }

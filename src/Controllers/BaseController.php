@@ -48,7 +48,6 @@ abstract class BaseController
         $this->flashManager = new FlashManager($session);
         $this->formService = new FormService($view, $model);
         $this->model = $model;
-        // $this->table = $this->model->getTableName();
         $this->postType = $this->model->getPostType();
         $this->view = $view;
         if ($getRoutesService) {

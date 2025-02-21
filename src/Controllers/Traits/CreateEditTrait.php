@@ -24,13 +24,14 @@ trait CreateEditTrait
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitions('create', $fields);
+        $postType = empty($this->postType) ? $this->model->getPsudoPostType() : $this->postType;
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->postType}/create",
+            "/admin/{$postType}/create",
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("x_save", 'Save :name', ['name' => __($this->postType)]),
+            __("x_save", 'Save :name', ['name' => __($postType)]),
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,
@@ -39,7 +40,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("x_create", 'Create :name', ['name' => __($this->postType)]),
+            __("x_create", 'Create :name', ['name' => __($postType)]),
             $formHtml
         );
     }
@@ -56,13 +57,14 @@ trait CreateEditTrait
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitions('edit', $fields);
+        $postType = empty($this->postType) ? $this->model->getPsudoPostType() : $this->postType;
 
         $formHtml = $this->formService->formHtml(
-            "/admin/{$this->postType}/edit/{$id}",
+            "/admin/{$postType}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("x_save", 'Save :name', ['name' => __($this->postType)]),
+            __("x_save", 'Save :name', ['name' => __($postType)]),
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,
@@ -72,7 +74,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("x_edit", 'Edit :name', ['name' => __($this->postType)]),
+            __("x_edit", 'Edit :name', ['name' => __($postType)]),
             $formHtml
         );
     }

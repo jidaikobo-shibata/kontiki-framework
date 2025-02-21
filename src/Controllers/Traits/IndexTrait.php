@@ -117,10 +117,11 @@ trait IndexTrait
         $title_placeholder = $this->context === 'normal'
           ? $title_placeholder
           : $this->context . ' ' . $title_placeholder;
+        $postType = empty($this->postType) ? $this->model->getPsudoPostType() : $this->postType;
 
         return $this->renderResponse(
             $response,
-            __($title, $title_placeholder, ['name' => __($this->postType)]),
+            __($title, $title_placeholder, ['name' => __($postType)]),
             $content
         );
     }

@@ -5,6 +5,7 @@ namespace Jidaikobo\Kontiki\Models;
 class UserModel extends BaseModel
 {
     protected string $table = 'users';
+    protected string $psudoPostType = 'user';
 
     public function getDisplayFields(): array
     {

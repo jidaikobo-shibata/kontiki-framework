@@ -28,7 +28,8 @@ class TableRenderer
         $fieldDefinitions = $model->getFieldDefinitions();
         $displayFields = $model->getDisplayFields();
         $this->deleteType = $model->getDeleteType();
-        $this->postType = $model->getPostType();;
+        $this->postType = $model->getPostType();
+        $this->postType = empty($this->postType) ? $model->getPsudoPostType() : $this->postType;
 
         // Filter fields based on the display fields defined in the model
         $this->fields = array_filter($fieldDefinitions, function ($key) use ($displayFields) {
