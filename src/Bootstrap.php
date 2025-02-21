@@ -6,13 +6,14 @@ use DI\Container;
 use Dotenv\Dotenv;
 use Jidaikobo\Log;
 use Slim\Factory\AppFactory;
+use Slim\App;
 
 class Bootstrap
 {
     public static function init(string $env = 'production', bool $frontend = FALSE)
     {
-        // check performance
-        // $startTime = microtime(true);
+        // check response performance
+        $GLOBALS['KONTIKI_START_TIME'] = microtime(true);
 
         // Set the error log handler
         Log::getInstance()->registerHandlers();
@@ -30,12 +31,10 @@ class Bootstrap
             require __DIR__ . '/functions/dev/functions.php';
         }
         require __DIR__ . '/functions/functions.php';
-        // jlog('Functions loaded: ' . microtime(true) - $startTime);
 
         // Load default language on class load
         $language = env('LANG', 'en');
         Utils\Lang::setLanguage($language);
-        // jlog('Language set: ' . microtime(true) - $startTime);
 
         if ($frontend) {
             return;
@@ -44,31 +43,36 @@ class Bootstrap
         // Configure a PHP-DI container
         $container = new Container();
         AppFactory::setContainer($container);
-        // jlog('DI container configured: ' . microtime(true) - $startTime);
 
         // Create a Slim application
         $app = AppFactory::create();
         $app->addErrorMiddleware(true, true, true);
         $basePath = env('BASEPATH', '/');
         $app->setBasePath($basePath);
-        // jlog('Slim app created: ' . microtime(true) - $startTime);
 
         // Add a header for security measures
         $app->add(Middleware\SecurityHeadersMiddleware::class);
-        // jlog('Security headers middleware added: ' . microtime(true) - $startTime);
 
         // Set dependencies
         $dependencies = new Config\Dependencies($app);
         $dependencies->register();
-        // jlog('Dependencies registered: ' . microtime(true) - $startTime);
 
         // Set Route
         $routesClass = class_exists('App\Config\Routes')
             ? new \App\Config\Routes()
             : new \Jidaikobo\Kontiki\Config\Routes();
         $routesClass->register($app, $container);
-        // jlog('Routes registered and Bootstrap init finished: ' . microtime(true) - $startTime);
 
        return $app;
+    }
+
+    public static function run(App $app, bool $timer = false): void
+    {
+        $app->run();
+
+        if ($timer) {
+            $elapsedTime = microtime(true) - $GLOBALS['KONTIKI_START_TIME'];
+            jlog("Total execution time: " . number_format($elapsedTime, 6) . " seconds");
+        }
     }
 }

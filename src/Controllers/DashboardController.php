@@ -69,7 +69,6 @@ class DashboardController
             $html.= '</ul></div></div>';
         }
 
-
         return $this->view->render(
             $response,
             'layout.php',

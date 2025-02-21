@@ -35,7 +35,6 @@ class AuthMiddleware implements MiddlewareInterface
             );
         }
 
-        // ログイン中の場合は次のミドルウェアまたはコントローラーに進む
         return $handler->handle($request);
     }
 }
