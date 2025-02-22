@@ -2,6 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
 
+use Jidaikobo\Kontiki\Services\ValidationService;
+
 trait ValidateTrait
 {
     /**
@@ -14,6 +16,7 @@ trait ValidateTrait
      */
     public function validateByFields(array $data, array $fieldDefinitions): array
     {
-        return $this->validationService->validate($data, $fieldDefinitions);
+        $validationService = new ValidationService($this->db);
+        return $validationService->validate($data, $fieldDefinitions);
     }
 }

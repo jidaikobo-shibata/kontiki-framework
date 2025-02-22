@@ -12,7 +12,7 @@ trait FrontendReadTrait
         $slug = $args['slug'];
         $postType = $args['postType'] ?? 'post';
         $data = [
-            'body' => $this->model->getByFieldWithCondtioned('slug', $slug, $postType, 'published')
+            'body' => $this->model->getByFieldWithCondtioned('slug', $slug, 'published')
         ];
         return $this->jsonResponse($response, $data);
     }

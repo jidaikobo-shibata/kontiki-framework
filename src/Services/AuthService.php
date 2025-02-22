@@ -3,6 +3,7 @@
 namespace Jidaikobo\Kontiki\Services;
 
 use Aura\Session\Session;
+use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
 
 class AuthService
@@ -11,10 +12,11 @@ class AuthService
     private Session $session;
     private string $segment = 'jidaikobo\kontiki\auth';
 
-    public function __construct(Session $session, UserModel $userModel)
+    public function __construct(Session $session)
     {
         $this->session = $session;
-        $this->userModel = $userModel;
+        $db = Database::getInstance()->getConnection();
+        $this->userModel = new UserModel($db);
     }
 
     /**

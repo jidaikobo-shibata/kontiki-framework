@@ -5,7 +5,6 @@ namespace Jidaikobo\Kontiki\Controllers;
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
-use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\AuthService;
 use Jidaikobo\Kontiki\Utils\FormHandler;
@@ -22,11 +21,16 @@ class AuthController extends BaseController
     public function __construct(
         PhpRenderer $view,
         Session $session,
-        UserModel $userModel,
         AuthService $authService
     ) {
-        parent::__construct($view, $session, $userModel);
+        parent::__construct($view, $session);
         $this->authService = $authService;
+    }
+
+    protected function setModel(): void
+    {
+        $db = Database::getInstance()->getConnection();
+        $this->model = new UserModel($db);
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void
@@ -47,8 +51,10 @@ class AuthController extends BaseController
     {
         $data = $this->flashManager->getData('data', ['username' => '']);
 
+        $formService = new FormService($this->view, $this->model);
+
         $content = $this->view->fetch('auth/login.php', $data);
-        $content = $this->formService->addMessages(
+        $content = $formService->addMessages(
             $content,
             $this->flashManager->getData('errors', [])
         );

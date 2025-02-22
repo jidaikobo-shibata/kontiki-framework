@@ -153,8 +153,6 @@
         // Find the file-list element where we'll append the files
         var fileListContainer = $('#file-list');
 
-console.log('file update');
-
         fileListContainer.html('<p role="status"><?= $get_file_list ?></p>'); // Show loading message
         // clear upload status
         $('#fileUploadStatus').html('');

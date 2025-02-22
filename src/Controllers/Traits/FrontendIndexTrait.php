@@ -9,12 +9,11 @@ trait FrontendIndexTrait
 {
     public function frontendIndex(Request $request, Response $response): Response
     {
-        $this->context = 'normal';
-        $baseurl = env('BASEURL') . '/' . $this->postType;
-        $data = $this->getIndexData($request->getQueryParams());
+        $baseurl = env('BASEURL') . '/' . $this->adminDirName;
+        $data = $this->model->getIndexData('published', $request->getQueryParams());
         $data = [
             'body' => $data,
-            'pagination' => $this->pagination->render($baseurl),
+            'pagination' => $this->model->getPagination()->render($baseurl),
         ];
         return $this->jsonResponse($response, $data);
     }

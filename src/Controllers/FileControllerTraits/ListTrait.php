@@ -70,7 +70,7 @@ trait ListTrait
      * @param string|null $desc description text.
      * @return string The generated HTML.
      */
-    private function renderImageOrLink(string $url, string $desc): string
+    private function renderImageOrLink(string $url, ?string $desc): string
     {
       // Check if the URL is an image URL (basic check based on file extension)
         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];

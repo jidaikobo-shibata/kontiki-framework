@@ -27,33 +27,6 @@ class Dependencies
     {
         $container = $this->app->getContainer();
 
-        // Set up a CakePHP Connection instance
-        $container->set(
-            Capsule::class,
-            function () {
-                $capsule = new Capsule();
-
-                $capsule->addConnection([
-                    'driver' => 'sqlite',
-                    'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
-                    'charset' => 'utf8',
-                    'collation' => 'utf8_unicode_ci',
-                    'prefix' => '',
-                ]);
-
-                // Global access for Eloquent or Query Builder
-                $capsule->setAsGlobal();
-                return $capsule;
-            }
-        );
-
-        $container->set(
-            Connection::class,
-            function (Capsule $capsule) {
-                return $capsule->getConnection();
-            }
-        );
-
         // Set up a Aura\Session instance
         $container->set(
             Session::class,

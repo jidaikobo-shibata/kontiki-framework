@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
+use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -30,24 +31,25 @@ trait DeleteTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->postType}_index");
+            return $this->redirectResponse($request, $response, "{$this->model->getPostType()}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForDelete($data);
 
-        $formHtml = $this->formService->formHtml(
-            "/admin/{$this->postType}/delete/{$id}",
+        $formService = new FormService($this->view, $this->model);
+        $formHtml = $formService->formHtml(
+            "/admin/{$this->adminDirName}/delete/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
                 "x_delete_confirm",
                 "Are you sure you want to delete this :name?",
-                ['name' => __($this->postType)]
+                ['name' => __($this->model->getPostType())]
             ),
             __("delete", "Delete"),
         );
-        $formHtml = $this->formService->addMessages(
+        $formHtml = $formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );
@@ -57,7 +59,7 @@ trait DeleteTrait
             __(
                 "x_delete",
                 "Delete :name",
-                ['name' => __($this->postType)]
+                ['name' => __($this->model->getPostType())]
             ),
             $formHtml
         );
@@ -69,7 +71,7 @@ trait DeleteTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->postType}/delete/{$id}";
+        $redirectTo = "/admin/{$this->adminDirName}/delete/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -83,18 +85,18 @@ trait DeleteTrait
                     __(
                         "x_delete_success",
                         ":name deleted successfully.",
-                        ['name' => __($this->postType)]
+                        ['name' => __($this->model->getPostType())]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
+                return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->postType)])
+                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->model->getPostType())])
               ]);
         }
 
-        $redirectTo = "/admin/{$this->postType}/edit/{$id}";
+        $redirectTo = "/admin/{$this->adminDirName}/edit/{$id}";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

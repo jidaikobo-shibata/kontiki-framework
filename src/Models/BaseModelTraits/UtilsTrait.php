@@ -15,34 +15,40 @@ trait UtilsTrait
      */
     public function getOptions(string $fieldName, bool $includeEmpty = false, string $emptyLabel = '', ?int $excludeId = null): array
     {
-        if (empty($fieldName)) {
-            throw new \InvalidArgumentException('Field name cannot be empty.');
-        }
+        $query = $this->db->table($this->table)->select(['id', $fieldName]);
 
-        // クエリを準備
-        $query = $this->db->table($this->table)
-            ->select(['id', $fieldName]);
-
-        // 除外IDがある場合はフィルタリング
-        if (!is_null($excludeId)) {
+        if ($excludeId !== null) {
             $query->where('id', '!=', $excludeId);
         }
 
         $results = $query->get();
 
-        $options = [];
-
-        foreach ($results as $row) {
-            if (isset($row->id, $row->$fieldName)) {
-                $processedRow = $this->processDataBeforeGet((array)$row);
-                $options[$row->id] = $processedRow[$fieldName];
-            }
-        }
+        $options = array_map(fn($row) => $this->processRow($row, $fieldName), $results->toArray());
 
         if ($includeEmpty) {
             $options = ['' => $emptyLabel] + $options;
         }
 
         return $options;
+    }
+
+    /**
+     * Process a row of data before retrieving.
+     *
+     * @param object $row The database row object.
+     * @param string $fieldName The field name to extract.
+     * @return mixed The processed field value.
+     */
+    private function processRow(object $row, string $fieldName)
+    {
+        if (!isset($row->id, $row->$fieldName)) {
+            return null;
+        }
+
+        $processedRow = method_exists($this, 'processDataBeforeGet')
+            ? $this->processDataBeforeGet((array)$row)
+            : (array)$row;
+
+        return [$row->id => $processedRow[$fieldName]];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
+namespace Jidaikobo\Kontiki\Models\Traits;
 
 use Carbon\Carbon;
 
@@ -88,14 +88,13 @@ trait CRUDTrait
     public function getByFieldWithCondtioned(
         string $field,
         mixed $value,
-        string $postType = 'post',
         string $context = 'published'
     ): ?array {
         $query = $this->buildSearchConditions();
         $query = $this->getAdditionalConditions($query, $context);
         $result = $query
             ->where($field, $value)
-            ->where('post_type', $postType)
+            ->where('post_type', $this->postType)
             ->first();
 
         if (is_object($result)) {
@@ -112,7 +111,6 @@ trait CRUDTrait
      * @param array $data Key-value pairs of column names and values.
      *
      * @return int|null The ID of the newly created record, or null if the operation failed.
-     * @throws InvalidArgumentException If validation fails.
      */
     public function create(array $data, bool $skipFieldFilter = false): ?int
     {

@@ -4,7 +4,7 @@ namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
-use Jidaikobo\Kontiki\Managers\CsrfManager;
+use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
@@ -22,14 +22,19 @@ class FileController extends BaseController
     use FileControllerTraits\MessagesTrait;
 
     protected PhpRenderer $view;
-    protected FileModel $fileModel;
     protected FileService $fileService;
-    protected CsrfManager $csrfManager;
+    protected FileModel $model;
 
-    public function __construct(Session $session, PhpRenderer $view, FileModel $fileModel, FileService $fileService)
+    public function __construct(Session $session, PhpRenderer $view, FileService $fileService)
     {
-        parent::__construct($view, $session, $fileModel);
+        parent::__construct($view, $session);
         $this->fileService = $fileService;
+    }
+
+    protected function setModel(): void
+    {
+        $db = Database::getInstance()->getConnection();
+        $this->model = new FileModel($db);
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void

@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Models;
 
 use Illuminate\Database\Connection;
-use Jidaikobo\Kontiki\Services\ValidationService;
 use Jidaikobo\Kontiki\Models\BaseModelTraits;
 
 /**
@@ -12,23 +11,20 @@ use Jidaikobo\Kontiki\Models\BaseModelTraits;
  */
 abstract class BaseModel implements ModelInterface
 {
-    use BaseModelTraits\CRUDTrait;
     use BaseModelTraits\FieldDefinitionTrait;
     use BaseModelTraits\SearchTrait;
     use BaseModelTraits\UtilsTrait;
     use BaseModelTraits\ValidateTrait;
 
-    protected Connection $db;
-    protected ValidationService $validationService;
-    protected string $deleteType = 'hardDelete';
+    protected string $table;
     protected string $postType = '';
-    protected string $psudoPostType = ''; // currently for user model only
-    protected string $table = 'posts';
+    protected string $psudoPostType = '';
+    protected string $deleteType = 'hardDelete';
+    protected Connection $db;
 
-    public function __construct(Connection $db, ValidationService $validationService)
+    public function __construct(Connection $db)
     {
         $this->db = $db;
-        $this->validationService = $validationService;
     }
 
     public function getDeleteType(): string

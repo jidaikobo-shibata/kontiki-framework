@@ -6,9 +6,7 @@ use Aura\Session\Session;
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
-use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Services\GetRoutesService;
-use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -19,14 +17,13 @@ use Slim\Views\PhpRenderer;
 abstract class BaseController
 {
     protected array $routes;
-    protected ModelInterface $model;
-    protected PhpRenderer $view;
-    protected FormService $formService;
-    protected string $postType;
+    protected string $adminDirName;
+
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
+    protected FormService $formService;
+    protected PhpRenderer $view;
     protected ?PhpRenderer $previewRenderer = null;
-    // protected string $table;
 
     /**
      * Constructor
@@ -35,24 +32,29 @@ abstract class BaseController
      *
      * @param PhpRenderer       $view             The view renderer.
      * @param Session           $session          The session manager.
-     * @param ModelInterface    $model            The model instance.
      * @param GetRoutesService  $GetRoutesService The sidebar service.
      */
     public function __construct(
         PhpRenderer $view,
         Session $session,
-        ModelInterface $model,
         ?GetRoutesService $getRoutesService = null
     ) {
+        $this->view = $view;
         $this->csrfManager = new CsrfManager($session);
         $this->flashManager = new FlashManager($session);
-        $this->formService = new FormService($view, $model);
-        $this->model = $model;
-        $this->postType = $this->model->getPostType();
-        $this->view = $view;
+        $this->setModel();
+        $this->setRoutes($getRoutesService);
+    }
+
+    protected function setModel(): void
+    {
+    }
+
+    protected function setRoutes($getRoutesService): void
+    {
         if ($getRoutesService) {
             $this->view->setAttributes(['sidebarItems' => $getRoutesService->getSidebar()]);
-            $this->routes = $getRoutesService->getLinks($this->postType);
+            $this->routes = $getRoutesService->getLinks($this->adminDirName);
         }
     }
 
@@ -184,8 +186,8 @@ abstract class BaseController
      * @param Response $response       The Slim response object.
      * @param string   $pageTitle      The page title for the rendered view.
      * @param string   $content        The main content of the page.
-     * @param string   $template       The template to use for rendering (default: 'layout.php').
-     * @param array    $additionalData Additional data to pass to the view (default: []).
+     * @param string   $template       The template to use for rendering.
+     * @param array    $additionalData Additional data to pass to the view.
      *
      * @return Response The rendered response.
      */
@@ -205,7 +207,8 @@ abstract class BaseController
             $additionalData
         );
 
-        $response = $response->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        $cacheControl = 'no-store, no-cache, must-revalidate, max-age=0';
+        $response = $response->withHeader('Cache-Control', $cacheControl)
                              ->withHeader('Pragma', 'no-cache')
                              ->withHeader('Expires', '0');
 
@@ -232,8 +235,11 @@ abstract class BaseController
      *
      * @return Response The modified response object with JSON content.
      */
-    public static function jsonResponse(Response $response, array $data, int $status = 200): Response
-    {
+    public static function jsonResponse(
+        Response $response,
+        array $data,
+        int $status = 200
+    ): Response {
         $response->getBody()->write(json_encode($data));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }

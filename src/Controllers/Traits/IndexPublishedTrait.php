@@ -7,9 +7,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait IndexPublishedTrait
 {
-    public function publishedIndex(Request $request, Response $response): Response
+    public function indexPublished(Request $request, Response $response): Response
     {
-        $this->context = 'published';
-        return static::index($request, $response);
+        return $this->index($request, $response, 'published');
     }
 }

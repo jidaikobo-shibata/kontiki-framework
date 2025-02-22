@@ -4,12 +4,15 @@ namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
 
 trait FieldDefinitionTrait
 {
-    protected function getUtcFields(): array
+    public function getDisplayFields(): array
     {
         return [];
     }
 
-    abstract public function getDisplayFields(): array;
+    public function getUtcFields(): array
+    {
+        return [];
+    }
 
     /**
      * Get the field definitions.
@@ -32,7 +35,7 @@ trait FieldDefinitionTrait
         return $fields;
     }
 
-    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
+    public function processFieldDefinitionsForSave(string $context, array $fieldDefinitions): array
     {
         return $fieldDefinitions;
     }

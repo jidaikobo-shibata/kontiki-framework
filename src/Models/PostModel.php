@@ -6,31 +6,26 @@ use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Services\AuthService;
-use Jidaikobo\Kontiki\Services\ValidationService;
 
 class PostModel extends BaseModel
 {
+    use Traits\CRUDTrait;
+    use Traits\IndexTrait;
     use Traits\SoftDeleteTrait;
     use Traits\PublishedTrait;
     use Traits\DraftTrait;
     use Traits\ExpiredTrait;
 
+    protected string $table = 'posts';
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
-    private AuthService $authService;
-
-    public function __construct(Connection $db, ValidationService $validationService, AuthService $authService)
-    {
-        parent::__construct($db, $validationService);
-        $this->authService = $authService;
-    }
 
     public function getDisplayFields(): array
     {
         return ['id', 'title', 'slug', 'created_at', 'status'];
     }
 
-    protected function getUtcFields(): array
+    public function getUtcFields(): array
     {
         return ['published_at', 'expired_at', 'created_at', 'updated_at'];
     }
@@ -38,9 +33,10 @@ class PostModel extends BaseModel
     public function getFieldDefinitions(array $params = []): array
     {
         // defaults
-        $userModel = new UserModel($this->db, $this->validationService);
+        $userModel = new UserModel($this->db);
         $userOptions = $userModel->getOptions('username');
-        $user = $this->authService->getCurrentUser();
+//        $user = $this->authService->getCurrentUser();
+        $user = ['id' => 1];
         $id = $params['id'] ?? null;
         $parentOptions = $this->getOptions('title', TRUE, '', $id);
         $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');

@@ -7,10 +7,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait IndexDraftTrait
 {
-    public function draftIndex(Request $request, Response $response): Response
+    public function indexDraft(Request $request, Response $response): Response
     {
-        // see also PostModel::getAdditionalConditions()
-        $this->context = 'draft';
-        return static::index($request, $response);
+        return $this->index($request, $response, 'draft');
     }
 }

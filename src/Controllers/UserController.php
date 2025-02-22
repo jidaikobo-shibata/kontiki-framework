@@ -3,6 +3,7 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
+use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Slim\Views\PhpRenderer;
@@ -10,16 +11,26 @@ use Slim\Views\PhpRenderer;
 class UserController extends BaseController
 {
     use Traits\IndexTrait;
+    use Traits\IndexAllTrait;
     use Traits\CreateEditTrait;
     use Traits\DeleteTrait;
+
+    protected string $adminDirName = 'user';
+    protected string $psudoPostType = 'user';
+    protected UserModel $model;
 
     public function __construct(
         PhpRenderer $view,
         Session $session,
-        UserModel $model,
         GetRoutesService $getRoutesService
     ) {
-        parent::__construct($view, $session, $model, $getRoutesService);
+        parent::__construct($view, $session, $getRoutesService);
+    }
+
+    protected function setModel(): void
+    {
+        $db = Database::getInstance()->getConnection();
+        $this->model = new UserModel($db);
     }
 
     private function hashPassword(string $password): string

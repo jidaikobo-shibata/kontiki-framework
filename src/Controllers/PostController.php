@@ -3,44 +3,45 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\PostModel;
 use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
-use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
 
 class PostController extends BaseController
 {
-    // use order affects the menu order...
-    use Traits\IndexTrait;
-    use Traits\DeleteTrait;
     use Traits\FrontendIndexTrait;
     use Traits\FrontendReadTrait;
+    use Traits\IndexTrait;
+    use Traits\IndexAllTrait;
     use Traits\IndexPublishedTrait;
     use Traits\IndexDraftTrait;
     use Traits\IndexReservedTrait;
     use Traits\IndexExpiredTrait;
-    use Traits\MarkdownHelpTrait;
-    use Traits\TrashRestoreTrait;
     use Traits\CreateEditTrait;
+    use Traits\TrashRestoreTrait;
+    use Traits\DeleteTrait;
+    use Traits\MarkdownHelpTrait;
     use Traits\PreviewTrait;
+
+    protected string $adminDirName = 'post';
+    protected PostModel $model;
 
     public function __construct(
         PhpRenderer $view,
         Session $session,
-        PostModel $model,
         GetRoutesService $getRoutesService
     ) {
-        parent::__construct($view, $session, $model, $getRoutesService);
+        parent::__construct($view, $session, $getRoutesService);
+    }
 
-        $projectPath = env('PROJECT_PATH', '');
-        $previewPath = file_exists($projectPath . '/app/views/post') ?
-            $projectPath . '/app/views/post' :
-            $projectPath . '/src/views/post' ;
-        $this->previewRenderer = new PhpRenderer($previewPath);
+    protected function setModel(): void
+    {
+        $db = Database::getInstance()->getConnection();
+        $this->model = new PostModel($db);
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void

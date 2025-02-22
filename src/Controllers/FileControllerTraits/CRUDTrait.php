@@ -21,8 +21,6 @@ trait CRUDTrait
      * and returns a JSON response indicating the result of the operation.
      *
      * @return Response
-     *
-     * @throws Exception If there is an issue with moving the uploaded file
      */
     public function handleFileUpload(Request $request, Response $response): Response
     {
@@ -76,7 +74,7 @@ trait CRUDTrait
     private function validateAndSave(array $fileData, Response $response): ?Response
     {
         $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processFieldDefinitions('create', $fields);
+        $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
         $validationResult = $this->model->validateByFields($fileData, $fields);
 
         if (!$validationResult['valid']) {
@@ -149,7 +147,7 @@ trait CRUDTrait
     protected function update(array $data, int $id = null)
     {
         $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processFieldDefinitions('edit', $fields);
+        $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
         $results = $this->model->validateByFields($data, $fields);
 
         if ($results['valid'] !== true) {
@@ -182,7 +180,6 @@ trait CRUDTrait
      * If any of these steps fail, an appropriate error message is returned as a JSON response.
      *
      * @return Response
-     * @throws ResponseException If there is an error during the deletion process.
      */
     public function handleDelete(Request $request, Response $response): Response
     {

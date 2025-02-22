@@ -4,6 +4,9 @@ namespace Jidaikobo\Kontiki\Models;
 
 class UserModel extends BaseModel
 {
+    use Traits\CRUDTrait;
+    use Traits\IndexTrait;
+
     protected string $table = 'users';
     protected string $psudoPostType = 'user';
 
@@ -57,7 +60,7 @@ class UserModel extends BaseModel
         ];
     }
 
-    public function processFieldDefinitions(string $context, array $fieldDefinitions): array
+    public function processFieldDefinitionsForSave(string $context, array $fieldDefinitions): array
     {
         if ($context == 'create') {
             return $fieldDefinitions;
@@ -71,6 +74,7 @@ class UserModel extends BaseModel
                 fn($rule) => $rule !== 'required'
             );
         }
+
         return $fieldDefinitions;
     }
 }

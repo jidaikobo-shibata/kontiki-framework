@@ -4,12 +4,9 @@ namespace Jidaikobo\Kontiki\Models;
 
 class FileModel extends BaseModel
 {
-    protected string $table = 'files';
+    use Traits\CRUDTrait;
 
-    public function getDisplayFields(): array
-    {
-        return ['id', 'name', 'path', 'created_at'];
-    }
+    protected string $table = 'files';
 
     public function getFieldDefinitions(array $params = []): array
     {

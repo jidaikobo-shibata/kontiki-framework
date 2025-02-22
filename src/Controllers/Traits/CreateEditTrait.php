@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
+use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -23,17 +24,18 @@ trait CreateEditTrait
         $data = $this->processDataForRenderForm('create', $data);
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitions('create', $fields);
-        $postType = empty($this->postType) ? $this->model->getPsudoPostType() : $this->postType;
+        $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
+        $postType = empty($this->model->getPostType()) ? $this->model->getPsudoPostType() : $this->model->getPostType();
 
-        $formHtml = $this->formService->formHtml(
-            "/admin/{$postType}/create",
+        $formService = new FormService($this->view, $this->model);
+        $formHtml = $formService->formHtml(
+            "/admin/{$this->adminDirName}/create",
             $fields,
             $this->csrfManager->getToken(),
             '',
             __("x_save", 'Save :name', ['name' => __($postType)]),
         );
-        $formHtml = $this->formService->addMessages(
+        $formHtml = $formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );
@@ -52,21 +54,22 @@ trait CreateEditTrait
         $data = $this->processDataForRenderForm('edit', $data);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
+            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
         }
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitions('edit', $fields);
-        $postType = empty($this->postType) ? $this->model->getPsudoPostType() : $this->postType;
+        $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
+        $postType = empty($this->model->getPostType()) ? $this->model->getPsudoPostType() : $this->model->getPostType();
 
-        $formHtml = $this->formService->formHtml(
-            "/admin/{$postType}/edit/{$id}",
+        $formService = new FormService($this->view, $this->model);
+        $formHtml = $formService->formHtml(
+            "/admin/{$this->adminDirName}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
             '',
             __("x_save", 'Save :name', ['name' => __($postType)]),
         );
-        $formHtml = $this->formService->addMessages(
+        $formHtml = $formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', []),
             $this->flashManager->getData('success', [])
@@ -98,8 +101,8 @@ trait CreateEditTrait
     protected function getDefaultRedirect(string $actionType, ?int $id = null): string
     {
         return $actionType === 'create'
-            ? "/admin/{$this->postType}/create"
-            : "/admin/{$this->postType}/edit/{$id}";
+            ? "/admin/{$this->adminDirName}/create"
+            : "/admin/{$this->adminDirName}/edit/{$id}";
     }
 
     protected function getFieldDefinitionsForAction(string $actionType, ?int $id = null): array
@@ -108,7 +111,7 @@ trait CreateEditTrait
             ? $this->model->getFieldDefinitions()
             : $this->model->getFieldDefinitions(['id' => $id]);
 
-        return $this->model->processFieldDefinitions($actionType, $fields);
+        return $this->model->processFieldDefinitionsForSave($actionType, $fields);
     }
 
     protected function saveData(string $actionType, ?int $id, array $data): int
@@ -138,7 +141,7 @@ trait CreateEditTrait
 
         // redirect preview
         if (isset($data['preview']) && $data['preview'] === '1') {
-            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/preview");
+            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/preview");
         }
 
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
@@ -187,9 +190,9 @@ trait CreateEditTrait
             $id = $this->saveData($actionType, $id, $data);
             $this->flashManager->addMessage(
                 'success',
-                __("x_save_success", ':name Saved successfully.', ['name' => __($this->postType)])
+                __("x_save_success", ':name Saved successfully.', ['name' => __($this->model->getPostType())])
             );
-            return $this->redirectResponse($request, $response, "/admin/{$this->postType}/edit/{$id}");
+            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/edit/{$id}");
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $this->getDefaultRedirect($actionType, $id));

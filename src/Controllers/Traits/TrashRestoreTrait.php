@@ -2,6 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
+use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -9,8 +10,7 @@ trait TrashRestoreTrait
 {
     public function trashIndex(Request $request, Response $response): Response
     {
-        $this->context = 'trash';
-        return static::index($request, $response);
+        return $this->index($request, $response, 'trash');
     }
 
     public function processFieldForTrashRestore(array $data): array
@@ -19,6 +19,7 @@ trait TrashRestoreTrait
             $field['attributes']['readonly'] = 'readonly';
 
             $existingClass = $field['attributes']['class'] ?? '';
+            $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
             $field['attributes']['class'] = trim($existingClass . ' form-control-plaintext p-2');
 
             $field['description'] = '';
@@ -45,7 +46,7 @@ trait TrashRestoreTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->postType}_index");
+            return $this->redirectResponse($request, $response, "{$this->model->getPostType()}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
@@ -53,18 +54,19 @@ trait TrashRestoreTrait
 
         $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;
 
-        $formHtml = $this->formService->formHtml(
-            "/admin/{$this->postType}/{$actionType}/{$id}",
+        $formService = new FormService($this->view, $this->model);
+        $formHtml = $formService->formHtml(
+            "/admin/{$this->adminDirName}/{$actionType}/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
                 "x_{$actionType}_confirm",
                 "Are you sure you want to {$actionType} this :name?",
-                ['name' => __($this->postType)]
+                ['name' => __($this->model->getPostType())]
             ),
             __($buttonText),
         );
-        $formHtml = $this->formService->addMessages(
+        $formHtml = $formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );
@@ -74,7 +76,7 @@ trait TrashRestoreTrait
             __(
                 "x_{$actionType}",
                 "{$actionType} :name",
-                ['name' => __($this->postType)]
+                ['name' => __($this->model->getPostType())]
             ),
             $formHtml
         );
@@ -97,7 +99,7 @@ trait TrashRestoreTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->postType}/{$actionType}/{$id}";
+        $redirectTo = "/admin/{$this->adminDirName}/{$actionType}/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -111,18 +113,18 @@ trait TrashRestoreTrait
                     __(
                         "x_{$actionType}_success",
                         ":name {$actionType} successfully.",
-                        ['name' => __($this->postType)]
+                        ['name' => __($this->model->getPostType())]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->postType}/index");
+                return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->postType)])
+                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->model->getPostType())])
               ]);
         }
 
-        $redirectTo = "/admin/{$this->postType}/index";
+        $redirectTo = "/admin/{$this->adminDirName}/index";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

@@ -7,9 +7,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait IndexExpiredTrait
 {
-    public function expiredIndex(Request $request, Response $response): Response
+    public function indexExpired(Request $request, Response $response): Response
     {
-        $this->context = 'expired';
-        return static::index($request, $response);
+        return $this->index($request, $response, 'expired');
     }
 }
