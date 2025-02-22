@@ -119,31 +119,36 @@ class TableRenderer
 
     protected function getStatusValues(string $name, array $row, Carbon $currentTime): array
     {
-        $values = [];
-
-        if ($name === 'status') {
-            $values[] = __($row[$name]) ?: '';
-
-            // Check for reserved (future publication)
-            if (!empty($row['published_at'])) {
-                $publishedAt = Carbon::parse($row['published_at']);
-                if ($publishedAt->greaterThan($currentTime)) {
-                    $values[] = __('reserved');
-                }
-            }
-
-            // Check for expired
-            if (!empty($row['expired_at'])) {
-                $expiredAt = Carbon::parse($row['expired_at']);
-                if ($currentTime->greaterThan($expiredAt)) {
-                    $values[] = __('expired');
-                }
-            }
-        } else {
-            $values[] = $row[$name] ?? '';
+        if ($name !== 'status') {
+            return [$row[$name] ?? ''];
         }
 
+        $values = [__($row[$name]) ?: ''];
+
+        $this->addStatusIfConditionMet($values, $row, 'published_at', $currentTime, fn($time) => $time->greaterThan($currentTime), 'reserved');
+        $this->addStatusIfConditionMet($values, $row, 'expired_at', $currentTime, fn($time) => $currentTime->greaterThan($time), 'expired');
+
         return $values;
+    }
+
+    /**
+     * Add a status to values if the condition is met.
+     *
+     * @param array  $values      Reference to the values array.
+     * @param array  $row         The data row.
+     * @param string $key         The key to check in the row.
+     * @param Carbon $currentTime The current timestamp.
+     * @param callable $condition Callback that takes a Carbon instance and returns a boolean.
+     * @param string $status      The status text to add if the condition is met.
+     */
+    private function addStatusIfConditionMet(array &$values, array $row, string $key, Carbon $currentTime, callable $condition, string $status): void
+    {
+        if (!empty($row[$key])) {
+            $time = new Carbon($row[$key]);
+            if ($condition($time)) {
+                $values[] = __($status);
+            }
+        }
     }
 
     protected function renderActions(array $row): string

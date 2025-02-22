@@ -35,39 +35,20 @@ class DashboardController
 
     public function dashboard(Request $request, Response $response): Response
     {
-        $namedRoutes = array_filter($this->routes, function ($item) {
-            return isset($item['name']) &&
-                (
-                    strpos($item['name'], 'index') !== false ||
-                    strpos($item['name'], 'create') !== false
-                );
-        });
+        // 指定のルートをフィルタリング
+        $namedRoutes = array_filter($this->routes, fn($item) =>
+            isset($item['name']) && (strpos($item['name'], 'index') !== false || strpos($item['name'], 'create') !== false)
+        );
 
+        // Post Type を分類
         $postTypes = [];
-        foreach ($namedRoutes as $namedRoute)
-        {
-            $postType = str_replace(['_index', '_create'], '', $namedRoute['name']);
-            if (strpos($namedRoute['name'], $postType) === false) continue;
-            $postTypes[$postType][] = $namedRoute;
+        foreach ($namedRoutes as $route) {
+            $postType = str_replace(['_index', '_create'], '', $route['name']);
+            $postTypes[$postType][] = $route;
         }
 
-        $html = '';
-        foreach ($postTypes as $postTypeName => $postTypeVals)
-        {
-            $html.= '<div class="card"><div class="card-header">';
-            $html.= '<h2 class="card-title">' . __($postTypeName) . '</h3>';
-            $html.= '</div><div class="card-body"><ul>';
-            foreach ($postTypeVals as $val)
-            {
-                $langLabel = preg_replace('/^[^_]+/', 'x', $val['name']);
-                $html.= '<li>';
-                $html.= '<a href="' . env('BASEPATH') . $val['path'] . '">';
-                $html.= __($langLabel, ':name index', ['name' => __($postTypeName)]);
-                $html.= '</a>';
-                $html.= '</li>';
-            }
-            $html.= '</ul></div></div>';
-        }
+        // HTML 生成
+        $html = $this->generateDashboardHtml($postTypes);
 
         return $this->view->render(
             $response,
@@ -77,6 +58,36 @@ class DashboardController
                 'content' => $html,
             ]
         );
-        ;
+    }
+
+    /**
+     * Generate the HTML content for the dashboard.
+     *
+     * @param array $postTypes Categorized post types and their routes.
+     * @return string The generated HTML.
+     */
+    private function generateDashboardHtml(array $postTypes): string
+    {
+        return array_reduce(array_keys($postTypes), function ($html, $postTypeName) use ($postTypes) {
+            $cardContent = array_reduce($postTypes[$postTypeName], function ($listHtml, $route) use ($postTypeName) {
+                $langLabel = preg_replace('/^[^_]+/', 'x', $route['name']);
+                $link = '<a href="' . env('BASEPATH') . $route['path'] . '">';
+                $link .= __($langLabel, ':name index', ['name' => __($postTypeName)]);
+                $link .= '</a>';
+
+                return $listHtml . "<li>$link</li>";
+            }, '');
+
+            return $html . <<<HTML
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">{$postTypeName}</h2>
+                </div>
+                <div class="card-body">
+                    <ul>{$cardContent}</ul>
+                </div>
+            </div>
+            HTML;
+        }, '');
     }
 }
