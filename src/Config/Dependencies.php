@@ -25,6 +25,7 @@ class Dependencies
 
     public function register(): void
     {
+        /** @var Container $container */
         $container = $this->app->getContainer();
 
         // Set up a Aura\Session instance

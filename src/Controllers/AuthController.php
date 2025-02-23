@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-use Jidaikobo\Kontiki\Managers\CsrfManager;
-use Jidaikobo\Kontiki\Managers\FlashManager;
+use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\AuthService;
 use Jidaikobo\Kontiki\Utils\FormHandler;
@@ -17,6 +17,7 @@ use Valitron\Validator;
 class AuthController extends BaseController
 {
     private AuthService $authService;
+    protected UserModel $model;
 
     public function __construct(
         PhpRenderer $view,

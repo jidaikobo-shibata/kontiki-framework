@@ -1098,16 +1098,16 @@
         },
         {
             "name": "jidaikobo/log",
-            "version": "v2.0.7",
+            "version": "v2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jidaikobo-shibata/log.git",
-                "reference": "7be5ac8bba09114c0743bd6be58e7d9c6f4b015a"
+                "reference": "4d606469f26aa3cd987b845350f31f250d8dad09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jidaikobo-shibata/log/zipball/7be5ac8bba09114c0743bd6be58e7d9c6f4b015a",
-                "reference": "7be5ac8bba09114c0743bd6be58e7d9c6f4b015a",
+                "url": "https://api.github.com/repos/jidaikobo-shibata/log/zipball/4d606469f26aa3cd987b845350f31f250d8dad09",
+                "reference": "4d606469f26aa3cd987b845350f31f250d8dad09",
                 "shasum": ""
             },
             "require": {
@@ -1117,7 +1117,6 @@
             "require-dev": {
                 "phpcompatibility/php-compatibility": "^9.3",
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^11.5",
                 "squizlabs/php_codesniffer": "^3.11"
             },
             "type": "library",
@@ -1139,9 +1138,9 @@
             "description": "A simple logging class with error and exception handling. adheres to PSR-1, PSR-12 and PSR-3.",
             "support": {
                 "issues": "https://github.com/jidaikobo-shibata/log/issues",
-                "source": "https://github.com/jidaikobo-shibata/log/tree/v2.0.7"
+                "source": "https://github.com/jidaikobo-shibata/log/tree/v2.0.8"
             },
-            "time": "2025-02-22T06:50:38+00:00"
+            "time": "2025-02-22T11:13:19+00:00"
         },
         {
             "name": "jidaikobo/php-markdown",

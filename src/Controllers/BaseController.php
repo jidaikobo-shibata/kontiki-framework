@@ -21,7 +21,6 @@ abstract class BaseController
 
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
-    protected FormService $formService;
     protected PhpRenderer $view;
     protected ?PhpRenderer $previewRenderer = null;
 
@@ -32,7 +31,7 @@ abstract class BaseController
      *
      * @param PhpRenderer       $view             The view renderer.
      * @param Session           $session          The session manager.
-     * @param GetRoutesService  $GetRoutesService The sidebar service.
+     * @param GetRoutesService  $getRoutesService The sidebar service.
      */
     public function __construct(
         PhpRenderer $view,
