@@ -18,6 +18,7 @@ abstract class BaseController
 {
     protected array $routes;
     protected string $adminDirName;
+    protected string $label = '';
 
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
@@ -60,6 +61,11 @@ abstract class BaseController
     public function getRoutes(): Array
     {
         return $this->routes;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 
     /**

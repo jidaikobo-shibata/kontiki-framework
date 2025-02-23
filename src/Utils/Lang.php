@@ -58,6 +58,7 @@ class Lang
             $default = ucfirst(str_replace('_', ' ', $key));
         }
 
+        $key = strtolower($key);
         $message = self::$messages[$key] ?? $default;
 
         foreach ($replace as $search => $value) {

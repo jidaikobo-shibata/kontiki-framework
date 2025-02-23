@@ -15,7 +15,7 @@ trait IndexTrait
         $data = $this->model->getIndexData($context, $request->getQueryParams());
 
         // render table
-        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $context, $this->getRoutes());
+        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->adminDirName, $context, $this->getRoutes());
         $content = $tableRenderer->render();
 
         // set messages
@@ -32,17 +32,12 @@ trait IndexTrait
         }
         $content .= $this->model->getPagination()->render(env('BASEPATH', '') . "/admin/{$this->adminDirName}/index");
 
-        $title = 'x_index';
-        $title .= $context === 'normal' ? '' : '_' . $context ;
-        $title_placeholder = 'Index of :name';
-        $title_placeholder = $context === 'normal'
-          ? $title_placeholder
-          : $context . ' ' . $title_placeholder;
-        $postType = $this->model->getPostType() ?? $this->model->getPsudoPostType();
+        $title = 'x_index_' . $context;
+        $title_placeholder = $context . ' index of :name';
 
         return $this->renderResponse(
             $response,
-            __($title, $title_placeholder, ['name' => __($postType)]),
+            __($title, $title_placeholder, ['name' => __($this->label)]),
             $content
         );
     }

@@ -12,6 +12,7 @@ class TableRenderer
     protected $data;
     protected $view;
     protected $table;
+    protected $adminDirName;
     protected $context;
     protected $routes;
     protected $postType;
@@ -21,6 +22,7 @@ class TableRenderer
         BaseModel $model,
         array $data,
         PhpRenderer $view,
+        string $adminDirName,
         string $context = 'all',
         array $routes = []
     ) {
@@ -28,8 +30,7 @@ class TableRenderer
         $fieldDefinitions = $model->getFieldDefinitions();
         $displayFields = $model->getDisplayFields();
         $this->deleteType = $model->getDeleteType();
-        $this->postType = $model->getPostType();
-        $this->postType = empty($this->postType) ? $model->getPsudoPostType() : $this->postType;
+        $this->adminDirName = $adminDirName;
 
         // Filter fields based on the display fields defined in the model
         $this->fields = array_filter($fieldDefinitions, function ($key) use ($displayFields) {
@@ -155,7 +156,7 @@ class TableRenderer
     {
         $id = e($row['id']);
 
-        $uri = env('BASEPATH', '') . "/admin/{$this->postType}/%s/%s";
+        $uri = env('BASEPATH', '') . "/admin/{$this->adminDirName}/%s/%s";
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
         $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s</a> ';
         $actions = [

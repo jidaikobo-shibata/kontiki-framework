@@ -18,7 +18,6 @@ abstract class BaseModel implements ModelInterface
 
     protected string $table;
     protected string $postType = '';
-    protected string $psudoPostType = '';
     protected string $deleteType = 'hardDelete';
     protected Connection $db;
 
@@ -40,10 +39,5 @@ abstract class BaseModel implements ModelInterface
     public function getPostType(): string
     {
         return $this->postType;
-    }
-
-    public function getPsudoPostType(): string
-    {
-        return $this->psudoPostType;
     }
 }

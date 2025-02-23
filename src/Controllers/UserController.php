@@ -16,7 +16,7 @@ class UserController extends BaseController
     use Traits\DeleteTrait;
 
     protected string $adminDirName = 'user';
-    protected string $psudoPostType = 'user';
+    protected string $label = 'User';
     protected UserModel $model;
 
     public function __construct(

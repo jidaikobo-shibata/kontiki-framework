@@ -46,7 +46,7 @@ trait TrashRestoreTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->model->getPostType()}_index");
+            return $this->redirectResponse($request, $response, "{$this->label}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
@@ -62,7 +62,7 @@ trait TrashRestoreTrait
             __(
                 "x_{$actionType}_confirm",
                 "Are you sure you want to {$actionType} this :name?",
-                ['name' => __($this->model->getPostType())]
+                ['name' => __($this->label)]
             ),
             __($buttonText),
         );
@@ -76,7 +76,7 @@ trait TrashRestoreTrait
             __(
                 "x_{$actionType}",
                 "{$actionType} :name",
-                ['name' => __($this->model->getPostType())]
+                ['name' => __($this->label)]
             ),
             $formHtml
         );
@@ -113,14 +113,14 @@ trait TrashRestoreTrait
                     __(
                         "x_{$actionType}_success",
                         ":name {$actionType} successfully.",
-                        ['name' => __($this->model->getPostType())]
+                        ['name' => __($this->label)]
                     )
                 );
                 return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->model->getPostType())])
+                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->label)])
               ]);
         }
 

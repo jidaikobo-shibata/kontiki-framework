@@ -28,6 +28,7 @@ class PostController extends BaseController
     use Traits\PreviewTrait;
 
     protected string $adminDirName = 'post';
+    protected string $label = 'Post';
     protected PostModel $model;
 
     public function __construct(

@@ -31,7 +31,7 @@ trait DeleteTrait
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->model->getPostType()}_index");
+            return $this->redirectResponse($request, $response, "{$this->label}_index");
         }
 
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
@@ -45,7 +45,7 @@ trait DeleteTrait
             __(
                 "x_delete_confirm",
                 "Are you sure you want to delete this :name?",
-                ['name' => __($this->model->getPostType())]
+                ['name' => __($this->label)]
             ),
             __("delete", "Delete"),
         );
@@ -59,7 +59,7 @@ trait DeleteTrait
             __(
                 "x_delete",
                 "Delete :name",
-                ['name' => __($this->model->getPostType())]
+                ['name' => __($this->label)]
             ),
             $formHtml
         );
@@ -85,14 +85,14 @@ trait DeleteTrait
                     __(
                         "x_delete_success",
                         ":name deleted successfully.",
-                        ['name' => __($this->model->getPostType())]
+                        ['name' => __($this->label)]
                     )
                 );
                 return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->model->getPostType())])
+                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->label)])
               ]);
         }
 

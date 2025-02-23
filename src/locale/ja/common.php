@@ -55,6 +55,7 @@ return [
     'x_management' => ':nameの管理',
     'x_index' => ':nameの一覧',
     'x_index_all' => ':nameの一覧',
+    'x_index_published' => '公開中の:name',
     'x_index_draft' => '下書き中の:name',
     'x_index_reserved' => '予約中の:name',
     'x_index_expired' => '期限切れした:name',

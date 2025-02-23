@@ -25,7 +25,6 @@ trait CreateEditTrait
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
-        $postType = empty($this->model->getPostType()) ? $this->model->getPsudoPostType() : $this->model->getPostType();
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
@@ -33,7 +32,7 @@ trait CreateEditTrait
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("x_save", 'Save :name', ['name' => __($postType)]),
+            __("x_save", 'Save :name', ['name' => __($this->label)]),
         );
         $formHtml = $formService->addMessages(
             $formHtml,
@@ -42,7 +41,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("x_create", 'Create :name', ['name' => __($postType)]),
+            __("x_create", 'Create :name', ['name' => __($this->label)]),
             $formHtml
         );
     }
@@ -59,7 +58,6 @@ trait CreateEditTrait
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
-        $postType = empty($this->model->getPostType()) ? $this->model->getPsudoPostType() : $this->model->getPostType();
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
@@ -67,7 +65,7 @@ trait CreateEditTrait
             $fields,
             $this->csrfManager->getToken(),
             '',
-            __("x_save", 'Save :name', ['name' => __($postType)]),
+            __("x_save", 'Save :name', ['name' => __($this->label)]),
         );
         $formHtml = $formService->addMessages(
             $formHtml,
@@ -77,7 +75,7 @@ trait CreateEditTrait
 
         return $this->renderResponse(
             $response,
-            __("x_edit", 'Edit :name', ['name' => __($postType)]),
+            __("x_edit", 'Edit :name', ['name' => __($this->label)]),
             $formHtml
         );
     }
@@ -190,7 +188,7 @@ trait CreateEditTrait
             $id = $this->saveData($actionType, $id, $data);
             $this->flashManager->addMessage(
                 'success',
-                __("x_save_success", ':name Saved successfully.', ['name' => __($this->model->getPostType())])
+                __("x_save_success", ':name Saved successfully.', ['name' => __($this->label)])
             );
             return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/edit/{$id}");
         } catch (\Exception $e) {

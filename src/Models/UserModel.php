@@ -8,7 +8,6 @@ class UserModel extends BaseModel
     use Traits\IndexTrait;
 
     protected string $table = 'users';
-    protected string $psudoPostType = 'user';
 
     public function getDisplayFields(): array
     {
