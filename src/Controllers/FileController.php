@@ -8,9 +8,9 @@ use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
 

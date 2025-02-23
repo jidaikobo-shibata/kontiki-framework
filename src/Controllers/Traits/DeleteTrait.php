@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
 use Jidaikobo\Kontiki\Services\FormService;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 
 trait DeleteTrait
 {

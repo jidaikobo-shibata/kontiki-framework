@@ -8,9 +8,9 @@ use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\AuthService;
 use Jidaikobo\Kontiki\Utils\FormHandler;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 use Slim\Views\PhpRenderer;
 use Valitron\Validator;
 

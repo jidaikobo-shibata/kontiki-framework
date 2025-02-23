@@ -6,9 +6,9 @@ use Aura\Session\Session;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\PostModel;
 use Jidaikobo\Kontiki\Services\GetRoutesService;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 use Slim\Views\PhpRenderer;
 
 class PostController extends BaseController
