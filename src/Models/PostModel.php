@@ -74,7 +74,9 @@ class PostModel extends BaseModel
             'default' => '',
             'searchable' => true,
             'rules' => $rules,
-            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
+                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
+                : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'main',
             'fieldset_template' => 'forms/fieldset/flat.php',
@@ -119,7 +121,9 @@ class PostModel extends BaseModel
                 ['lengthMin', 3],
                 ['unique', $this->table, 'slug', $id]
             ],
-            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
+                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
+                : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'main',
             'fieldset_template' => 'forms/fieldset/flat.php',
@@ -138,7 +142,9 @@ class PostModel extends BaseModel
             'default' => $default,
             'searchable' => true,
             'rules' => [],
-            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
+                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
+                : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
@@ -156,7 +162,9 @@ class PostModel extends BaseModel
             'default' => $default,
             'searchable' => true,
             'rules' => $rules,
-            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
+                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
+                : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
@@ -178,7 +186,9 @@ class PostModel extends BaseModel
             'default' => '',
             'searchable' => true,
             'rules' => [],
-            'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
+                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
+                : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',

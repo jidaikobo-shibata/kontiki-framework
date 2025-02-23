@@ -7,7 +7,6 @@ use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\AuthService;
-use Jidaikobo\Kontiki\Utils\FormHandler;
 use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
