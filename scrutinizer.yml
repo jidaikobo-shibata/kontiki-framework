@@ -1,6 +1,5 @@
 checks:
   php: true
-    undefined-method: false
 
 build:
   environment:
