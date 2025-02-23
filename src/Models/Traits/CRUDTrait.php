@@ -94,7 +94,7 @@ trait CRUDTrait
         $data = $this->setPosttypeBeforeSave($data);
 
         $success = $this->db->table($this->table)->insert($data);
-        return $success ? $this->db->getPdo()->lastInsertId() : null;
+        return $success ? (int) $this->db->getPdo()->lastInsertId() : null;
     }
 
     /**
@@ -114,7 +114,7 @@ trait CRUDTrait
         $data = $this->processDataBeforeSave($data);
         $data = $this->setPosttypeBeforeSave($data);
 
-        return $this->db->table($this->table)
+        return (bool) $this->db->table($this->table)
             ->where('id', $id)
             ->update($data);
     }
