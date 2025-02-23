@@ -36,8 +36,15 @@ class DashboardController
     public function dashboard(Request $request, Response $response): Response
     {
         // 指定のルートをフィルタリング
-        $namedRoutes = array_filter($this->routes, fn($item) =>
-            isset($item['name']) && (strpos($item['name'], 'index') !== false || strpos($item['name'], 'create') !== false));
+        $namedRoutes = array_filter(
+            $this->routes,
+            fn($item) =>
+                isset($item['name']) &&
+                (
+                    strpos($item['name'], 'index') !== false ||
+                    strpos($item['name'], 'create') !== false
+                )
+        );
 
         // Post Type を分類
         $postTypes = [];
@@ -67,26 +74,31 @@ class DashboardController
      */
     private function generateDashboardHtml(array $postTypes): string
     {
-        return array_reduce(array_keys($postTypes), function ($html, $postTypeName) use ($postTypes) {
-            $cardContent = array_reduce($postTypes[$postTypeName], function ($listHtml, $route) use ($postTypeName) {
-                $langLabel = preg_replace('/^[^_]+/', 'x', $route['name']);
-                $link = '<a href="' . env('BASEPATH') . $route['path'] . '">';
-                $link .= __($langLabel, ':name index', ['name' => __($postTypeName)]);
-                $link .= '</a>';
+        return array_reduce(
+            array_keys($postTypes),
+            function ($html, $postTypeName) use ($postTypes) {
+                $cardContent = array_reduce($postTypes[$postTypeName], function ($listHtml, $route) use ($postTypeName) {
+                    $langLabel = preg_replace('/^[^_]+/', 'x', $route['name']);
+                    $link = '<a href="' . env('BASEPATH') . $route['path'] . '">';
+                    $link .= __($langLabel, ':name index', ['name' => __($postTypeName)]);
+                    $link .= '</a>';
 
-                return $listHtml . "<li>$link</li>";
-            }, '');
+                    return $listHtml . "<li>$link</li>";
+                }, '');
 
-            return $html . <<<HTML
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">{$postTypeName}</h2>
+                $label = __($postTypeName);
+                return $html . <<<HTML
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">{$label}</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul>{$cardContent}</ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul>{$cardContent}</ul>
-                </div>
-            </div>
-            HTML;
-        }, '');
+                HTML;
+            },
+            ''
+        );
     }
 }
