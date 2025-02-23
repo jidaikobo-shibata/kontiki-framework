@@ -2,25 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Models\Traits;
 
-use Carbon\Carbon;
-
 trait CRUDTrait
 {
-    public function processDataBeforeSave(array $data): array
-    {
-        foreach ($data as $field => $value) {
-            if (in_array($field, $this->getUtcFields())) {
-                if (empty($value)) {
-                    $data[$field] = null;
-                } else {
-                    $date = Carbon::parse($value, env('TIMEZONE', 'UTC'))->setTimezone('UTC');
-                    $data[$field] = $date->format('Y-m-d H:i:s');
-                }
-            }
-        }
-        return $data;
-    }
-
     public function setPosttypeBeforeSave(array $data): array
     {
         $post_type = $data['post_type'] ?? '';
@@ -29,17 +12,6 @@ trait CRUDTrait
         }
         if (!empty($this->postType)) {
             $data['post_type'] = $this->postType;
-        }
-        return $data;
-    }
-
-    public function processDataBeforeGet(array $data): array
-    {
-        foreach ($data as $field => $value) {
-            if (in_array($field, $this->getUtcFields()) && !empty($value)) {
-                $date = Carbon::parse($value, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
-                $data[$field] = $date->format('Y-m-d H:i:s');
-            }
         }
         return $data;
     }
