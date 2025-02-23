@@ -8,6 +8,8 @@ use Slim\Psr7\Response;
 
 trait CreateEditTrait
 {
+    private array $pendingKVSData;
+
     public function prepareDataForRenderForm(array $default = []): array
     {
         return $this->flashManager->getData('data', $default);
@@ -115,17 +117,20 @@ trait CreateEditTrait
     protected function saveData(string $actionType, ?int $id, array $data): int
     {
         $data = $this->processDataForSave($actionType, $data);
+        $data = $this->divideKVS($data);
 
         if ($actionType === 'create') {
             $newId = $this->model->create($data);
             if ($newId === null) {
                 throw new \RuntimeException('Failed to create record. No ID returned.');
             }
+            $this->saveKVS($newId);
             return $newId;
         }
 
         if ($actionType === 'edit' && $id !== null) {
             $this->model->update($id, $data);
+            $this->saveKVS($id);
             return $id;
         }
 
@@ -195,5 +200,42 @@ trait CreateEditTrait
             $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $this->getDefaultRedirect($actionType, $id));
         }
+    }
+
+    protected function divideKVS(array $data): array
+    {
+        $kvsData = [];
+        foreach ($this->model->getKVSFieldDefinitions() as $key => $definition) {
+            if (isset($data[$key])) {
+                $kvsData[$key] = $data[$key];
+                unset($data[$key]);
+            }
+        }
+
+        if (!empty($kvsData)) {
+            $this->pendingKVSData = $kvsData;
+        }
+
+        return $data;
+    }
+
+    protected function saveKVS(int $id): void
+    {
+        if (empty($this->pendingKVSData)) {
+            return;
+        }
+
+        foreach ($this->pendingKVSData as $key => $value) {
+            $existing = $this->model->getKVS($id, $key);
+
+            if ($value === '' || $value === null) {
+                $this->model->deleteKVS($id, $key);
+            } else if ($existing !== null) {
+                $this->model->updateKVS($id, $key, $value);
+            } else {
+                $this->model->createKVS($id, $key, $value);
+            }
+        }
+        $this->pendingKVSData = [];
     }
 }

@@ -22,6 +22,11 @@ trait FieldDefinitionTrait
      */
     abstract public function getFieldDefinitions(array $params = []): array;
 
+    public function getKVSFieldDefinitions(array $params = []): array
+    {
+        return [];
+    }
+
     public function getFieldDefinitionsWithDefaults(array $data): array
     {
         $fields = $this->getFieldDefinitions();

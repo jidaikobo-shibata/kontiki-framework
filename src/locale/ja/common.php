@@ -31,6 +31,8 @@ return [
     'created_at' => '作成日時',
     'updated_at' => '更新日時',
     'deleted_at' => '削除日時',
+    'excerpt' => '抜粋',
+    'eyecatch' => '代表画像',
 
     'slug' => '記事ID（スラッグ）',
     'slug_exp' => 'URLの末尾で記事のIDとして用います。英単語（about-us）や日時（YYYYMMDD）などを指定します。半角英数字とハイフンが使えます。',
@@ -46,7 +48,7 @@ return [
     'published' => '公開中',
     'pending' => '非公開',
     'parent' => '親',
-    'Publishing settings' => '公開設定',
+    'publishing_settings' => '公開設定',
     'display_filter' => '表示フィルタ',
 
     'management_portal' => '管理画面',

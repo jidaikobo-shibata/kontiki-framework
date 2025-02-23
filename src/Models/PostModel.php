@@ -45,10 +45,20 @@ class PostModel extends BaseModel
         $hide_parent = env('POST_HIDE_PARENT', false);
         $hide_author = env('POST_HIDE_AUTHOR', false);
 
-        return [
+        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
+
+        $fields = [
             'id' => $this->getIdField(),
             'title' => $this->getTextField('title', ['required']),
-            'content' => $this->getContentField(),
+            'content' => $this->getContentField(
+                __('content'),
+                $content_exp,
+                [
+                    'class' => 'form-control font-monospace kontiki-file-upload',
+                    'data-button-class' => 'mt-2',
+                    'rows' => '10'
+                ]
+            ),
             'slug' => $this->getSlugField($id),
             'parent_id' => $this->getSelectField('parent', $parentOptions, '', $hide_parent),
             'published_at' => $this->getDateTimeField('published_at', 'published_at_exp', $now),
@@ -57,6 +67,31 @@ class PostModel extends BaseModel
             'creator_id' => $this->getSelectField('creator', $userOptions, $user['id'], $hide_author),
             'created_at' => $this->getIdField(__('created_at', 'Created')),
         ];
+
+        return array_merge($fields, $this->getKVSFieldDefinitions($params));
+    }
+
+    public function getKVSFieldDefinitions(array $params = []): array
+    {
+        return [
+            'excerpt' => $this->getContentField(
+                __('excerpt'),
+                '',
+                [
+                    'class' => 'form-control font-monospace',
+                    'data-button-class' => 'mt-2',
+                    'rows' => '3'
+                ]
+            ),
+            'eyecatch' => $this->getTextField(
+                __('eyecatch'),
+                [],
+                [
+                    'class' => 'form-control font-monospace kontiki-file-upload',
+                ],
+                'forms/fieldset/input-group.php'
+            ),
+        ];
     }
 
     private function getIdField(string $label = 'ID'): array
@@ -64,12 +99,16 @@ class PostModel extends BaseModel
         return ['label' => $label];
     }
 
-    private function getTextField(string $name, array $rules = []): array
-    {
+    private function getTextField(
+        string $name,
+        array $rules = [],
+        array $attributes = ['class' => 'form-control'],
+        string $fieldset_template = 'forms/fieldset/flat.php',
+    ): array {
         return [
             'label' => __($name),
             'type' => 'text',
-            'attributes' => ['class' => 'form-control'],
+            'attributes' => $attributes,
             'label_attributes' => ['class' => 'form-label'],
             'default' => '',
             'searchable' => true,
@@ -79,21 +118,17 @@ class PostModel extends BaseModel
                 : FILTER_SANITIZE_SPECIAL_CHARS,
             'template' => 'default',
             'group' => 'main',
-            'fieldset_template' => 'forms/fieldset/flat.php',
+            'fieldset_template' => $fieldset_template,
         ];
     }
 
-    private function getContentField(): array
+    private function getContentField($label, $description = '', $attributes = []): array
     {
         return [
-            'label' => __('content'),
-            'description' => __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".'),
+            'label' => $label,
+            'description' => $description,
             'type' => 'textarea',
-            'attributes' => [
-                'class' => 'form-control font-monospace kontiki-file-upload',
-                'data-button-class' => 'mt-2',
-                'rows' => '10'
-            ],
+            'attributes' => $attributes,
             'label_attributes' => ['class' => 'form-label'],
             'default' => '',
             'searchable' => true,
