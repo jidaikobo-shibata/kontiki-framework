@@ -35,7 +35,7 @@ class AuthController extends BaseController
 
     public static function registerRoutes(App $app, string $basePath = ''): void
     {
-        $app->get('/login',  AuthController::class . ':showLoginForm')->setName('login');
+        $app->get('/login', AuthController::class . ':showLoginForm')->setName('login');
         $app->post('/login', AuthController::class . ':processLogin');
         $app->get('/logout', AuthController::class . ':logout');
     }

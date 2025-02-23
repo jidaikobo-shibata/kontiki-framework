@@ -13,7 +13,7 @@
     if (!empty($faviconPath)) :
         echo '  <link rel="shortcut icon" href="' . $faviconPath . '">';
     endif;
-  ?>
+    ?>
 
   <title><?= e($pageTitle) ?></title>
 

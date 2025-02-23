@@ -31,14 +31,14 @@ trait TrashRestoreTrait
 
     public function trash(Request $request, Response $response, array $args): Response
     {
-      $id = $args['id'];
-      return static::confirmTrashRestore($request, $response, $id, 'trash');
+        $id = $args['id'];
+        return static::confirmTrashRestore($request, $response, $id, 'trash');
     }
 
     public function restore(Request $request, Response $response, array $args): Response
     {
-      $id = $args['id'];
-      return static::confirmTrashRestore($request, $response, $id, 'restore');
+        $id = $args['id'];
+        return static::confirmTrashRestore($request, $response, $id, 'restore');
     }
 
     public function confirmTrashRestore(Request $request, Response $response, int $id, string $actionType): Response
@@ -84,14 +84,14 @@ trait TrashRestoreTrait
 
     public function handleTrash(Request $request, Response $response, array $args): Response
     {
-      $id = $args['id'];
-      return static::executeTrashRestore($request, $response, $id, 'trash');
+        $id = $args['id'];
+        return static::executeTrashRestore($request, $response, $id, 'trash');
     }
 
     public function handleRestore(Request $request, Response $response, array $args): Response
     {
-      $id = $args['id'];
-      return static::executeTrashRestore($request, $response, $id, 'restore');
+        $id = $args['id'];
+        return static::executeTrashRestore($request, $response, $id, 'restore');
     }
 
     public function executeTrashRestore(Request $request, Response $response, int $id, string $actionType): Response

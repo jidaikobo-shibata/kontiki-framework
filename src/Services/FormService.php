@@ -44,7 +44,7 @@ class FormService
      */
     public function formHtml(
         string $action,
-        array  $fields,
+        array $fields,
         string $csrfToken,
         string $description = '',
         string $buttonText = 'Submit'

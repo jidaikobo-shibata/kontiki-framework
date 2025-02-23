@@ -46,7 +46,8 @@ trait PreviewTrait
                 [
                     'title' => $data['title'],
                     'content' => $data['content'],
-                ]);
+                ]
+            );
         }
     }
 }

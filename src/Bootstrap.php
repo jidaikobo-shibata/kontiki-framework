@@ -10,7 +10,7 @@ use Slim\App;
 
 class Bootstrap
 {
-    public static function init(string $env = 'production', bool $frontend = FALSE)
+    public static function init(string $env = 'production', bool $frontend = false)
     {
         // check response performance
         $GLOBALS['KONTIKI_START_TIME'] = microtime(true);
@@ -64,7 +64,7 @@ class Bootstrap
             : new \Jidaikobo\Kontiki\Config\Routes();
         $routesClass->register($app, $container);
 
-       return $app;
+        return $app;
     }
 
     public static function run(App $app, bool $timer = false): void

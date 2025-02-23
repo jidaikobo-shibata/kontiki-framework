@@ -8,7 +8,6 @@ use Slim\Psr7\Response;
 
 trait ListTrait
 {
-
     /**
      * Handles the AJAX request to fetch the file list.
      *

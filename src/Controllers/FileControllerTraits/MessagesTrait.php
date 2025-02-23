@@ -37,27 +37,27 @@ trait MessagesTrait
     protected function errorResponse(Response $response, string $message, int $status): Response
     {
         return $this->messageResponse(
-          $response,
-          MessageUtils::alertHtml($message, 'warning'),
-          $status
+            $response,
+            MessageUtils::alertHtml($message, 'warning'),
+            $status
         );
     }
 
     protected function successResponse(Response $response, string $message): Response
     {
         return $this->messageResponse(
-          $response,
-          MessageUtils::alertHtml($message),
-          200
+            $response,
+            MessageUtils::alertHtml($message),
+            200
         );
     }
 
     protected function successResponseHtml(Response $response, string $message): Response
     {
         return $this->messageResponse(
-          $response,
-          MessageUtils::alertHtml($message, 'success', false),
-          200
+            $response,
+            MessageUtils::alertHtml($message, 'success', false),
+            200
         );
     }
 }

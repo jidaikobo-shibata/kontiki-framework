@@ -11,16 +11,16 @@
       <ul class="navbar-nav">
         <?php
         $html = '';
-        foreach ($displayModes as $displayMode):
-            $html.= '<li class="nav-item">';
+        foreach ($displayModes as $displayMode) :
+            $html .= '<li class="nav-item">';
             $current = strpos($_SERVER['REQUEST_URI'], $displayMode['path']) !== false ?
                 ' active" aria-current="page' :
                 '';
 
-            $html.= '<a href="' . env('BASEPATH') . $displayMode['path'] . '" class="nav-link' . $current . '">';
-            $html.= $displayMode['name'];
-            $html.= '</a>';
-            $html.= '</li>';
+            $html .= '<a href="' . env('BASEPATH') . $displayMode['path'] . '" class="nav-link' . $current . '">';
+            $html .= $displayMode['name'];
+            $html .= '</a>';
+            $html .= '</li>';
         endforeach;
         echo $html;
         ?>

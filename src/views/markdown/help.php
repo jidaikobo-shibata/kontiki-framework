@@ -1,4 +1,5 @@
 <?php
+
 /**
   * @var string $pageTitle
   * @var string $content

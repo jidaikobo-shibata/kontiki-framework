@@ -38,7 +38,7 @@ class PostModel extends BaseModel
 //        $user = $this->authService->getCurrentUser();
         $user = ['id' => 1];
         $id = $params['id'] ?? null;
-        $parentOptions = $this->getOptions('title', TRUE, '', $id);
+        $parentOptions = $this->getOptions('title', true, '', $id);
         $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
 
         // env

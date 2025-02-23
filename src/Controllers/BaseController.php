@@ -58,7 +58,7 @@ abstract class BaseController
         }
     }
 
-    public function getRoutes(): Array
+    public function getRoutes(): array
     {
         return $this->routes;
     }
@@ -143,7 +143,6 @@ abstract class BaseController
     {
         $data = $data ?? [];
         if (!$this->isCsrfTokenValid($data)) {
-
             $this->flashManager->addErrors([
                 ['messages' => [__("csrf_invalid", 'Invalid CSRF token.')]],
             ]);

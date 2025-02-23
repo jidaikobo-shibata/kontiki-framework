@@ -37,8 +37,7 @@ class DashboardController
     {
         // 指定のルートをフィルタリング
         $namedRoutes = array_filter($this->routes, fn($item) =>
-            isset($item['name']) && (strpos($item['name'], 'index') !== false || strpos($item['name'], 'create') !== false)
-        );
+            isset($item['name']) && (strpos($item['name'], 'index') !== false || strpos($item['name'], 'create') !== false));
 
         // Post Type を分類
         $postTypes = [];
