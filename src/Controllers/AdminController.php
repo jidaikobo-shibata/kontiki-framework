@@ -26,8 +26,8 @@ class AdminController
         $app->group(
             '/admin',
             function (RouteCollectorProxy $group) {
-                $group->get('/admin.js', [AdminController::class, 'serveJs']);
-                $group->get('/favicon.ico', [AdminController::class, 'serveFavicon']);
+                $group->get('/admin.js', AdminController::class . ':serveJs');
+                $group->get('/favicon.ico', AdminController::class . ':serveFavicon');
             }
         )->add(AuthMiddleware::class);
     }

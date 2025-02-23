@@ -51,8 +51,7 @@ class PostController extends BaseController
         parent::registerRoutes($app, $basePath);
 
         // set frontend routes
-        $controllerClass = static::class;
-        $app->get('/' . $basePath . '/index',  [$controllerClass, 'frontendIndex']);
-        $app->get('/' . $basePath . '/slug/{slug}',  [$controllerClass, 'frontendReadBySlug']);
+        $app->get('/' . $basePath . '/index', PostController::class . ':frontendIndex');
+        $app->get('/' . $basePath . '/slug/{slug}', PostController::class . ':frontendReadBySlug');
     }
 }

@@ -2,15 +2,15 @@
 
 namespace Jidaikobo\Kontiki\Services;
 
-use Slim\Routing\RouteCollector;
-use Slim\Routing\RouteParser;
+use Slim\Interfaces\RouteParserInterface;
+use Slim\Interfaces\RouteCollectorInterface;
 
 class GetRoutesService
 {
-    private RouteParser $routeParser;
-    private RouteCollector $routeCollector;
+    private RouteParserInterface $routeParser;
+    private RouteCollectorInterface $routeCollector;
 
-    public function __construct(RouteParser $routeParser, RouteCollector $routeCollector)
+    public function __construct(RouteParserInterface $routeParser, RouteCollectorInterface $routeCollector)
     {
         $this->routeParser = $routeParser;
         $this->routeCollector = $routeCollector;

@@ -39,7 +39,7 @@ class ApiClient
      * @param string $method The HTTP method.
      * @param array|null $data Data to send with the request (optional).
      * @param array $headers Additional HTTP headers (optional).
-     * @return resource|object The initialized cURL handle.
+     * @return \CurlHandle The initialized cURL handle.
      */
     private static function initializeCurl(string $url, string $method, ?array $data, array $headers)
     {

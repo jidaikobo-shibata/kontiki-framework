@@ -42,13 +42,13 @@ class FileController extends BaseController
         $app->group(
             '/admin',
             function (RouteCollectorProxy $group) {
-                $group->get('/get_csrf_token', [FileController::class, 'callGetCsrfToken']);
-                $group->get('/filelist', [FileController::class, 'callFilelist']);
-                $group->post('/upload', [FileController::class, 'callHandleFileUpload']);
-                $group->post('/update', [FileController::class, 'callHandleUpdate']);
-                $group->post('/delete', [FileController::class, 'callHandleDelete']);
-                $group->get('/fileManager.js', [FileController::class, 'callServeJs']);
-                $group->get('/fileManagerInstance.js', [FileController::class, 'callServeInstanceJs']);
+                $group->get('/get_csrf_token', FileController::class . ':callGetCsrfToken');
+                $group->get('/filelist', FileController::class . ':callFilelist');
+                $group->post('/upload', FileController::class . ':callHandleFileUpload');
+                $group->post('/update', FileController::class . ':callHandleUpdate');
+                $group->post('/delete', FileController::class . ':callHandleDelete');
+                $group->get('/fileManager.js', FileController::class . ':callServeJs');
+                $group->get('/fileManagerInstance.js', FileController::class . ':callServeInstanceJs');
             }
         )->add(AuthMiddleware::class);
     }
