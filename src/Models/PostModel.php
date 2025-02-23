@@ -73,8 +73,13 @@ class PostModel extends BaseModel
 
     public function getKVSFieldDefinitions(array $params = []): array
     {
-        return [
-            'excerpt' => $this->getContentField(
+        $fields = [];
+
+        $hide_excerpt = env('POST_HIDE_KVS_EXCERPT', false);
+        $hide_eyecatch = env('POST_HIDE_KVS_EYECATCH', false);
+
+        if (!$hide_excerpt) {
+            $fields['excerpt'] = $this->getContentField(
                 __('excerpt'),
                 '',
                 [
@@ -82,16 +87,22 @@ class PostModel extends BaseModel
                     'data-button-class' => 'mt-2',
                     'rows' => '3'
                 ]
-            ),
-            'eyecatch' => $this->getTextField(
-                __('eyecatch'),
-                [],
+            );
+        }
+
+        if (!$hide_eyecatch) {
+            $fields['eyecatch'] = $this->getContentField(
+                __('excerpt'),
+                '',
                 [
-                    'class' => 'form-control font-monospace kontiki-file-upload',
-                ],
-                'forms/fieldset/input-group.php'
-            ),
-        ];
+                    'class' => 'form-control font-monospace',
+                    'data-button-class' => 'mt-2',
+                    'rows' => '3'
+                ]
+            );
+        }
+
+        return $fields;
     }
 
     private function getIdField(string $label = 'ID'): array
