@@ -10,6 +10,7 @@ use Jidaikobo\Kontiki\Services\AuthService;
 class PostModel extends BaseModel
 {
     use Traits\CRUDTrait;
+    use Traits\PostMetaTrait;
     use Traits\IndexTrait;
     use Traits\SoftDeleteTrait;
     use Traits\PublishedTrait;
@@ -68,15 +69,15 @@ class PostModel extends BaseModel
             'created_at' => $this->getIdField(__('created_at', 'Created')),
         ];
 
-        return array_merge($fields, $this->getKVSFieldDefinitions($params));
+        return array_merge($fields, $this->getPostMetaFieldDefinitions($params));
     }
 
-    public function getKVSFieldDefinitions(array $params = []): array
+    public function getPostMetaFieldDefinitions(array $params = []): array
     {
         $fields = [];
 
-        $hide_excerpt = env('POST_HIDE_KVS_EXCERPT', false);
-        $hide_eyecatch = env('POST_HIDE_KVS_EYECATCH', false);
+        $hide_excerpt = env('POST_HIDE_POSTMETA_EXCERPT', false);
+        $hide_eyecatch = env('POST_HIDE_POSTMETA_EYECATCH', false);
 
         if (!$hide_excerpt) {
             $fields['excerpt'] = $this->getContentField(

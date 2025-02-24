@@ -49,6 +49,8 @@ class FormService
         string $description = '',
         string $buttonText = 'Submit'
     ): string {
+//$this->model
+
         $formRenderer = new FormRenderer($fields, $this->view);
 
         return $this->view->fetch(

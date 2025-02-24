@@ -8,7 +8,7 @@ use Slim\Psr7\Response;
 
 trait CreateEditTrait
 {
-    private array $pendingKVSData;
+    private array $pendingPostMetaData;
 
     public function prepareDataForRenderForm(array $default = []): array
     {
@@ -117,20 +117,20 @@ trait CreateEditTrait
     protected function saveData(string $actionType, ?int $id, array $data): int
     {
         $data = $this->processDataForSave($actionType, $data);
-        $data = $this->divideKVS($data);
+        $data = $this->dividePostMeta($data);
 
         if ($actionType === 'create') {
             $newId = $this->model->create($data);
             if ($newId === null) {
                 throw new \RuntimeException('Failed to create record. No ID returned.');
             }
-            $this->saveKVS($newId);
+            $this->savePostMeta($newId);
             return $newId;
         }
 
         if ($actionType === 'edit' && $id !== null) {
             $this->model->update($id, $data);
-            $this->saveKVS($id);
+            $this->savePostMeta($id);
             return $id;
         }
 
@@ -202,40 +202,40 @@ trait CreateEditTrait
         }
     }
 
-    protected function divideKVS(array $data): array
+    protected function dividePostMeta(array $data): array
     {
-        $kvsData = [];
-        foreach ($this->model->getKVSFieldDefinitions() as $key => $definition) {
+        $postMetaData = [];
+        foreach ($this->model->getPostMetaFieldDefinitions() as $key => $definition) {
             if (isset($data[$key])) {
-                $kvsData[$key] = $data[$key];
+                $postMetaData[$key] = $data[$key];
                 unset($data[$key]);
             }
         }
 
-        if (!empty($kvsData)) {
-            $this->pendingKVSData = $kvsData;
+        if (!empty($postMetaData)) {
+            $this->pendingPostMetaData = $postMetaData;
         }
 
         return $data;
     }
 
-    protected function saveKVS(int $id): void
+    protected function savePostMeta(int $id): void
     {
-        if (empty($this->pendingKVSData)) {
+        if (empty($this->pendingPostMetaData)) {
             return;
         }
 
-        foreach ($this->pendingKVSData as $key => $value) {
-            $existing = $this->model->getKVS($id, $key);
+        foreach ($this->pendingPostMetaData as $key => $value) {
+            $existing = $this->model->getPostMeta($id, $key);
 
             if ($value === '' || $value === null) {
-                $this->model->deleteKVS($id, $key);
+                $this->model->deletePostMeta($id, $key);
             } else if ($existing !== null) {
-                $this->model->updateKVS($id, $key, $value);
+                $this->model->updatePostMeta($id, $key, $value);
             } else {
-                $this->model->createKVS($id, $key, $value);
+                $this->model->createPostMeta($id, $key, $value);
             }
         }
-        $this->pendingKVSData = [];
+        $this->pendingPostMetaData = [];
     }
 }

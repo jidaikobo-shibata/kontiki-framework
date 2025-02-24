@@ -22,7 +22,7 @@ trait FieldDefinitionTrait
      */
     abstract public function getFieldDefinitions(array $params = []): array;
 
-    public function getKVSFieldDefinitions(array $params = []): array
+    public function getPostMetaFieldDefinitions(array $params = []): array
     {
         return [];
     }

@@ -34,10 +34,10 @@ trait CRUDTrait
         $result = $this->db->table($this->table)
             ->where('id', $id)
             ->first();
-        $kvs = $this->getAllKVS($id);
+        $postMeta = $this->getAllPostMeta($id);
 
         $result = is_array($result) ? $result : (array)$result;
-        $result = array_merge($result, $kvs);
+        $result = array_merge($result, $postMeta);
         $result = $this->processDataBeforeGet($result);
 
         return $result ? (array)$result : null;
@@ -75,82 +75,6 @@ trait CRUDTrait
         }
 
         return $result ? (array)$result : null;
-    }
-
-    public function getAllKVS(int $id): array
-    {
-        $controllerClass = static::class;
-
-        $result = $this->db->table('kvs_store')
-            ->where('model', $controllerClass)
-            ->where('model_id', $id)
-            ->get()
-            ->map(fn($item) => [
-                'key' => $item->key,
-                'value' => json_decode($item->value, true) // `value` だけ JSON デコード
-            ])
-            ->toArray();
-
-        $retvals = [];
-        foreach ($result as $each)
-        {
-            $retvals[$each['key']] = $each['value'];
-        }
-
-        return $retvals;
-    }
-
-    public function getKVS(int $id, string $key): mixed
-    {
-        $controllerClass = static::class;
-        $result = $this->db->table('kvs_store')
-            ->where('model', $controllerClass)
-            ->where('model_id', $id)
-            ->where('key', $key)
-            ->first();
-
-        if ($result) {
-            $result = (array) $result; // stdClass → array に変換
-            return json_decode($result['value'], true);
-        }
-
-        return null;
-    }
-
-    public function createKVS(int $id, string $key, mixed $value): void
-    {
-        $controllerClass = static::class;
-        $data = [
-            'model' => $controllerClass,
-            'model_id' => $id,
-            'key' => $key,
-            'value' => json_encode($value),
-        ];
-        $this->db->table('kvs_store')->insert($data);
-    }
-
-    public function updateKVS(int $id, string $key, mixed $value): void
-    {
-        $data = [
-            'value' => json_encode($value),
-        ];
-
-        $controllerClass = static::class;
-        $this->db->table('kvs_store')
-            ->where('model', $controllerClass)
-            ->where('model_id', $id)
-            ->where('key', $key)
-            ->update($data);
-    }
-
-    public function deleteKVS(int $id, string $key): mixed
-    {
-        $controllerClass = static::class;
-        $this->db->table('kvs_store')
-            ->where('model', $controllerClass)
-            ->where('model_id', $id)
-            ->where('key', $key)
-            ->delete();
     }
 
     /**
