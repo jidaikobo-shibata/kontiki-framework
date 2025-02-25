@@ -50,12 +50,12 @@
                     <tr>
                         <th class="align-middle" scope="row"><?= __('description') ?></th>
                         <td class="text-break"><?= e($file['description']); ?></td>
-                        <td class="text-nowrap align-middle"><a href="#" class="fileEditBtn">編集する</a></td>
+                        <td class="text-nowrap align-middle"><a href="#" data-description-id="target-description-id-<?= $fileId ?>" class="fileEditBtn"><?= __('edit') ?></a></td>
                     </tr>
                     </table>
 
                     <?php
-                        echo '<form class="fileEdit d-none border p-3">';
+                        echo '<form class="fileEdit d-none border p-3" id="target-description-id-' . $fileId . '">';
                         echo '<div class="updateStatus"></div>';
                         echo '<div class="mb-3">';
                         echo '<label for="eachDescription_' . $fileId . '" class="form-label">' . __('description') . '</label>';

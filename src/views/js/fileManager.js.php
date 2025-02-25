@@ -138,6 +138,7 @@
      */
     setupPagination() {
         // Listen for clicks on pagination links
+        $(document).off('click', '.pagination .page-link-ajax'); // ensure reset click event
         $(document).on('click', '.pagination .page-link-ajax', (event) => {
             event.preventDefault(); // Prevent the default link behavior
             const page = $(event.target).data('page'); // Get the page number from data attribute
@@ -194,11 +195,13 @@
      */
     setupImageModal() {
         // Handle click event
+        $(document).off('click', '.clickable-image'); // ensure reset click event
         $(document).on('click', '.clickable-image', (e) => {
             this.showImageInModal(e.target);
         });
 
         // Handle keydown event (Enter or Space)
+        $(document).off('keydown', '.clickable-image'); // ensure reset click event
         $(document).on('keydown', '.clickable-image', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault(); // Prevent default scroll behavior for Space key
@@ -293,6 +296,7 @@
      * @returns {void}
      */
     setupCopyUrl() {
+        $(document).off('click', '.fileCopyUrl'); // ensure reset click event
         $(document).on('click', '.fileCopyUrl', (e) => {
             e.preventDefault(); // Prevent default anchor behavior
 
@@ -321,22 +325,20 @@
      * @returns {void}
      */
     setupShowEdit() {
-        $(document).on('click', '.fileEditBtn', (e) => {
+        $(document).off('click', '.fileEditBtn'); // ensure reset click event
+        $(document).on('click', '.fileEditBtn', function (e) {
             e.preventDefault(); // Prevent the default anchor behavior
 
-            // Find the closest table row and the form associated with the edit button
-            const editBtn = $(e.target); // The clicked button
-            const form = editBtn.closest('td.eachFile').find('form.fileEdit');
+            const editBtn = $(this);
+            const formId = editBtn.attr('data-description-id');
+            const form = $('#' + formId);
 
-            // Toggle the visibility of the form
             if (form.hasClass('d-none')) {
-                // Show the form
                 form.removeClass('d-none');
-                editBtn.text('<?= $close ?>'); // Update the button text
+                editBtn.text('<?= $close ?>');
             } else {
-                // Hide the form
                 form.addClass('d-none');
-                editBtn.text('<?= $edit ?>'); // Reset the button text
+                editBtn.text('<?= $edit ?>');
             }
         });
     }
@@ -347,6 +349,7 @@
      * @param {Event} e - The event object representing the click event.
      */
     setupDeleteFile() {
+        $(document).off('click', 'a.file-delete-link'); // ensure reset click event
         $(document).on('click', 'a.file-delete-link', (e) => {
             e.preventDefault(); // Prevent default anchor behavior
 
@@ -451,6 +454,7 @@
      * Handles the "Insert" button click to insert a file reference into the textarea and display success status.
      */
     setupInsertFile() {
+        $(document).off('click', '.fileInsertBtn'); // ensure reset click event
         $(document).on('click', '.fileInsertBtn', (e) => {
             e.preventDefault(); // Prevent default anchor behavior
 
@@ -475,6 +479,7 @@
      * @returns {void}
      */
     setupPagination() {
+        $(document).off('click', '#switchToViewTab'); // ensure reset click event
         $(document).on('click', '#switchToViewTab', (event) => {
             event.preventDefault();
             var viewTab = new bootstrap.Tab(document.getElementById("view-tab"));

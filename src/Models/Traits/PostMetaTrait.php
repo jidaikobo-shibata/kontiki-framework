@@ -7,7 +7,6 @@ trait PostMetaTrait
     public function getAllPostMeta(int $id): array
     {
         $modelClass = static::class;
-
         $result = $this->db->table('post_meta')
             ->where('model', $modelClass)
             ->where('model_id', $id)

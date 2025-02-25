@@ -34,10 +34,14 @@ trait CRUDTrait
         $result = $this->db->table($this->table)
             ->where('id', $id)
             ->first();
-        $postMeta = $this->getAllPostMeta($id);
 
         $result = is_array($result) ? $result : (array)$result;
-        $result = array_merge($result, $postMeta);
+
+        if (method_exists($this, 'getAllPostMeta')) {
+            $postMeta = $this->getAllPostMeta($id);
+            $result = array_merge($result, $postMeta);
+        }
+
         $result = $this->processDataBeforeGet($result);
 
         return $result ? (array)$result : null;
