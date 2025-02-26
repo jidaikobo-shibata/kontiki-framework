@@ -2,11 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Aura\Session\Session;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
-use Slim\Views\PhpRenderer;
 
 class UserController extends BaseController
 {
@@ -18,14 +15,6 @@ class UserController extends BaseController
     protected string $adminDirName = 'user';
     protected string $label = 'User';
     protected UserModel $model;
-
-    public function __construct(
-        PhpRenderer $view,
-        Session $session,
-        GetRoutesService $getRoutesService
-    ) {
-        parent::__construct($view, $session, $getRoutesService);
-    }
 
     protected function setModel(): void
     {

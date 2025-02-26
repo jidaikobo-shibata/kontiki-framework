@@ -19,17 +19,16 @@ class TableRenderer
     protected $deleteType; // Context: "hardDelete" or "softDelete"
 
     public function __construct(
-        BaseModel $model,
+        array $fieldDefinitions,
+        array $displayFields,
+        string $deleteType,
         array $data,
         PhpRenderer $view,
         string $adminDirName,
         string $context = 'all',
         array $routes = []
     ) {
-        // Automatically retrieve field definitions and display fields from the model
-        $fieldDefinitions = $model->getFieldDefinitions();
-        $displayFields = $model->getDisplayFields();
-        $this->deleteType = $model->getDeleteType();
+        $this->deleteType = $deleteType;
         $this->adminDirName = $adminDirName;
 
         // Filter fields based on the display fields defined in the model
@@ -45,6 +44,7 @@ class TableRenderer
 
     public function render(): string
     {
+        $createButton = $this->renderCreateButton();
         $displayModes = $this->renderDisplayModes();
         $headers = $this->renderHeaders();
         $rows = array_map(function ($row) {
@@ -52,26 +52,40 @@ class TableRenderer
         }, $this->data);
 
         return $this->view->fetch('tables/table.php', [
+            'createButton' => $createButton,
             'displayModes' => $displayModes,
             'headers' => $headers,
             'rows' => implode("\n", $rows),
         ]);
     }
 
+    protected function renderCreateButton(): array
+    {
+        $filtered = array_filter($this->routes, function ($routes) {
+            return in_array('createButton', $routes['type'], true);
+        });
+        $createButton = !empty($filtered) ? reset($filtered) : [];
+        return $createButton;
+    }
+
     protected function renderDisplayModes(): array
     {
         $displayModes = [];
         $seenPaths = [];
+        $seenNames = [];
 
         foreach ($this->routes as $route) {
             if (
-                strpos($route['path'], '/index') === false ||
-                strpos($route['path'], '/admin/') === false
+                strpos($route['path'], $this->adminDirName) === false ||
+                strpos($route['path'], '/index') === false
             ) {
                 continue;
             }
 
-            if (in_array($route['path'], $seenPaths, true)) {
+            if (
+                in_array($route['path'], $seenPaths, true) ||
+                in_array(basename($route['path']), $seenNames, true)
+            ) {
                 continue;
             }
 
@@ -80,6 +94,7 @@ class TableRenderer
                 'path' => $route['path'],
             ];
             $seenPaths[] = $route['path'];
+            $seenNames[] = basename($route['path']);
         }
 
         return $displayModes;

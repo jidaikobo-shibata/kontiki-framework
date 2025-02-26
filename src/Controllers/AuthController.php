@@ -15,15 +15,11 @@ use Valitron\Validator;
 
 class AuthController extends BaseController
 {
-    private AuthService $authService;
     protected UserModel $model;
+    private AuthService $authService;
 
-    public function __construct(
-        PhpRenderer $view,
-        Session $session,
-        AuthService $authService
-    ) {
-        parent::__construct($view, $session);
+    public function __construct(App $app, AuthService $authService) {
+        parent::__construct($app);
         $this->authService = $authService;
     }
 

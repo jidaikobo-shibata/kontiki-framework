@@ -2,7 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Aura\Session\Session;
 use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
@@ -12,7 +11,6 @@ use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Slim\Routing\RouteCollectorProxy;
-use Slim\Views\PhpRenderer;
 
 class FileController extends BaseController
 {
@@ -21,13 +19,12 @@ class FileController extends BaseController
     use FileControllerTraits\ListTrait;
     use FileControllerTraits\MessagesTrait;
 
-    protected PhpRenderer $view;
     protected FileService $fileService;
     protected FileModel $model;
 
-    public function __construct(Session $session, PhpRenderer $view, FileService $fileService)
+    public function __construct(App $app, FileService $fileService)
     {
-        parent::__construct($view, $session);
+        parent::__construct($app);
         $this->fileService = $fileService;
     }
 

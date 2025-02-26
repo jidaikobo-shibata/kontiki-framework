@@ -62,6 +62,7 @@ return [
     'x_index_reserved' => '予約中の:name',
     'x_index_expired' => '期限切れした:name',
     'x_index_trash' => 'ごみ箱（:name）',
+    'x_index_taxonomy' => ':nameの分類',
     'x_create' => ':nameの作成',
     'x_edit' => ':nameの編集',
     'x_save' => ':nameを保存する',

@@ -1,17 +1,27 @@
 <?php
 /**
-  * @var array $groupedLinks
-  * @var array $groupNames
+  * @var array $dashboardItems
   */
 ?>
 
-<?php foreach ($groupedLinks as $group => $links) : ?>
-<h2 class="fs-4"><?= e($groupNames[$group]) ?></h2>
-<ul>
-    <?php foreach ($links as $link) : ?>
-        <li>
-            <a href="<?= e($link['url']) ?>"><?= e($link['name']) ?></a>
-        </li>
-    <?php endforeach; ?>
-</ul>
+<?php foreach ($dashboardItems as $controller => $links) : ?>
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <span class="nav-icon fas fa-folder"></span>
+            <?= e(__("x_management", ':name Management', ['name' => __($controller)])) ?>
+        </h2>
+    </div>
+    <div class="card-body">
+        <ul>
+        <?php foreach ($links as $link) : ?>
+          <li>
+            <a href="<?= e($link['path']) ?>">
+              <?= __($link['name']) ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
 <?php endforeach; ?>

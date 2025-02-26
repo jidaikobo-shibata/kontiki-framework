@@ -9,7 +9,7 @@ use Illuminate\Database\Connection;
 use DI\Container;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\FileService;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
+use Jidaikobo\Kontiki\Services\RoutesService;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Views\PhpRenderer;
@@ -27,6 +27,9 @@ class Dependencies
     {
         /** @var Container $container */
         $container = $this->app->getContainer();
+
+        // Set up App
+        $container->set(App::class, $this->app);
 
         // Set up a Aura\Session instance
         $container->set(
@@ -54,6 +57,14 @@ class Dependencies
             }
         );
 
+        // Register AuthService
+        $container->set(
+            AuthService::class,
+            function ($container) {
+                return new AuthService($container->get(Session::class));
+            }
+        );
+
         // Register FileService
         $container->set(
             FileService::class,
@@ -66,11 +77,11 @@ class Dependencies
             }
         );
 
-        // Set up getRoutes
+        // Set up Routes
         $container->set(
-            GetRoutesService::class,
+            RoutesService::class,
             function () {
-                return new GetRoutesService(
+                return new RoutesService(
                     $this->app->getRouteCollector()->getRouteParser(),
                     $this->app->getRouteCollector()
                 );

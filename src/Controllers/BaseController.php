@@ -6,7 +6,7 @@ use Aura\Session\Session;
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
+use Jidaikobo\Kontiki\Services\RoutesService;
 use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -16,10 +16,11 @@ use Slim\Views\PhpRenderer;
 
 abstract class BaseController
 {
-    protected array $routes;
-    protected string $adminDirName;
+    protected array $routes = [];
+    protected string $adminDirName = '';
     protected string $label = '';
 
+    protected App $app;
     protected CsrfManager $csrfManager;
     protected FlashManager $flashManager;
     protected PhpRenderer $view;
@@ -30,32 +31,29 @@ abstract class BaseController
      *
      * Initializes the BaseController with its dependencies.
      *
-     * @param PhpRenderer       $view             The view renderer.
-     * @param Session           $session          The session manager.
-     * @param GetRoutesService  $getRoutesService The sidebar service.
+     * @param App $app container
      */
-    public function __construct(
-        PhpRenderer $view,
-        Session $session,
-        ?GetRoutesService $getRoutesService = null
-    ) {
-        $this->view = $view;
-        $this->csrfManager = new CsrfManager($session);
-        $this->flashManager = new FlashManager($session);
+    public function __construct(App $app) {
+        $this->app = $app;
+        $container = $app->getContainer();
+        $this->csrfManager = new CsrfManager($container->get(Session::class));
+        $this->flashManager = new FlashManager($container->get(Session::class));
+        $this->view = $container->get(PhpRenderer::class);
+        $routesService = $container->get(RoutesService::class);
+        $this->setRoutes($routesService);
+        $this->view->setAttributes([
+                'sidebarItems' => $routesService->getRoutesByType('sidebar')
+            ]);
         $this->setModel();
-        $this->setRoutes($getRoutesService);
     }
 
     protected function setModel(): void
     {
     }
 
-    protected function setRoutes($getRoutesService): void
+    protected function setRoutes($routesService): void
     {
-        if ($getRoutesService) {
-            $this->view->setAttributes(['sidebarItems' => $getRoutesService->getSidebar()]);
-            $this->routes = $getRoutesService->getLinks($this->adminDirName);
-        }
+        $this->routes = $routesService->getRoutesByController($this->adminDirName);
     }
 
     public function getRoutes(): array

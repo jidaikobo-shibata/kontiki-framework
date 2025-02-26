@@ -8,7 +8,7 @@ use Slim\Psr7\Response;
 
 trait CreateEditTrait
 {
-    private array $pendingPostMetaData;
+    private array $pendingMetaData;
 
     public function prepareDataForRenderForm(array $default = []): array
     {
@@ -117,20 +117,20 @@ trait CreateEditTrait
     protected function saveData(string $actionType, ?int $id, array $data): int
     {
         $data = $this->processDataForSave($actionType, $data);
-        $data = $this->dividePostMeta($data);
+        $data = $this->divideMetaData($data);
 
         if ($actionType === 'create') {
             $newId = $this->model->create($data);
             if ($newId === null) {
                 throw new \RuntimeException('Failed to create record. No ID returned.');
             }
-            $this->savePostMeta($newId);
+            $this->saveMetaData($newId);
             return $newId;
         }
 
         if ($actionType === 'edit' && $id !== null) {
             $this->model->update($id, $data);
-            $this->savePostMeta($id);
+            $this->saveMetaData($id);
             return $id;
         }
 
@@ -202,40 +202,40 @@ trait CreateEditTrait
         }
     }
 
-    protected function dividePostMeta(array $data): array
+    protected function divideMetaData(array $data): array
     {
-        $postMetaData = [];
-        foreach ($this->model->getPostMetaFieldDefinitions() as $key => $definition) {
+        $MetaData = [];
+        foreach ($this->model->getMetaDataFieldDefinitions() as $key => $definition) {
             if (isset($data[$key])) {
-                $postMetaData[$key] = $data[$key];
+                $MetaData[$key] = $data[$key];
                 unset($data[$key]);
             }
         }
 
-        if (!empty($postMetaData)) {
-            $this->pendingPostMetaData = $postMetaData;
+        if (!empty($MetaData)) {
+            $this->pendingMetaData = $MetaData;
         }
 
         return $data;
     }
 
-    protected function savePostMeta(int $id): void
+    protected function saveMetaData(int $id): void
     {
-        if (empty($this->pendingPostMetaData)) {
+        if (empty($this->pendingMetaData)) {
             return;
         }
 
-        foreach ($this->pendingPostMetaData as $key => $value) {
-            $existing = $this->model->getPostMeta($id, $key);
+        foreach ($this->pendingMetaData as $key => $value) {
+            $existing = $this->model->getMetaData($id, $key);
 
             if ($value === '' || $value === null) {
-                $this->model->deletePostMeta($id, $key);
+                $this->model->deleteMetaData($id, $key);
             } else if ($existing !== null) {
-                $this->model->updatePostMeta($id, $key, $value);
+                $this->model->updateMetaData($id, $key, $value);
             } else {
-                $this->model->createPostMeta($id, $key, $value);
+                $this->model->createMetaData($id, $key, $value);
             }
         }
-        $this->pendingPostMetaData = [];
+        $this->pendingMetaData = [];
     }
 }

@@ -10,11 +10,11 @@ class CreateTermRelationshipsTable extends AbstractMigration
             'term_relationships',
             [
                 'id' => false,
-                'primary_key' => ['post_id', 'term_taxonomy_id']
+                'primary_key' => ['post_id', 'term_id']
             ]
         );
         $table->addColumn('post_id', 'integer')
-              ->addColumn('term_taxonomy_id', 'integer')
+              ->addColumn('term_id', 'integer')
               ->create();
     }
 }

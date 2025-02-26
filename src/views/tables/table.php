@@ -1,10 +1,20 @@
 <?php
 /**
+  * @var array $createButton
   * @var array $displayModes
   * @var string $headers
   * @var string $rows
   */
 ?>
+
+<?php
+if (isset($createButton['path'])):
+    $html = '';
+    $html .= '<a href="' . $createButton['path'] . '" class="btn btn-primary btn-sm" id="create_button_in_index">' . __('create') . '</a>';
+    echo $html;
+endif;
+?>
+
 <nav class="navbar navbar-expand-lg bg-secondary-subtle" aria-label="<?= __('display_filter') ?>">
   <div class="container-fluid">
     <div class="collapse navbar-collapse">

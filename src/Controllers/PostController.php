@@ -2,14 +2,10 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Aura\Session\Session;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\PostModel;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
+use Jidaikobo\Kontiki\Services\AuthService;
 use Slim\App;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
-use Slim\Views\PhpRenderer;
 
 class PostController extends BaseController
 {
@@ -31,18 +27,10 @@ class PostController extends BaseController
     protected string $label = 'Post';
     protected PostModel $model;
 
-    public function __construct(
-        PhpRenderer $view,
-        Session $session,
-        GetRoutesService $getRoutesService
-    ) {
-        parent::__construct($view, $session, $getRoutesService);
-    }
-
     protected function setModel(): void
     {
         $db = Database::getInstance()->getConnection();
-        $this->model = new PostModel($db);
+        $this->model = new PostModel($db, $this->app->getContainer()->get(AuthService::class));
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void
@@ -51,7 +39,8 @@ class PostController extends BaseController
         parent::registerRoutes($app, $basePath);
 
         // set frontend routes
-        $app->get('/' . $basePath . '/index', PostController::class . ':frontendIndex');
-        $app->get('/' . $basePath . '/slug/{slug}', PostController::class . ':frontendReadBySlug');
+        $controllerClass = static::class;
+        $app->get('/' . $basePath . '/index', $controllerClass . ':frontendIndex');
+        $app->get('/' . $basePath . '/slug/{slug}', $controllerClass . ':frontendReadBySlug');
     }
 }

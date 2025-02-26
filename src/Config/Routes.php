@@ -16,5 +16,6 @@ class Routes
         Controllers\FileController::registerRoutes($app);
         Controllers\UserController::registerRoutes($app, 'user');
         Controllers\PostController::registerRoutes($app, 'post');
+        Controllers\CategoryController::registerRoutes($app, 'post/category');
     }
 }

@@ -1,5 +1,10 @@
 $(document).ready(function () {
     /**
+     * move button
+     */
+    $("#create_button_in_index").insertAfter("#content-header h1");
+
+    /**
      * open sidebar menu items
      */
     var currentUrl = window.location.pathname;

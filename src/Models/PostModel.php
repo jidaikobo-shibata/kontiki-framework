@@ -10,16 +10,24 @@ use Jidaikobo\Kontiki\Services\AuthService;
 class PostModel extends BaseModel
 {
     use Traits\CRUDTrait;
-    use Traits\PostMetaTrait;
+    use Traits\MetaDataTrait;
     use Traits\IndexTrait;
     use Traits\SoftDeleteTrait;
     use Traits\PublishedTrait;
     use Traits\DraftTrait;
     use Traits\ExpiredTrait;
+    use Traits\TaxonomyTrait;
 
     protected string $table = 'posts';
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
+    protected AuthService $authService;
+
+    public function __construct(Connection $db, AuthService $authService)
+    {
+        parent::__construct($db);
+        $this->authService = $authService;
+    }
 
     public function getDisplayFields(): array
     {
@@ -36,8 +44,7 @@ class PostModel extends BaseModel
         // defaults
         $userModel = new UserModel($this->db);
         $userOptions = $userModel->getOptions('username');
-//        $user = $this->authService->getCurrentUser();
-        $user = ['id' => 1];
+        $user = $this->authService->getCurrentUser();
         $id = $params['id'] ?? null;
         $parentOptions = $this->getOptions('title', true, '', $id);
         $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
@@ -69,15 +76,15 @@ class PostModel extends BaseModel
             'created_at' => $this->getIdField(__('created_at', 'Created')),
         ];
 
-        return array_merge($fields, $this->getPostMetaFieldDefinitions($params));
+        return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
     }
 
-    public function getPostMetaFieldDefinitions(array $params = []): array
+    public function getMetaDataFieldDefinitions(array $params = []): array
     {
         $fields = [];
 
-        $hide_excerpt = env('POST_HIDE_POSTMETA_EXCERPT', false);
-        $hide_eyecatch = env('POST_HIDE_POSTMETA_EYECATCH', false);
+        $hide_excerpt = env('POST_HIDE_METADATA_EXCERPT', false);
+        $hide_eyecatch = env('POST_HIDE_METADATA_EYECATCH', false);
 
         if (!$hide_excerpt) {
             $fields['excerpt'] = $this->getContentField(
@@ -92,16 +99,23 @@ class PostModel extends BaseModel
         }
 
         if (!$hide_eyecatch) {
-            $fields['eyecatch'] = $this->getContentField(
-                __('excerpt'),
+            $fields['eyecatch'] = $this->getTextField(
+                __('eyecatch'),
                 '',
                 [
-                    'class' => 'form-control font-monospace',
-                    'data-button-class' => 'mt-2',
-                    'rows' => '3'
+                    'class' => 'form-control font-monospace kontiki-file-upload',
                 ]
             );
         }
+            $fields['eyecatch'] = $this->getTextField(
+                __('eyecatch'),
+                [],
+                [
+                    'class' => 'form-control font-monospace kontiki-file-upload',
+                ],
+                'forms/fieldset/input-group.php'
+            );
+
 
         return $fields;
     }
@@ -240,6 +254,17 @@ class PostModel extends BaseModel
             'group' => 'meta',
             'fieldset_template' => 'forms/fieldset/flat.php',
         ];
+    }
+
+    public function getTaxonomyDefinitions(array $params = []): array
+    {
+        $taxonomies = [
+            'category' => [
+                'label' => __('category'),
+                'Model' => 'CategoryModel',
+            ],
+        ];
+        return $taxonomies;
     }
 
     public function getAdditionalConditions(Builder $query, string $context = 'all'): Builder

@@ -37,9 +37,9 @@ trait CRUDTrait
 
         $result = is_array($result) ? $result : (array)$result;
 
-        if (method_exists($this, 'getAllPostMeta')) {
-            $postMeta = $this->getAllPostMeta($id);
-            $result = array_merge($result, $postMeta);
+        if (method_exists($this, 'getAllMetaData')) {
+            $metaData = $this->getAllMetaData($id);
+            $result = array_merge($result, $metaData);
         }
 
         $result = $this->processDataBeforeGet($result);

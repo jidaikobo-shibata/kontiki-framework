@@ -52,9 +52,11 @@
 
   <!-- .content-wrapper -->
   <main class="content-wrapper">
-    <section class="content-header">
+    <section class="content-header" id="content-header">
       <div class="container-fluid">
-        <h1><?= e($pageTitle) ?></h1>
+        <div class="d-flex align-items-center gap-3">
+            <h1><?= e($pageTitle) ?></h1>
+        </div>
       </div>
     </section>
 

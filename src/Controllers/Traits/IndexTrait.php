@@ -15,7 +15,16 @@ trait IndexTrait
         $data = $this->model->getIndexData($context, $request->getQueryParams());
 
         // render table
-        $tableRenderer = new TableRenderer($this->model, $data, $this->view, $this->adminDirName, $context, $this->getRoutes());
+        $tableRenderer = new TableRenderer(
+            $this->model->getFieldDefinitions(),
+            $this->model->getDisplayFields(),
+            $this->model->getDeleteType(),
+            $data,
+            $this->view,
+            $this->adminDirName,
+            $context,
+            $this->getRoutes()
+        );
         $content = $tableRenderer->render();
 
         // set messages
