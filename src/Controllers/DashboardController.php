@@ -29,7 +29,8 @@ class DashboardController
         $app->group(
             '/admin',
             function (RouteCollectorProxy $group) {
-                $group->get('/dashboard', DashboardController::class . ':dashboard');
+                $group->get('/dashboard', DashboardController::class . ':dashboard')
+                    ->setName('dashboard');
             }
         )->add(AuthMiddleware::class);
     }
