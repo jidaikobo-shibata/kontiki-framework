@@ -27,7 +27,7 @@ endif;
                 ' active" aria-current="page' :
                 '';
 
-            $html .= '<a href="' . env('BASEPATH') . $displayMode['path'] . '" class="nav-link' . $current . '">';
+            $html .= '<a href="' . $displayMode['path'] . '" class="nav-link' . $current . '">';
             $html .= $displayMode['name'];
             $html .= '</a>';
             $html .= '</li>';

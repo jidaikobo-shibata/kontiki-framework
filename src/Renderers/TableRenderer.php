@@ -71,21 +71,9 @@ class TableRenderer
     protected function renderDisplayModes(): array
     {
         $displayModes = [];
-        $seenPaths = [];
-        $seenNames = [];
 
         foreach ($this->routes as $route) {
-            if (
-                strpos($route['path'], $this->adminDirName) === false ||
-                strpos($route['path'], '/index') === false
-            ) {
-                continue;
-            }
-
-            if (
-                in_array($route['path'], $seenPaths, true) ||
-                in_array(basename($route['path']), $seenNames, true)
-            ) {
+            if (strpos($route['path'], $this->adminDirName . '/index') === false) {
                 continue;
             }
 
@@ -93,8 +81,6 @@ class TableRenderer
                 'name' => __(basename($route['path'])),
                 'path' => $route['path'],
             ];
-            $seenPaths[] = $route['path'];
-            $seenNames[] = basename($route['path']);
         }
 
         return $displayModes;
