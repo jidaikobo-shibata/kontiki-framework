@@ -1,11 +1,17 @@
 {
     "name": "jidaikobo/kontiki",
+    "type": "project",
     "authors": [
         {
             "name": "jidaikobo-shibata",
             "email": "shibata@jidaikobo.com"
         }
     ],
+    "scripts": {
+        "post-create-project-cmd": [
+            "@php scripts/install.php"
+        ]
+    },
     "license": "MIT",
     "require": {
         "slim/slim": "^4.14",
@@ -16,10 +22,9 @@
         "vlucas/phpdotenv": "^5.6",
         "vlucas/valitron": "^1.4",
         "aura/session": "^4.0",
-        "jidaikobo/log": "^2.0",
-        "michelf/php-markdown": "^2.0",
         "illuminate/database": "^11.36",
         "nesbot/carbon": "^3.8",
+        "jidaikobo/log": "^2.0",
         "jidaikobo/php-markdown": "^1.0"
     },
     "autoload": {

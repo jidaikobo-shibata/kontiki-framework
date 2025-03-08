@@ -2,6 +2,10 @@
 
 # jidaikobo/kontiki
 
+```
+composer create-project jidaikobo/kontiki cms
+```
+
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT), see the [LICENSE file](https://github.com/jidaikobo-shibata/kontiki?tab=MIT-1-ov-file) for details
