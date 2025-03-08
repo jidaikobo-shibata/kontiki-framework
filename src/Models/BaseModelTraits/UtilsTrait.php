@@ -51,7 +51,11 @@ trait UtilsTrait
 
         $results = $query->get();
 
-        $options = array_map(fn($row) => $this->processRow($row, $fieldName), $results->toArray());
+        $options = array_column(
+            array_map(fn($row) => $this->processRow($row, $fieldName), $results->toArray()),
+            1,
+            0
+        );
 
         if ($includeEmpty) {
             $options = ['' => $emptyLabel] + $options;
@@ -75,6 +79,6 @@ trait UtilsTrait
 
         $processedRow = $this->processDataBeforeGet((array)$row);
 
-        return [$row->id => $processedRow[$fieldName]];
+        return [$row->id, $processedRow[$fieldName]];
     }
 }
