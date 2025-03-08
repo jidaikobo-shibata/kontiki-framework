@@ -13,10 +13,10 @@ use Slim\Views\PhpRenderer;
 
 class CategoryController extends BaseController
 {
-    use Traits\IndexTrait;
-    use Traits\IndexTaxonomyTrait;
-    use Traits\CreateEditTrait;
-    use Traits\DeleteTrait;
+    // use Traits\IndexTrait;
+    // use Traits\IndexTaxonomyTrait;
+    // use Traits\CreateEditTrait;
+    // use Traits\DeleteTrait;
 
     protected string $adminDirName = 'post/category';
     protected string $label = 'Post/Category';

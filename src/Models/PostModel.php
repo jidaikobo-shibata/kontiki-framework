@@ -107,15 +107,6 @@ class PostModel extends BaseModel
                 ]
             );
         }
-            $fields['eyecatch'] = $this->getTextField(
-                __('eyecatch'),
-                [],
-                [
-                    'class' => 'form-control font-monospace kontiki-file-upload',
-                ],
-                'forms/fieldset/input-group.php'
-            );
-
 
         return $fields;
     }
