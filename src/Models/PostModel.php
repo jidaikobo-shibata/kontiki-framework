@@ -49,10 +49,6 @@ class PostModel extends BaseModel
         $parentOptions = $this->getOptions('title', true, '', $id);
         $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
 
-        // env
-        $hide_parent = env('POST_HIDE_PARENT', false);
-        $hide_author = env('POST_HIDE_AUTHOR', false);
-
         // description
         $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
         $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
@@ -96,8 +92,7 @@ class PostModel extends BaseModel
             'parent_id' => $this->getField(
                 'parent',
                 [
-//                    'type' => 'select',
-                    'type' => 'hidden',
+                    'type' => env('POST_HIDE_PARENT', false) ? 'hidden' : 'select',
                     'options' => $parentOptions,
                     'attributes' => [
                         'class' => 'form-control form-select'
@@ -144,8 +139,7 @@ class PostModel extends BaseModel
             'creator_id' => $this->getField(
                 'creator',
                 [
-//                    'type' => 'select',
-                    'type' => 'hidden',
+                    'type' => env('POST_HIDE_AUTHOR', false) ? 'hidden' : 'select',
                     'options' => $userOptions,
                     'default' => $user['id'],
                     'attributes' => [
