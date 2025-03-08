@@ -22,7 +22,7 @@ return [
     'title' => 'タイトル',
     'content' => '内容',
     'required' => '必須',
-    'content_exp' => '「内容」は<a href="' . env('BASEPATH') . '/admin/post/markdown-help" target="markdown-help">マークダウン記法</a>で入力してください。「ファイルアップロード」でファイルを追加できます。',
+    'content_exp' => '「内容」は<a href="' . env('BASEPATH') . '/post/markdown-help" target="markdown-help">マークダウン記法</a>で入力してください。「ファイルアップロード」でファイルを追加できます。',
     'description' => '説明',
     'search_str' => '検索文字',
     'search' => '検索する',

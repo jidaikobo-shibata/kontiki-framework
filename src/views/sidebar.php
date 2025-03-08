@@ -4,7 +4,7 @@
   */
 ?>
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <a href="<?= env('BASEPATH', '') ?>/admin/dashboard" class="brand-link">
+  <a href="<?= env('BASEPATH', '') ?>/dashboard" class="brand-link">
     <span class="brand-text font-weight-light"><?= env('COPYRIGHT', '') ?></span>
   </a>
 
@@ -13,7 +13,7 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
       <?php
         foreach ($sidebarItems as $controller => $links) :
-            $dataPath = env('BASEPATH') . '/admin/' . $controller;
+            $dataPath = env('BASEPATH') . '/' . $controller;
       ?>
           <li class="nav-item" data-path="<?= e($dataPath) ?>">
             <a href="#" class="nav-link" aria-expanded="false">

@@ -16,14 +16,12 @@ trait IndexTrait
 
         // render table
         $tableRenderer = new TableRenderer(
-            $this->model->getFieldDefinitions(),
-            $this->model->getDisplayFields(),
-            $this->model->getDeleteType(),
-            $data,
+            $this->model,
             $this->view,
             $this->adminDirName,
-            $context,
-            $this->getRoutes()
+            $this->getRoutes(),
+            $data,
+            $context
         );
         $content = $tableRenderer->render();
 

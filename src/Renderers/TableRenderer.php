@@ -19,17 +19,18 @@ class TableRenderer
     protected $deleteType; // Context: "hardDelete" or "softDelete"
 
     public function __construct(
-        array $fieldDefinitions,
-        array $displayFields,
-        string $deleteType,
-        array $data,
+        BaseModel $model,
         PhpRenderer $view,
         string $adminDirName,
-        string $context = 'all',
-        array $routes = []
+        array $routes = [],
+        array $data,
+        string $context = 'all'
     ) {
-        $this->deleteType = $deleteType;
+        $this->deleteType = $model->getDeleteType();
         $this->adminDirName = $adminDirName;
+
+        $fieldDefinitions = $model->getFieldDefinitions();
+        $displayFields = $model->getDisplayFields();
 
         // Filter fields based on the display fields defined in the model
         $this->fields = array_filter($fieldDefinitions, function ($key) use ($displayFields) {
@@ -157,7 +158,7 @@ class TableRenderer
     {
         $id = e($row['id']);
 
-        $uri = env('BASEPATH', '') . "/admin/{$this->adminDirName}/%s/%s";
+        $uri = env('BASEPATH', '') . "/{$this->adminDirName}/%s/%s";
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
         $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s</a> ';
         $actions = [

@@ -53,27 +53,109 @@ class PostModel extends BaseModel
         $hide_parent = env('POST_HIDE_PARENT', false);
         $hide_author = env('POST_HIDE_AUTHOR', false);
 
-        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/admin/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
+        // description
+        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
+        $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
 
         $fields = [
-            'id' => $this->getIdField(),
-            'title' => $this->getTextField('title', ['required']),
-            'content' => $this->getContentField(
-                __('content'),
-                $content_exp,
+            'id' => $this->getReadOnlyField('ID'),
+
+            'title' => $this->getField(
+                'title',
                 [
-                    'class' => 'form-control font-monospace kontiki-file-upload',
-                    'data-button-class' => 'mt-2',
-                    'rows' => '10'
+                    'rules' => ['required']
                 ]
             ),
-            'slug' => $this->getSlugField($id),
-            'parent_id' => $this->getSelectField('parent', $parentOptions, '', $hide_parent),
-            'published_at' => $this->getDateTimeField('published_at', 'published_at_exp', $now),
-            'expired_at' => $this->getDateTimeField('expired_at', 'expired_at_exp'),
-            'status' => $this->getStatusField(),
-            'creator_id' => $this->getSelectField('creator', $userOptions, $user['id'], $hide_author),
-            'created_at' => $this->getIdField(__('created_at', 'Created')),
+
+            'content' => $this->getField(
+                __('content'),
+                [
+                    'type' => 'textarea',
+                    'description' => $content_exp,
+                    'attributes' => [
+                        'class' => 'form-control font-monospace kontiki-file-upload',
+                        'data-button-class' => 'mt-2',
+                        'rows' => '10'
+                    ]
+                ]
+            ),
+
+            'slug' => $this->getField(
+                __('slug'),
+                [
+                    'description' => $slug_exp,
+                    'rules' => [
+                        'required',
+                        'slug',
+                        ['lengthMin', 3],
+                        ['unique', $this->table, 'slug', $id]
+                    ],
+                ]
+            ),
+
+            'parent_id' => $this->getField(
+                'parent',
+                [
+//                    'type' => 'select',
+                    'type' => 'hidden',
+                    'options' => $parentOptions,
+                    'attributes' => [
+                        'class' => 'form-control form-select'
+                    ],
+                    'group' => 'meta',
+                ]
+            ),
+
+            'published_at' => $this->getField(
+                'published_at',
+                [
+                    'type' => 'datetime-local',
+                    'description' => __('published_at_exp'),
+                    'default' => __($now),
+                    'group' => 'meta',
+                ]
+            ),
+
+            'expired_at' => $this->getField(
+                'expired_at',
+                [
+                    'type' => 'datetime-local',
+                    'description' => __('expired_at_exp'),
+                    'group' => 'meta',
+                ]
+            ),
+
+            'status' => $this->getField(
+                'status',
+                [
+                    'type' => 'select',
+                    'options' => [
+                        'draft' => __('draft'),
+                        'published' => __('published'),
+                        'pending' => __('pending'),
+                    ],
+                    'attributes' => [
+                        'class' => 'form-control form-select'
+                    ],
+                    'group' => 'meta',
+                ]
+            ),
+
+            'creator_id' => $this->getField(
+                'creator',
+                [
+//                    'type' => 'select',
+                    'type' => 'hidden',
+                    'options' => $userOptions,
+                    'default' => $user['id'],
+                    'attributes' => [
+                        'class' => 'form-control form-select'
+                    ],
+                    'group' => 'meta',
+                ]
+            ),
+
+            'created_at' => $this->getReadOnlyField(__('created_at', 'Created')),
         ];
 
         return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
@@ -89,11 +171,14 @@ class PostModel extends BaseModel
         if (!$hide_excerpt) {
             $fields['excerpt'] = $this->getContentField(
                 __('excerpt'),
-                '',
                 [
-                    'class' => 'form-control font-monospace',
-                    'data-button-class' => 'mt-2',
-                    'rows' => '3'
+                    'type' => 'textarea',
+                    'description' => $content_exp,
+                    'attributes' => [
+                        'class' => 'form-control font-monospace',
+                        'data-button-class' => 'mt-2',
+                        'rows' => '3'
+                    ]
                 ]
             );
         }
@@ -101,150 +186,15 @@ class PostModel extends BaseModel
         if (!$hide_eyecatch) {
             $fields['eyecatch'] = $this->getTextField(
                 __('eyecatch'),
-                '',
                 [
-                    'class' => 'form-control font-monospace kontiki-file-upload',
+                    'attributes' => [
+                        'class' => 'form-control font-monospace kontiki-file-upload',
+                    ]
                 ]
             );
         }
 
         return $fields;
-    }
-
-    private function getIdField(string $label = 'ID'): array
-    {
-        return ['label' => $label];
-    }
-
-    private function getTextField(
-        string $name,
-        array $rules = [],
-        array $attributes = ['class' => 'form-control'],
-        string $fieldset_template = 'forms/fieldset/flat.php',
-    ): array {
-        return [
-            'label' => __($name),
-            'type' => 'text',
-            'attributes' => $attributes,
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => $rules,
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'main',
-            'fieldset_template' => $fieldset_template,
-        ];
-    }
-
-    private function getContentField($label, $description = '', $attributes = []): array
-    {
-        return [
-            'label' => $label,
-            'description' => $description,
-            'type' => 'textarea',
-            'attributes' => $attributes,
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => [],
-            'filter' => FILTER_UNSAFE_RAW,
-            'template' => 'default',
-            'group' => 'main',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
-    }
-
-    private function getSlugField(?int $id): array
-    {
-        return [
-            'label' => __('slug'),
-            'description' => __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.'),
-            'type' => 'text',
-            'attributes' => ['class' => 'form-control'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => [
-                'required',
-                'slug',
-                ['lengthMin', 3],
-                ['unique', $this->table, 'slug', $id]
-            ],
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'main',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
-    }
-
-    private function getSelectField(string $name, array $options, $default = '', $hide = false): array
-    {
-        $type = $hide ? 'hidden' : 'select';
-        return [
-            'label' => __($name),
-            'type' => $type,
-            'options' => $options,
-            'attributes' => ['class' => 'form-control form-select'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => $default,
-            'searchable' => true,
-            'rules' => [],
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'meta',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
-    }
-
-    private function getDateTimeField(string $name, string $description = '', $default = '', array $rules = []): array
-    {
-        return [
-            'label' => __($name),
-            'description' => __($description),
-            'type' => 'datetime-local',
-            'attributes' => ['class' => 'form-control'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => $default,
-            'searchable' => true,
-            'rules' => $rules,
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'meta',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
-    }
-
-    private function getStatusField(): array
-    {
-        return [
-            'label' => __('status'),
-            'type' => 'select',
-            'options' => [
-                'draft' => __('draft'),
-                'published' => __('published'),
-                'pending' => __('pending'),
-            ],
-            'attributes' => ['class' => 'form-control form-select'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => [],
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'meta',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
     }
 
     public function getTaxonomyDefinitions(array $params = []): array
