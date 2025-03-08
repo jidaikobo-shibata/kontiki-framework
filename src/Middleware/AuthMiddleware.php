@@ -13,6 +13,11 @@ class AuthMiddleware implements MiddlewareInterface
 {
     private AuthService $authService;
     private PhpRenderer $view;
+    private array $excludedRoutes = [
+        '/favicon.ico',
+        '/login',
+        '/logout',
+    ];
 
     public function __construct(AuthService $authService, PhpRenderer $view)
     {
@@ -22,6 +27,14 @@ class AuthMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
+        $path = str_replace(env('BASEPATH', ''), '', $request->getUri()->getPath());
+
+        // for guest routes
+        if (in_array($path, $this->excludedRoutes, true)) {
+            return $handler->handle($request);
+        }
+
+        // for login users
         if (!$this->authService->isLoggedIn()) {
             $response = new \Slim\Psr7\Response();
             $content = $this->view->fetch('error/404.php');

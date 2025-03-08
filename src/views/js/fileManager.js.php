@@ -21,7 +21,7 @@
      * @param {string} targetTextareaId - The ID of the target textarea for file insertion.
      */
     constructor(ajaxUrl, targetTextareaId) {
-        this.ajaxUrl = ajaxUrl || '/admin/'; // Default to '/admin/' if no URL is provided
+        this.ajaxUrl = ajaxUrl || '/'; // Default to '/admin/' if no URL is provided
         this.targetTextareaId = targetTextareaId || 'content'; // Default textarea ID
         this.init();
     }

@@ -26,11 +26,9 @@
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
   <!-- Scripts -->
-<?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') !== false) : ?>
-  <script src="<?= env('BASEPATH', '') ?>/admin/fileManager.js"></script>
-  <script src="<?= env('BASEPATH', '') ?>/admin/fileManagerInstance.js"></script>
-  <script src="<?= env('BASEPATH', '') ?>/admin/admin.js"></script>
-<?php endif; ?>
+  <script src="<?= env('BASEPATH', '') ?>/fileManager.js"></script>
+  <script src="<?= env('BASEPATH', '') ?>/fileManagerInstance.js"></script>
+  <script src="<?= env('BASEPATH', '') ?>/admin.js"></script>
 
   <title><?= e($pageTitle) ?></title>
 </head>

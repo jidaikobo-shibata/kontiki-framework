@@ -84,6 +84,25 @@ BASEPATH=/cms
 
 # Database connection information
 DB_DATABASE=db/$projectEnv/database.sqlite3
+
+# Upload directory
+# Relative path from the project root
+UPLOADDIR=/../cms/uploads
+
+# Allowed MIME types (in JSON format)
+ALLOWED_MIME_TYPES=["image/jpeg","image/png","application/pdf"]
+
+# Maximum file upload size (in bytes)
+MAXSIZE=5000000
+
+# admin favicon path
+ADMIN_FAVICON_PATH=favicon.ico
+
+# Post Default Settings
+POST_HIDE_PARENT=true
+POST_HIDE_AUTHOR=true
+POST_HIDE_METADATA_EXCERPT=true
+POST_HIDE_METADATA_EYECATCH=true
 EOL;
 
 $envFilePath = __DIR__ . "/../config/$projectEnv/.env";

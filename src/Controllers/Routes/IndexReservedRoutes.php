@@ -6,8 +6,8 @@ use Slim\Routing\RouteCollectorProxy;
 
 class IndexReservedRoutes
 {
-    public static function register(RouteCollectorProxy $group, string $basePath, string $controllerClass): void
+    public static function register(RouteCollectorProxy $app, string $basePath, string $controllerClass): void
     {
-        $group->get('/index/reserved', [$controllerClass, 'indexReserved']);
+        $app->get("/{$basePath}/index/reserved", [$controllerClass, 'indexReserved']);
     }
 }

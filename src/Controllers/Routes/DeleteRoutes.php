@@ -6,9 +6,9 @@ use Slim\Routing\RouteCollectorProxy;
 
 class DeleteRoutes
 {
-    public static function register(RouteCollectorProxy $group, string $_basePath, string $controllerClass): void
+    public static function register(RouteCollectorProxy $app, string $basePath, string $controllerClass): void
     {
-        $group->get('/delete/{id}', [$controllerClass, 'delete']);
-        $group->post('/delete/{id}', [$controllerClass, 'handleDelete']);
+        $app->get("/{$basePath}/delete/{id}", [$controllerClass, 'delete']);
+        $app->post("/{$basePath}/delete/{id}", [$controllerClass, 'handleDelete']);
     }
 }

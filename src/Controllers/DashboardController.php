@@ -2,7 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\RoutesService;
 use Slim\App;
 use Slim\Psr7\Request;
@@ -26,18 +25,12 @@ class DashboardController
 
     public static function registerRoutes(App $app): void
     {
-        $app->group(
-            '/admin',
-            function (RouteCollectorProxy $group) {
-                $group->get('/dashboard', DashboardController::class . ':dashboard')
-                    ->setName('dashboard');
-            }
-        )->add(AuthMiddleware::class);
+        $app->get('/dashboard', DashboardController::class . ':dashboard')
+            ->setName('dashboard');
     }
 
     public function dashboard(Request $request, Response $response): Response
     {
-
         $content = $this->view->fetch(
             'dashboard/dashboard.php',
             ['dashboardItems' => $this->routes]

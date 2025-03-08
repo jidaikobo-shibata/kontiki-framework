@@ -32,7 +32,7 @@
                 delete fileManager;
             }
 
-            fileManager = new KontikiFileManager('<?= $basepath ?>/admin/', targetTargetComponentId);
+            fileManager = new KontikiFileManager('<?= $basepath ?>/', targetTargetComponentId);
         }
     });
 

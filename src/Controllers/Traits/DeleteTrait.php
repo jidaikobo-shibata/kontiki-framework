@@ -39,7 +39,7 @@ trait DeleteTrait
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
-            "/admin/{$this->adminDirName}/delete/{$id}",
+            "/{$this->adminDirName}/delete/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
@@ -71,7 +71,7 @@ trait DeleteTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->adminDirName}/delete/{$id}";
+        $redirectTo = "/{$this->adminDirName}/delete/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -88,7 +88,7 @@ trait DeleteTrait
                         ['name' => __($this->label)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
+                return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
@@ -96,7 +96,7 @@ trait DeleteTrait
               ]);
         }
 
-        $redirectTo = "/admin/{$this->adminDirName}/edit/{$id}";
+        $redirectTo = "/{$this->adminDirName}/edit/{$id}";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

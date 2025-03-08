@@ -56,7 +56,7 @@ trait TrashRestoreTrait
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
-            "/admin/{$this->adminDirName}/{$actionType}/{$id}",
+            "/{$this->adminDirName}/{$actionType}/{$id}",
             $data,
             $this->csrfManager->getToken(),
             __(
@@ -99,7 +99,7 @@ trait TrashRestoreTrait
         $data = $request->getParsedBody() ?? [];
 
         // validate csrf token
-        $redirectTo = "/admin/{$this->adminDirName}/{$actionType}/{$id}";
+        $redirectTo = "/{$this->adminDirName}/{$actionType}/{$id}";
         $redirectResponse = $this->validateCsrfToken($data, $request, $response, $redirectTo);
         if ($redirectResponse) {
             return $redirectResponse;
@@ -116,7 +116,7 @@ trait TrashRestoreTrait
                         ['name' => __($this->label)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
+                return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
@@ -124,7 +124,7 @@ trait TrashRestoreTrait
               ]);
         }
 
-        $redirectTo = "/admin/{$this->adminDirName}/index";
+        $redirectTo = "/{$this->adminDirName}/index";
         return $this->redirectResponse($request, $response, $redirectTo);
     }
 }

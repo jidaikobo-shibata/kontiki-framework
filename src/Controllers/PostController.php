@@ -40,7 +40,7 @@ class PostController extends BaseController
 
         // set frontend routes
         $controllerClass = static::class;
-        $app->get('/' . $basePath . '/index', $controllerClass . ':frontendIndex');
-        $app->get('/' . $basePath . '/slug/{slug}', $controllerClass . ':frontendReadBySlug');
+        // $app->get('/' . $basePath . '/index', $controllerClass . ':frontendIndex');
+        // $app->get('/' . $basePath . '/slug/{slug}', $controllerClass . ':frontendReadBySlug');
     }
 }

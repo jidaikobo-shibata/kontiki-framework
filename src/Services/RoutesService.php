@@ -71,12 +71,12 @@ class RoutesService
     /**
      * Extract the controller name from the route pattern.
      *
-     * @param  string $pattern The route pattern (e.g., "/admin/users").
+     * @param  string $pattern The route pattern (e.g., "/users").
      * @return string The extracted controller name (e.g., "users").
      */
     private function extractControllerFromPattern(string $pattern): string
     {
         $segments = explode('/', trim($pattern, '/'));
-        return $segments[1] ?? 'general';
+        return $segments[0] ?? 'general';
     }
 }

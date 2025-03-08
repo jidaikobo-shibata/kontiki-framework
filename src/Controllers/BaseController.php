@@ -79,17 +79,13 @@ abstract class BaseController
     public static function registerRoutes(App $app, string $basePath = ''): void
     {
         $controllerClass = static::class;
-
-        $app->group('/admin/' . $basePath, function (RouteCollectorProxy $group) use ($controllerClass, $basePath) {
-            $traits = class_uses($controllerClass);
-
-            foreach ($traits as $trait) {
-                $routeClass = self::resolveRouteClass($trait);
-                if (class_exists($routeClass) && method_exists($routeClass, 'register')) {
-                    $routeClass::register($group, $basePath, $controllerClass);
-                }
+        $traits = class_uses($controllerClass);
+        foreach ($traits as $trait) {
+            $routeClass = self::resolveRouteClass($trait);
+            if (class_exists($routeClass) && method_exists($routeClass, 'register')) {
+                $routeClass::register($app, $basePath, $controllerClass);
             }
-        })->add(AuthMiddleware::class);
+        }
     }
 
     /**

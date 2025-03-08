@@ -4,13 +4,11 @@ namespace Jidaikobo\Kontiki\Controllers;
 
 use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 use Jidaikobo\Kontiki\Core\Database;
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
 use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use Slim\Routing\RouteCollectorProxy;
 
 class FileController extends BaseController
 {
@@ -36,18 +34,13 @@ class FileController extends BaseController
 
     public static function registerRoutes(App $app, string $basePath = ''): void
     {
-        $app->group(
-            '/admin',
-            function (RouteCollectorProxy $group) {
-                $group->get('/get_csrf_token', FileController::class . ':callGetCsrfToken');
-                $group->get('/filelist', FileController::class . ':callFilelist');
-                $group->post('/upload', FileController::class . ':callHandleFileUpload');
-                $group->post('/update', FileController::class . ':callHandleUpdate');
-                $group->post('/delete', FileController::class . ':callHandleDelete');
-                $group->get('/fileManager.js', FileController::class . ':callServeJs');
-                $group->get('/fileManagerInstance.js', FileController::class . ':callServeInstanceJs');
-            }
-        )->add(AuthMiddleware::class);
+        $app->get('/get_csrf_token', FileController::class . ':callGetCsrfToken');
+        $app->get('/filelist', FileController::class . ':callFilelist');
+        $app->post('/upload', FileController::class . ':callHandleFileUpload');
+        $app->post('/update', FileController::class . ':callHandleUpdate');
+        $app->post('/delete', FileController::class . ':callHandleDelete');
+        $app->get('/fileManager.js', FileController::class . ':callServeJs');
+        $app->get('/fileManagerInstance.js', FileController::class . ':callServeInstanceJs');
     }
 
     public function callGetCsrfToken(Request $request, Response $response): Response

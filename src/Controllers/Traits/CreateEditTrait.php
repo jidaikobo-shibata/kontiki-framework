@@ -30,7 +30,7 @@ trait CreateEditTrait
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
-            "/admin/{$this->adminDirName}/create",
+            "/{$this->adminDirName}/create",
             $fields,
             $this->csrfManager->getToken(),
             '',
@@ -55,7 +55,7 @@ trait CreateEditTrait
         $data = $this->processDataForRenderForm('edit', $data);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/index");
+            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
         }
 
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
@@ -63,7 +63,7 @@ trait CreateEditTrait
 
         $formService = new FormService($this->view, $this->model);
         $formHtml = $formService->formHtml(
-            "/admin/{$this->adminDirName}/edit/{$id}",
+            "/{$this->adminDirName}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
             '',
@@ -101,8 +101,8 @@ trait CreateEditTrait
     protected function getDefaultRedirect(string $actionType, ?int $id = null): string
     {
         return $actionType === 'create'
-            ? "/admin/{$this->adminDirName}/create"
-            : "/admin/{$this->adminDirName}/edit/{$id}";
+            ? "/{$this->adminDirName}/create"
+            : "/{$this->adminDirName}/edit/{$id}";
     }
 
     protected function getFieldDefinitionsForAction(string $actionType, ?int $id = null): array
@@ -144,7 +144,7 @@ trait CreateEditTrait
 
         // redirect preview
         if (isset($data['preview']) && $data['preview'] === '1') {
-            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/preview");
+            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/preview");
         }
 
         $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
@@ -195,7 +195,7 @@ trait CreateEditTrait
                 'success',
                 __("x_save_success", ':name Saved successfully.', ['name' => __($this->label)])
             );
-            return $this->redirectResponse($request, $response, "/admin/{$this->adminDirName}/edit/{$id}");
+            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/edit/{$id}");
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);
             return $this->redirectResponse($request, $response, $this->getDefaultRedirect($actionType, $id));

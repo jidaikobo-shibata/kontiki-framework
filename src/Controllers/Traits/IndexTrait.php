@@ -39,7 +39,7 @@ trait IndexTrait
         if (!empty($success)) {
             $content = $tableHandler->addSuccessMessages($content, $success);
         }
-        $content .= $this->model->getPagination()->render(env('BASEPATH', '') . "/admin/{$this->adminDirName}/index");
+        $content .= $this->model->getPagination()->render(env('BASEPATH', '') . "/{$this->adminDirName}/index");
 
         $title = 'x_index_' . $context;
         $title_placeholder = $context . ' index of :name';

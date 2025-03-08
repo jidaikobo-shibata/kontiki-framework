@@ -2,8 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
 use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -23,13 +21,8 @@ class AdminController
 
     public static function registerRoutes(App $app): void
     {
-        $app->group(
-            '/admin',
-            function (RouteCollectorProxy $group) {
-                $group->get('/admin.js', AdminController::class . ':serveJs');
-                $group->get('/favicon.ico', AdminController::class . ':serveFavicon');
-            }
-        )->add(AuthMiddleware::class);
+        $app->get('/admin.js', AdminController::class . ':serveJs');
+        $app->get('/favicon.ico', AdminController::class . ':serveFavicon');
     }
 
     /**

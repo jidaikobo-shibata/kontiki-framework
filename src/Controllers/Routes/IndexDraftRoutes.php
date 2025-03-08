@@ -6,8 +6,8 @@ use Slim\Routing\RouteCollectorProxy;
 
 class IndexDraftRoutes
 {
-    public static function register(RouteCollectorProxy $group, string $basePath, string $controllerClass): void
+    public static function register(RouteCollectorProxy $app, string $basePath, string $controllerClass): void
     {
-        $group->get('/index/draft', [$controllerClass, 'indexDraft']);
+        $app->get("/{$basePath}/index/draft", [$controllerClass, 'indexDraft']);
     }
 }
