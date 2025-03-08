@@ -462,9 +462,22 @@
             const fileRow = $(e.target).closest('tr'); // The row containing the button
             const codeContent = fileRow.find('td.text-break code').text().trim(); // Get <code> content
 
-            // Insert the reference into the textarea
-            const textarea = $(`#${this.targetTextareaId}`);
-            textarea.val((_, currentValue) => currentValue + '\n' + codeContent); // Append to the existing content
+            // Insert the reference at the caret position in the textarea
+            const textarea = document.getElementById(this.targetTextareaId);
+            if (!textarea) return;
+
+            const startPos = textarea.selectionStart; // Get cursor start position
+            const endPos = textarea.selectionEnd; // Get cursor end position
+            const textBefore = textarea.value.substring(0, startPos);
+            const textAfter = textarea.value.substring(endPos, textarea.value.length);
+
+            // Insert at caret position
+            textarea.value = textBefore + codeContent + textAfter;
+
+            // Restore caret position after inserted text
+            const newCaretPos = startPos + codeContent.length;
+            textarea.selectionStart = textarea.selectionEnd = newCaretPos;
+
             textarea.focus(); // Focus back on the textarea
 
             // Display success status
