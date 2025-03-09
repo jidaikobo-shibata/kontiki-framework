@@ -29,13 +29,10 @@ class TableRenderer
         $this->deleteType = $model->getDeleteType();
         $this->adminDirName = $adminDirName;
 
-        $fieldDefinitions = $model->getFieldDefinitions();
-        $displayFields = $model->getDisplayFields();
-
-        // Filter fields based on the display fields defined in the model
-        $this->fields = array_filter($fieldDefinitions, function ($key) use ($displayFields) {
-            return in_array($key, $displayFields, true);
-        }, ARRAY_FILTER_USE_KEY);
+        $this->fields = array_filter(
+            $model->getFieldDefinitions(),
+            fn($field) => !empty($field['display_in_list'])
+        );
 
         $this->data = $data;
         $this->view = $view;

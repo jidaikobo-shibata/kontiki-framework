@@ -13,96 +13,75 @@ class CategoryModel extends BaseModel
 
     protected string $table = 'terms';
 
-    public function getDisplayFields(): array
-    {
-        return ['term_id', 'name', 'slug'];
-    }
-
     public function getFieldDefinitions(array $params = []): array
     {
         $id = 1;
         $fields = [
             'id' => $this->getIdField(),
-            'name' => $this->getTextField('name', ['required']),
+            'name' => $this->getNameField(),
             'slug' => $this->getSlugField($id),
-            'parent_id' => $this->getSelectField('parent', []),
-            'term_order' => $this->getTextField('order'),
+            'parent_id' => $this->getParentIdField(),
+            'term_order' => $this->getTermOrederField(),
         ];
 
         return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
     }
 
-    private function getIdField(string $label = 'ID'): array
+    private function getNameField(): array
     {
-        return ['label' => $label];
-    }
-
-    private function getTextField(
-        string $name,
-        array $rules = [],
-        array $attributes = ['class' => 'form-control'],
-        string $fieldset_template = 'forms/fieldset/flat.php',
-    ): array {
-        return [
-            'label' => __($name),
-            'type' => 'text',
-            'attributes' => $attributes,
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => $rules,
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'main',
-            'fieldset_template' => $fieldset_template,
-        ];
+        return $this->getField(
+            __('name'),
+            [
+                'rules' => ['required'],
+                'display_in_list' => true
+            ]
+        );
     }
 
     private function getSlugField(?int $id): array
     {
-        return [
-            'label' => __('slug'),
-            'description' => __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.'),
-            'type' => 'text',
-            'attributes' => ['class' => 'form-control'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => '',
-            'searchable' => true,
-            'rules' => [
-                'required',
-                'slug',
-                ['lengthMin', 3],
-                ['unique', $this->table, 'slug', $id]
-            ],
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'main',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
+        $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
+
+        return $this->getField(
+            __('slug'),
+            [
+                'description' => $slug_exp,
+                'rules' => [
+                    'required',
+                    'slug',
+                    ['lengthMin', 3],
+                    ['unique', $this->table, 'slug', $id]
+                ],
+            ]
+        );
     }
 
-    private function getSelectField(string $name, array $options, $default = '', $hide = false): array
+    private function getParentIdField(): array
     {
-        $type = $hide ? 'hidden' : 'select';
-        return [
-            'label' => __($name),
-            'type' => $type,
-            'options' => $options,
-            'attributes' => ['class' => 'form-control form-select'],
-            'label_attributes' => ['class' => 'form-label'],
-            'default' => $default,
-            'searchable' => true,
-            'rules' => [],
-            'filter' => defined('FILTER_SANITIZE_FULL_SPECIAL_CHARS')
-                ? FILTER_SANITIZE_FULL_SPECIAL_CHARS
-                : FILTER_SANITIZE_SPECIAL_CHARS,
-            'template' => 'default',
-            'group' => 'meta',
-            'fieldset_template' => 'forms/fieldset/flat.php',
-        ];
+        $type = false ? 'hidden' : 'select';
+        return $this->getField(
+            __('parent'),
+            [
+                'type' => $type,
+                'options' => [],
+                'default' => '',
+                'rules' => [
+                    'required',
+                    'slug',
+                    ['lengthMin', 3],
+                    ['unique', $this->table, 'slug', $id]
+                ],
+            ]
+        );
+    }
+
+    private function getTermOrederField(): array
+    {
+        return $this->getField(
+            __('order'),
+            [
+                'display_in_list' => true
+            ]
+        );
     }
 }

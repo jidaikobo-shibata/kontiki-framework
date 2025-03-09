@@ -9,53 +9,44 @@ class UserModel extends BaseModel
 
     protected string $table = 'users';
 
-    public function getDisplayFields(): array
-    {
-        return ['id', 'username', 'created_at'];
-    }
-
     public function getFieldDefinitions(array $params = []): array
     {
         $id = $params['id'] ?? null;
 
         return [
-            'id' => [
-                'label' => 'ID',
-            ],
-            'username' => [
-                'label' => __('username', 'Username'),
-                'type' => 'text',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => true,
-                'rules' => [
-                    'required',
-                    ['lengthMin', 3],
-                    ['unique', $this->table, 'username', $id]
-                ],
-                'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'password' => [
-                'label' => __('password', 'Password'),
-                'description' => __('users_edit_message', 'If the password is blank, the password will not be changed.'),
-                'type' => 'password',
-                'attributes' => ['class' => 'form-control'],
-                'label_attributes' => ['class' => 'form-label'],
-                'default' => '',
-                'searchable' => false,
-                'rules' => ['required', ['lengthMin', 8]],
-                'filter' => FILTER_UNSAFE_RAW,
-                'template' => 'default',
-                'group' => 'main',
-                'fieldset_template' => 'forms/fieldset/flat.php',
-            ],
-            'created_at' => [
-                'label' => __('created_at', 'Created'),
-            ],
+            'id' => $this->getIdField(),
+
+            'username' => $this->getField(
+                __('username', 'Username'),
+                [
+                    'rules' => [
+                        'required',
+                        ['lengthMin', 3],
+                        ['unique', $this->table, 'username', $id]
+                    ],
+                    'display_in_list' => true
+                ]
+            ),
+
+            'password' => $this->getField(
+                __('password', 'password'),
+                [
+                    'type' => 'password',
+                    'description' => __('users_edit_message', 'If the password is blank, the password will not be changed.'),
+                    'rules' => [
+                        'required',
+                        ['lengthMin', 8]
+                    ],
+                    'filter' => FILTER_UNSAFE_RAW,
+                ]
+            ),
+
+            'created_at' => $this->getReadOnlyField(
+                __('created_at', 'Created'),
+                [
+                    'display_in_list' => true
+                ]
+            ),
         ];
     }
 

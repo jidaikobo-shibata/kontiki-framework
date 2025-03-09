@@ -9,16 +9,6 @@ namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
  */
 trait FieldDefinitionTrait
 {
-    public function getDisplayFields(): array
-    {
-        return [];
-    }
-
-    public function getUtcFields(): array
-    {
-        return [];
-    }
-
     /**
      * Get the field definitions.
      *
@@ -83,6 +73,23 @@ trait FieldDefinitionTrait
         return $fieldDefinitions;
     }
 
+
+    /**
+     * Get the definition for Id field.
+     *
+     * wrapper of read-only field.
+     *
+     */
+    protected function getIdField(): array
+    {
+        return $this->getReadOnlyField(
+            __('ID'),
+            [
+                'display_in_list' => true
+            ]
+        );
+    }
+
     /**
      * Get the definition for a read-only field.
      *
@@ -97,7 +104,8 @@ trait FieldDefinitionTrait
     {
         return [
             'label' => $label,
-            'display_in_list' => $options['display_in_list'] ?? true,
+            'display_in_list' => $options['display_in_list'] ?? false,
+            'save_as_utc' => $options['save_as_utc'] ?? false,
         ];
     }
 

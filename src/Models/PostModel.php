@@ -29,114 +29,144 @@ class PostModel extends BaseModel
         $this->authService = $authService;
     }
 
-    public function getDisplayFields(): array
-    {
-        return ['id', 'title', 'slug', 'created_at', 'status'];
-    }
-
-    public function getUtcFields(): array
-    {
-        return ['published_at', 'expired_at', 'created_at', 'updated_at'];
-    }
-
     public function getFieldDefinitions(array $params = []): array
     {
         // defaults
+        $id = $params['id'] ?? null;
+
+        $fields = [
+            'id' => $this->getIdField(),
+            'title' => $this->getTitleField(),
+            'content' => $this->getContentField(),
+            'slug' => $this->getSlugField($id),
+            'parent_id' => $this->getParentIdField($id),
+            'published_at' => $this->getPublishedAtField(),
+            'expired_at' => $this->getExpiredAtField(),
+            'status' => $this->getStatusField(),
+            'creator_id' => $this->getCreatorIdField(),
+            'created_at' => $this->getCreatedAtField(),
+            'updated_at' => $this->getUpdatedAtField(),
+        ];
+
+        return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
+    }
+
+    private function getTitleField(): array
+    {
+        return $this->getField(
+            __('title'),
+            [
+                'rules' => ['required'],
+                'display_in_list' => true
+            ]
+        );
+    }
+
+    private function getContentField(): array
+    {
+        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
+        return $this->getField(
+            __('content'),
+            [
+                'type' => 'textarea',
+                'description' => $content_exp,
+                'attributes' => [
+                    'class' => 'form-control font-monospace kontiki-file-upload',
+                    'data-button-class' => 'mt-2',
+                    'rows' => '10'
+                ]
+            ]
+        );
+    }
+
+    private function getSlugField(?int $id): array
+    {
+        $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
+
+        return $this->getField(
+            __('slug'),
+            [
+                'description' => $slug_exp,
+                'rules' => [
+                    'required',
+                    'slug',
+                    ['lengthMin', 3],
+                    ['unique', $this->table, 'slug', $id]
+                ],
+            ]
+        );
+    }
+
+    private function getParentIdField(?int $id): array
+    {
+        $parentOptions = $this->getOptions('title', true, '', $id);
+        return $this->getField(
+            'parent',
+            [
+                'type' => env('POST_HIDE_PARENT', false) ? 'hidden' : 'select',
+                'options' => $parentOptions,
+                'attributes' => [
+                    'class' => 'form-control form-select'
+                ],
+                'group' => 'meta',
+            ]
+        );
+    }
+
+    private function getPublishedAtField(): array
+    {
+        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
+        return $this->getField(
+            'published_at',
+            [
+                'type' => 'datetime-local',
+                'description' => __('published_at_exp'),
+                'default' => $now,
+                'group' => 'meta',
+                'save_as_utc' => true
+            ]
+        );
+    }
+
+    private function getExpiredAtField(): array
+    {
+        return $this->getField(
+            'expired_at',
+            [
+                'type' => 'datetime-local',
+                'description' => __('expired_at_exp'),
+                'group' => 'meta',
+                'save_as_utc' => true
+            ]
+        );
+    }
+
+    private function getStatusField(): array
+    {
+        return $this->getField(
+            'status',
+            [
+                'type' => 'select',
+                'options' => [
+                    'draft' => __('draft'),
+                    'published' => __('published'),
+                    'pending' => __('pending'),
+                ],
+                'attributes' => [
+                    'class' => 'form-control form-select'
+                ],
+                'display_in_list' => true,
+                'group' => 'meta',
+            ]
+        );
+    }
+
+    private function getCreatorIdField(): array
+    {
         $userModel = new UserModel($this->db);
         $userOptions = $userModel->getOptions('username');
         $user = $this->authService->getCurrentUser();
-        $id = $params['id'] ?? null;
-        $parentOptions = $this->getOptions('title', true, '', $id);
-        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
-
-        // description
-        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
-        $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
-
-        $fields = [
-            'id' => $this->getReadOnlyField('ID'),
-
-            'title' => $this->getField(
-                'title',
-                [
-                    'rules' => ['required']
-                ]
-            ),
-
-            'content' => $this->getField(
-                __('content'),
-                [
-                    'type' => 'textarea',
-                    'description' => $content_exp,
-                    'attributes' => [
-                        'class' => 'form-control font-monospace kontiki-file-upload',
-                        'data-button-class' => 'mt-2',
-                        'rows' => '10'
-                    ]
-                ]
-            ),
-
-            'slug' => $this->getField(
-                __('slug'),
-                [
-                    'description' => $slug_exp,
-                    'rules' => [
-                        'required',
-                        'slug',
-                        ['lengthMin', 3],
-                        ['unique', $this->table, 'slug', $id]
-                    ],
-                ]
-            ),
-
-            'parent_id' => $this->getField(
-                'parent',
-                [
-                    'type' => env('POST_HIDE_PARENT', false) ? 'hidden' : 'select',
-                    'options' => $parentOptions,
-                    'attributes' => [
-                        'class' => 'form-control form-select'
-                    ],
-                    'group' => 'meta',
-                ]
-            ),
-
-            'published_at' => $this->getField(
-                'published_at',
-                [
-                    'type' => 'datetime-local',
-                    'description' => __('published_at_exp'),
-                    'default' => __($now),
-                    'group' => 'meta',
-                ]
-            ),
-
-            'expired_at' => $this->getField(
-                'expired_at',
-                [
-                    'type' => 'datetime-local',
-                    'description' => __('expired_at_exp'),
-                    'group' => 'meta',
-                ]
-            ),
-
-            'status' => $this->getField(
-                'status',
-                [
-                    'type' => 'select',
-                    'options' => [
-                        'draft' => __('draft'),
-                        'published' => __('published'),
-                        'pending' => __('pending'),
-                    ],
-                    'attributes' => [
-                        'class' => 'form-control form-select'
-                    ],
-                    'group' => 'meta',
-                ]
-            ),
-
-            'creator_id' => $this->getField(
+        return $this->getField(
                 'creator',
                 [
                     'type' => env('POST_HIDE_AUTHOR', false) ? 'hidden' : 'select',
@@ -147,12 +177,28 @@ class PostModel extends BaseModel
                     ],
                     'group' => 'meta',
                 ]
-            ),
+            );
+    }
 
-            'created_at' => $this->getReadOnlyField(__('created_at', 'Created')),
-        ];
+    private function getCreatedAtField(): array
+    {
+        return $this->getReadOnlyField(
+            __('created_at', 'Created'),
+            [
+                'display_in_list' => true,
+                'save_as_utc' => true
+            ]
+        );
+    }
 
-        return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
+    private function getUpdatedAtField(): array
+    {
+        return $this->getReadOnlyField(
+            __('updated_at', 'Updated'),
+            [
+                'save_as_utc' => true
+            ]
+        );
     }
 
     public function getMetaDataFieldDefinitions(array $params = []): array
