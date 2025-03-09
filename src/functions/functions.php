@@ -1,5 +1,19 @@
 <?php
 
+if (!function_exists('jlog')) {
+    /**
+     * Log function for development
+     *
+     * @param mixed $messages message
+     *
+     * @return void
+     */
+    function jlog($messages)
+    {
+        \Jidaikobo\Log::write($messages);
+    }
+}
+
 if (!function_exists('__')) {
     /**
      * Translate the given text and replace placeholders.
@@ -84,5 +98,19 @@ if (!function_exists('setenv')) {
 
         $_SERVER[$key] = (string) $value;
         $_ENV[$key] = (string) $value;
+    }
+}
+
+if (!function_exists('performance')) {
+    function performance($timer = false): void
+    {
+        \Jidaikobo\Kontiki\Bootstrap::performance($timer);
+    }
+}
+
+if (!function_exists('homeUrl')) {
+    function homeUrl(): string
+    {
+        return env('BASEURL');
     }
 }

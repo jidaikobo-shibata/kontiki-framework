@@ -1,43 +1,31 @@
 <?php
 
-if (!function_exists('getData')) {
+if (!function_exists('getIndex')) {
     /**
-     * Sends an API request and returns the response as an array.
-     *
-     * @param array $request Configuration for the API request.
-     *                       - url (string): The endpoint URL (required).
-     *                       - method (string): The HTTP method (GET, POST, etc.). Default is 'GET'.
-     *                       - data (array|null): Data to send with the request (optional).
-     *                       - headers (array): Additional HTTP headers (optional).
+     * @param array $args Configuration for the request.
      * @return array|null The API response decoded as an array, or null on failure.
      */
-    function getData(array $request): ?array
+    function getIndex(array $args): ?array
     {
-        try {
-            // Validate required parameter
-            if (empty($request['url'])) {
-                throw new InvalidArgumentException('The "url" parameter is required.');
-            }
-
-            // Extract parameters with defaults
-            $url = $request['url'];
-            $method = $request['method'] ?? 'GET';
-            $data = $request['data'] ?? null;
-            $headers = $request['headers'] ?? [];
-
-            // Call the API using ApiClient
-            return \Jidaikobo\Kontiki\Frontend\ApiClient::request($url, $method, $data, $headers);
-        } catch (Exception $e) {
-            // Log the error message for debugging
-            error_log('API Request Error: ' . $e->getMessage());
-            return null; // Return null in case of an error
-        }
+        $model = new \Jidaikobo\Kontiki\Models\PostModel();
+        $retval = [];
+        $retval['body'] = $model->getIndexData('published', $args);
+        $retval['pagination'] = $model->getPagination();
+        return $retval;
     }
 }
 
-if (!function_exists('homeUrl')) {
-    function homeUrl(): string
+if (!function_exists('getData')) {
+    /**
+     * @param array $args Configuration for the request.
+     * @return array|null The API response decoded as an array, or null on failure.
+     */
+    function getData(array $args): ?array
     {
-        return env('BASEURL');
+        $model = new \Jidaikobo\Kontiki\Models\PostModel();
+        $slug = $args['slug'] ?? '';
+        $retval = [];
+        $retval['body'] = $model->getByFieldWithCondtioned('slug', $slug, 'published');
+        return $retval;
     }
 }

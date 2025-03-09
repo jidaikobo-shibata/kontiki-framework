@@ -18,7 +18,9 @@ trait IndexTrait
 
         // Set up pagination
         $totalItems = $query->count();
-        $this->pagination = new Pagination((int)($queryParams['paged'] ?? 1), 10);
+        $paged = (int)($queryParams['paged'] ?? 1);
+        $perPage = (int)($queryParams['perPage'] ?? 10);
+        $this->pagination = new Pagination($paged, $perPage);
         $this->pagination->setTotalItems($totalItems);
 
         // Fetch and process data

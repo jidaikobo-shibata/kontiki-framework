@@ -24,9 +24,6 @@ class Bootstrap
         $dotenv->load();
 
         // Load Functions
-        if ($env === 'development') {
-            require __DIR__ . '/functions/dev/functions.php';
-        }
         require __DIR__ . '/functions/functions.php';
 
         // setenv
@@ -73,10 +70,15 @@ class Bootstrap
         return $app;
     }
 
-    public static function run(App $app, bool $timer = true): void
+    public static function run(App $app): void
     {
         $app->run();
+        self::performance();
+    }
 
+    public static function performance($timer = false): void
+    {
+        // $timer = true;
         if ($timer) {
             $elapsedTime = microtime(true) - $GLOBALS['KONTIKI_START_TIME'];
             jlog("Total execution time: " . number_format($elapsedTime, 6) . " seconds");
