@@ -5,7 +5,7 @@ namespace Jidaikobo\Kontiki\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
-use Jidaikobo\Kontiki\Services\AuthService;
+use Jidaikobo\Kontiki\Core\Auth;
 
 class PostModel extends BaseModel
 {
@@ -21,13 +21,6 @@ class PostModel extends BaseModel
     protected string $table = 'posts';
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
-    protected AuthService $authService;
-
-    public function __construct(Connection $db, AuthService $authService)
-    {
-        parent::__construct($db);
-        $this->authService = $authService;
-    }
 
     public function getFieldDefinitions(array $params = []): array
     {
@@ -165,7 +158,7 @@ class PostModel extends BaseModel
     {
         $userModel = new UserModel($this->db);
         $userOptions = $userModel->getOptions('username');
-        $user = $this->authService->getCurrentUser();
+        $user = Auth::getInstance()->getCurrentUser();
         return $this->getField(
                 'creator',
                 [

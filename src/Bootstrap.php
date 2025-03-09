@@ -10,7 +10,7 @@ use Slim\App;
 
 class Bootstrap
 {
-    public static function init(string $env = 'production', bool $frontend = false)
+    public static function init(string $env = 'production')
     {
         // check response performance
         $GLOBALS['KONTIKI_START_TIME'] = microtime(true);
@@ -37,10 +37,6 @@ class Bootstrap
         $language = env('LANG', 'en');
         Utils\Lang::setLanguage($language);
 
-        if ($frontend) {
-            return;
-        }
-
         // Configure a PHP-DI container
         $container = new Container();
         AppFactory::setContainer($container);
@@ -58,6 +54,16 @@ class Bootstrap
         $dependencies = new Config\Dependencies($app);
         $dependencies->register();
 
+        // Set Singleton - use it minimum!
+        Core\Database::setInstance([
+                'driver' => 'sqlite',
+                'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix' => '',
+            ]);
+        Core\Auth::setInstance($app->getContainer()->get(\Aura\Session\Session::class));
+
         // Set Route
         $routesClass = class_exists('App\Config\Routes')
             ? new \App\Config\Routes()
@@ -67,7 +73,7 @@ class Bootstrap
         return $app;
     }
 
-    public static function run(App $app, bool $timer = false): void
+    public static function run(App $app, bool $timer = true): void
     {
         $app->run();
 

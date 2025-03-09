@@ -3,6 +3,7 @@
 namespace Jidaikobo\Kontiki\Models;
 
 use Illuminate\Database\Connection;
+use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\BaseModelTraits;
 
 /**
@@ -21,9 +22,9 @@ abstract class BaseModel implements ModelInterface
     protected string $deleteType = 'hardDelete';
     protected Connection $db;
 
-    public function __construct(Connection $db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = Database::getInstance()->getConnection();
     }
 
     public function getDeleteType(): string

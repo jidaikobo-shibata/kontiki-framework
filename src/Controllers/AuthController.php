@@ -2,31 +2,20 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Aura\Session\Session;
-use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Services\FormService;
-use Jidaikobo\Kontiki\Services\AuthService;
 use Slim\App;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use Slim\Views\PhpRenderer;
-use Valitron\Validator;
 
 class AuthController extends BaseController
 {
     protected UserModel $model;
-    private AuthService $authService;
-
-    public function __construct(App $app, AuthService $authService) {
-        parent::__construct($app);
-        $this->authService = $authService;
-    }
 
     protected function setModel(): void
     {
-        $db = Database::getInstance()->getConnection();
-        $this->model = new UserModel($db);
+        $this->model = new UserModel();
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void
@@ -77,7 +66,7 @@ class AuthController extends BaseController
         $password = $data['password'] ?? '';
 
         // Validate Login
-        if ($this->authService->login($username, $password)) {
+        if (Auth::getInstance()->login($username, $password)) {
             return $this->redirectResponse($request, $response, 'dashboard');
         }
 
@@ -91,7 +80,7 @@ class AuthController extends BaseController
 
     public function logout(Request $request, Response $response): Response
     {
-        $this->authService->logout();
+        Auth::getInstance()->logout();
         return $this->redirectResponse($request, $response, 'login');
     }
 }

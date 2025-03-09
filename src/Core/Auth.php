@@ -1,22 +1,38 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Services;
+namespace Jidaikobo\Kontiki\Core;
 
 use Aura\Session\Session;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
 
-class AuthService
+class Auth
 {
-    protected UserModel $userModel;
+    private static ?Auth $instance = null;
+    private UserModel $userModel;
     private Session $session;
     private string $segment = 'jidaikobo\kontiki\auth';
 
-    public function __construct(Session $session)
+    private function __construct(Session $session)
     {
         $this->session = $session;
         $db = Database::getInstance()->getConnection();
         $this->userModel = new UserModel($db);
+    }
+
+    public static function setInstance(Session $session): void
+    {
+        if (self::$instance === null) {
+            self::$instance = new self($session);
+        }
+    }
+
+    public static function getInstance(): Auth
+    {
+        if (self::$instance === null) {
+            throw new \RuntimeException("Call setInstance() first.");
+        }
+        return self::$instance;
     }
 
     /**

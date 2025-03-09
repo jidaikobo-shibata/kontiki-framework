@@ -2,7 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Middleware;
 
-use Jidaikobo\Kontiki\Services\AuthService;
+use Jidaikobo\Kontiki\Core\Auth;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
@@ -11,7 +11,6 @@ use Slim\Views\PhpRenderer;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    private AuthService $authService;
     private PhpRenderer $view;
     private array $excludedRoutes = [
         '/favicon.ico',
@@ -19,9 +18,8 @@ class AuthMiddleware implements MiddlewareInterface
         '/logout',
     ];
 
-    public function __construct(AuthService $authService, PhpRenderer $view)
+    public function __construct(PhpRenderer $view)
     {
-        $this->authService = $authService;
         $this->view = $view;
     }
 
@@ -35,7 +33,7 @@ class AuthMiddleware implements MiddlewareInterface
         }
 
         // for login users
-        if (!$this->authService->isLoggedIn()) {
+        if (!Auth::getInstance()->isLoggedIn()) {
             $response = new \Slim\Psr7\Response();
             $content = $this->view->fetch('error/404.php');
             return $this->view->render(

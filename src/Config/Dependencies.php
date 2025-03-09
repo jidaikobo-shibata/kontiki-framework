@@ -4,14 +4,9 @@ namespace Jidaikobo\Kontiki\Config;
 
 use Aura\Session\SessionFactory;
 use Aura\Session\Session;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Connection;
 use DI\Container;
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
-use Jidaikobo\Kontiki\Services\AuthService;
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\RoutesService;
-use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Views\PhpRenderer;
 
@@ -55,14 +50,6 @@ class Dependencies
             PhpRenderer::class,
             function () {
                 return new PhpRenderer(env('PROJECT_PATH', '') . '/src/views');
-            }
-        );
-
-        // Register AuthService
-        $container->set(
-            AuthService::class,
-            function ($container) {
-                return new AuthService($container->get(Session::class));
             }
         );
 
