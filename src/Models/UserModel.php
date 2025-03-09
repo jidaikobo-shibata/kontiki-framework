@@ -5,15 +5,16 @@ namespace Jidaikobo\Kontiki\Models;
 class UserModel extends BaseModel
 {
     use Traits\CRUDTrait;
+    use Traits\MetaDataTrait;
     use Traits\IndexTrait;
 
     protected string $table = 'users';
 
-    public function getFieldDefinitions(array $params = []): array
+    public function setFieldDefinitions(array $params = []): void
     {
         $id = $params['id'] ?? null;
 
-        return [
+        $fields = [
             'id' => $this->getIdField(),
 
             'username' => $this->getField(
@@ -48,6 +49,9 @@ class UserModel extends BaseModel
                 ]
             ),
         ];
+
+        $MetaData = $this->getMetaDataFieldDefinitions($params);
+        $this->fieldDefinitions = array_merge($fields, $MetaData);
     }
 
     public function processFieldDefinitionsForSave(string $context, array $fieldDefinitions): array

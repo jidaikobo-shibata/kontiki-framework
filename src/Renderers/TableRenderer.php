@@ -22,8 +22,8 @@ class TableRenderer
         BaseModel $model,
         PhpRenderer $view,
         string $adminDirName,
-        array $routes = [],
         array $data,
+        array $routes = [],
         string $context = 'all'
     ) {
         $this->deleteType = $model->getDeleteType();

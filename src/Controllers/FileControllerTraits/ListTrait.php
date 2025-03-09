@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 
 use Jidaikobo\Kontiki\Utils\Pagination;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait ListTrait
 {

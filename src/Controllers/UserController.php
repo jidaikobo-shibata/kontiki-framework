@@ -18,8 +18,7 @@ class UserController extends BaseController
 
     protected function setModel(): void
     {
-        $db = Database::getInstance()->getConnection();
-        $this->model = new UserModel($db);
+        $this->model = new UserModel();
     }
 
     private function hashPassword(string $password): string

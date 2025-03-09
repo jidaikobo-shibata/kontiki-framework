@@ -13,18 +13,19 @@ class CategoryModel extends BaseModel
 
     protected string $table = 'terms';
 
-    public function getFieldDefinitions(array $params = []): array
+    public function setFieldDefinitions(array $params = []): void
     {
         $id = 1;
         $fields = [
             'id' => $this->getIdField(),
             'name' => $this->getNameField(),
             'slug' => $this->getSlugField($id),
-            'parent_id' => $this->getParentIdField(),
+            'parent_id' => $this->getParentIdField($id),
             'term_order' => $this->getTermOrederField(),
         ];
 
-        return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
+        $MetaData = $this->getMetaDataFieldDefinitions($params);
+        $this->fieldDefinitions = array_merge($fields, $MetaData);
     }
 
     private function getNameField(): array
@@ -56,7 +57,7 @@ class CategoryModel extends BaseModel
         );
     }
 
-    private function getParentIdField(): array
+    private function getParentIdField($id): array
     {
         $type = false ? 'hidden' : 'select';
         return $this->getField(

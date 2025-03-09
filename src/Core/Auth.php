@@ -16,8 +16,7 @@ class Auth
     private function __construct(Session $session)
     {
         $this->session = $session;
-        $db = Database::getInstance()->getConnection();
-        $this->userModel = new UserModel($db);
+        $this->userModel = new UserModel();
     }
 
     public static function setInstance(Session $session): void

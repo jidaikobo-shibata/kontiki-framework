@@ -8,7 +8,7 @@
 ?>
 
 <?php
-if (isset($createButton['path'])):
+if (isset($createButton['path'])) :
     $html = '';
     $html .= '<a href="' . $createButton['path'] . '" class="btn btn-primary btn-sm" id="create_button_in_index">' . __('create') . '</a>';
     echo $html;

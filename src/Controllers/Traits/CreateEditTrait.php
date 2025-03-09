@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
 use Jidaikobo\Kontiki\Services\FormService;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait CreateEditTrait
 {
@@ -48,8 +48,11 @@ trait CreateEditTrait
         );
     }
 
-    public function renderEditForm(Request $request, Response $response, array $args): Response
-    {
+    public function renderEditForm(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
         $id = $args['id'];
         $data = $this->prepareDataForRenderForm($this->model->getById($id));
         $data = $this->processDataForRenderForm('edit', $data);
@@ -230,7 +233,7 @@ trait CreateEditTrait
 
             if ($value === '' || $value === null) {
                 $this->model->deleteMetaData($id, $key);
-            } else if ($existing !== null) {
+            } elseif ($existing !== null) {
                 $this->model->updateMetaData($id, $key, $value);
             } else {
                 $this->model->createMetaData($id, $key, $value);

@@ -2,8 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait IndexExpiredTrait
 {

@@ -22,7 +22,7 @@ class PostModel extends BaseModel
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
 
-    public function getFieldDefinitions(array $params = []): array
+    public function setFieldDefinitions(array $params = []): void
     {
         // defaults
         $id = $params['id'] ?? null;
@@ -30,7 +30,7 @@ class PostModel extends BaseModel
         $fields = [
             'id' => $this->getIdField(),
             'title' => $this->getTitleField(),
-            'content' => $this->getContentField(),
+            'content' => $this->getContentField(__('content')),
             'slug' => $this->getSlugField($id),
             'parent_id' => $this->getParentIdField($id),
             'published_at' => $this->getPublishedAtField(),
@@ -40,8 +40,8 @@ class PostModel extends BaseModel
             'created_at' => $this->getCreatedAtField(),
             'updated_at' => $this->getUpdatedAtField(),
         ];
-
-        return array_merge($fields, $this->getMetaDataFieldDefinitions($params));
+        $MetaData = $this->getMetaDataFieldDefinitions($params);
+        $this->fieldDefinitions = array_merge($fields, $MetaData);
     }
 
     private function getTitleField(): array
@@ -55,11 +55,11 @@ class PostModel extends BaseModel
         );
     }
 
-    private function getContentField(): array
+    private function getContentField(string $label): array
     {
         $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
         return $this->getField(
-            __('content'),
+            $label,
             [
                 'type' => 'textarea',
                 'description' => $content_exp,
@@ -92,7 +92,10 @@ class PostModel extends BaseModel
 
     private function getParentIdField(?int $id): array
     {
-        $parentOptions = $this->getOptions('title', true, '', $id);
+        static $parentOptions = [];
+        if (empty($parentOptions)) {
+            $parentOptions = $this->getOptions('title', true, '', $id);
+        }
         return $this->getField(
             'parent',
             [
@@ -156,12 +159,15 @@ class PostModel extends BaseModel
 
     private function getCreatorIdField(): array
     {
-        $userModel = new UserModel($this->db);
-        $userOptions = $userModel->getOptions('username');
+        static $userOptions = [];
+        if (empty($userOptions)) {
+            $userModel = new UserModel();
+            $userOptions = $userModel->getOptions('username');
+        }
         $user = Auth::getInstance()->getCurrentUser();
         return $this->getField(
-                'creator',
-                [
+            'creator',
+            [
                     'type' => env('POST_HIDE_AUTHOR', false) ? 'hidden' : 'select',
                     'options' => $userOptions,
                     'default' => $user['id'],
@@ -170,7 +176,7 @@ class PostModel extends BaseModel
                     ],
                     'group' => 'meta',
                 ]
-            );
+        );
     }
 
     private function getCreatedAtField(): array
@@ -202,27 +208,26 @@ class PostModel extends BaseModel
         $hide_eyecatch = env('POST_HIDE_METADATA_EYECATCH', false);
 
         if (!$hide_excerpt) {
-            $fields['excerpt'] = $this->getContentField(
+            $fields['excerpt'] = $this->getField(
                 __('excerpt'),
                 [
                     'type' => 'textarea',
-                    'description' => $content_exp,
                     'attributes' => [
-                        'class' => 'form-control font-monospace',
-                        'data-button-class' => 'mt-2',
-                        'rows' => '3'
+                        'class' => 'form-control',
+                        'row' => 3,
                     ]
                 ]
             );
         }
 
         if (!$hide_eyecatch) {
-            $fields['eyecatch'] = $this->getTextField(
+            $fields['eyecatch'] = $this->getField(
                 __('eyecatch'),
                 [
                     'attributes' => [
                         'class' => 'form-control font-monospace kontiki-file-upload',
-                    ]
+                    ],
+                    'fieldset_template' => 'forms/fieldset/input-group.php',
                 ]
             );
         }

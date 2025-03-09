@@ -70,10 +70,10 @@ class Dependencies
             RoutesService::class,
             function () {
                 return new RoutesService(
-                    $this->app->getRouteCollector()->getRouteParser(),
                     $this->app->getRouteCollector()
                 );
             }
         );
+
     }
 }

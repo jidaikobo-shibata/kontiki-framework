@@ -3,7 +3,7 @@
 namespace Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 
 use Jidaikobo\Kontiki\Utils\MessageUtils;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
 
 trait MessagesTrait
 {

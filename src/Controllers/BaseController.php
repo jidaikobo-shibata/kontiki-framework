@@ -3,13 +3,16 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
+
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\RoutesService;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 use Slim\App;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
 use Slim\Routing\RouteContext;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
@@ -33,7 +36,8 @@ abstract class BaseController
      *
      * @param App $app container
      */
-    public function __construct(App $app) {
+    public function __construct(App $app)
+    {
         $this->app = $app;
         $container = $app->getContainer();
         $this->csrfManager = new CsrfManager($container->get(Session::class));
@@ -164,8 +168,13 @@ abstract class BaseController
      *
      * @return Response
      */
-    protected function redirectResponse(Request $request, Response $response, string $target, array $routeData = [], int $status = 302): Response
-    {
+    protected function redirectResponse(
+        Request $request,
+        Response $response,
+        string $target,
+        array $routeData = [],
+        int $status = 302
+    ): Response {
         if (strpos($target, '/') === 0 || filter_var($target, FILTER_VALIDATE_URL)) {
             $redirectUrl = env('BASEPATH', '') . $target;
         } else {

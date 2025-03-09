@@ -2,14 +2,17 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\PhpRenderer;
 
 trait PreviewTrait
 {
-    public function handlePreviewById(Request $request, Response $response, array $args): Response
-    {
+    public function handlePreviewById(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
         $id = $args['id'];
         $data = $this->prepareDataForRenderForm($this->model->getById($id));
         return static::renderPreview($response, $data);

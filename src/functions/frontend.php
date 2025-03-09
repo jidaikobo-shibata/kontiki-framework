@@ -3,9 +3,9 @@
 if (!function_exists('getIndex')) {
     /**
      * @param array $args Configuration for the request.
-     * @return array|null The API response decoded as an array, or null on failure.
+     * @return array
      */
-    function getIndex(array $args): ?array
+    function getIndex(array $args): array
     {
         $model = new \Jidaikobo\Kontiki\Models\PostModel();
         $retval = [];
@@ -18,9 +18,9 @@ if (!function_exists('getIndex')) {
 if (!function_exists('getData')) {
     /**
      * @param array $args Configuration for the request.
-     * @return array|null The API response decoded as an array, or null on failure.
+     * @return array
      */
-    function getData(array $args): ?array
+    function getData(array $args): array
     {
         $model = new \Jidaikobo\Kontiki\Models\PostModel();
         $slug = $args['slug'] ?? '';

@@ -3,8 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
 use Jidaikobo\Kontiki\Services\FormService;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait TrashRestoreTrait
 {
@@ -41,8 +41,12 @@ trait TrashRestoreTrait
         return static::confirmTrashRestore($request, $response, $id, 'restore');
     }
 
-    public function confirmTrashRestore(Request $request, Response $response, int $id, string $actionType): Response
-    {
+    public function confirmTrashRestore(
+        Request $request,
+        Response $response,
+        int $id,
+        string $actionType
+    ): Response {
         $data = $this->model->getById($id);
 
         if (!$data) {

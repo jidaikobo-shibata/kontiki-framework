@@ -18,8 +18,7 @@ trait MetaDataTrait
             ->toArray();
 
         $retvals = [];
-        foreach ($result as $each)
-        {
+        foreach ($result as $each) {
             $retvals[$each['meta_key']] = $each['meta_value'];
         }
 

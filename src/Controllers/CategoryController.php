@@ -2,14 +2,7 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Aura\Session\Session;
-use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\CategoryModel;
-use Jidaikobo\Kontiki\Services\GetRoutesService;
-use Slim\App;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
-use Slim\Views\PhpRenderer;
 
 class CategoryController extends BaseController
 {
@@ -24,7 +17,6 @@ class CategoryController extends BaseController
 
     protected function setModel(): void
     {
-        $db = Database::getInstance()->getConnection();
-        $this->model = new CategoryModel($db);
+        $this->model = new CategoryModel();
     }
 }

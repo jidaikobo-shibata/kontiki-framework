@@ -12,7 +12,8 @@ trait ExpiredTrait
     public function applyExpiredConditions(Builder $query): Builder
     {
         $currentTime = Carbon::now('UTC')->format('Y-m-d H:i:s');
-        return $query->where($this->expiredField, '<=', $currentTime);
+        return $query->whereNotNull($this->expiredField)
+            ->where($this->expiredField, '<=', $currentTime);
     }
 
     public function applyNotExpiredConditions(Builder $query): Builder

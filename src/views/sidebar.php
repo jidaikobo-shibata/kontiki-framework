@@ -14,7 +14,7 @@
       <?php
         foreach ($sidebarItems as $controller => $links) :
             $dataPath = env('BASEPATH') . '/' . $controller;
-      ?>
+            ?>
           <li class="nav-item" data-path="<?= e($dataPath) ?>">
             <a href="#" class="nav-link" aria-expanded="false">
               <i class="nav-icon fas fa-folder"></i>

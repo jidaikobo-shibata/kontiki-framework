@@ -8,9 +8,9 @@ class FileModel extends BaseModel
 
     protected string $table = 'files';
 
-    public function getFieldDefinitions(array $params = []): array
+    public function setFieldDefinitions(array $params = []): void
     {
-        return [
+        $fields = [
             'id' => [
                 'label' => 'ID',
             ],
@@ -47,5 +47,6 @@ class FileModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
         ];
+        $this->fieldDefinitions = $fields;
     }
 }

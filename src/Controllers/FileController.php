@@ -6,9 +6,11 @@ use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\FileModel;
 use Jidaikobo\Kontiki\Services\FileService;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 use Slim\App;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
 
 class FileController extends BaseController
 {
@@ -28,8 +30,7 @@ class FileController extends BaseController
 
     protected function setModel(): void
     {
-        $db = Database::getInstance()->getConnection();
-        $this->model = new FileModel($db);
+        $this->model = new FileModel();
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void

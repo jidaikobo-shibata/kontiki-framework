@@ -9,6 +9,10 @@ namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
  */
 trait FieldDefinitionTrait
 {
+    protected ?array $fieldDefinitions = null;
+
+    abstract function setFieldDefinitions(array $params = []): void;
+
     /**
      * Get the field definitions.
      *
@@ -18,7 +22,13 @@ trait FieldDefinitionTrait
      * @return array Field definitions where each key represents a field name
      *               and its value contains field metadata.
      */
-    abstract public function getFieldDefinitions(array $params = []): array;
+    public function getFieldDefinitions(array $params = []): array
+    {
+        if ($this->fieldDefinitions === null) {
+            $this->setFieldDefinitions($params);
+        }
+        return $this->fieldDefinitions;
+    }
 
     /**
      * Get the metadata field definitions.
@@ -134,7 +144,8 @@ trait FieldDefinitionTrait
             'template' => $options['template'] ?? 'default',
             'group' => $options['group'] ?? 'main',
             'fieldset_template' => $options['fieldset_template'] ?? 'forms/fieldset/flat.php',
-            'display_in_list' => $options['display_in_list'] ?? false
+            'display_in_list' => $options['display_in_list'] ?? false,
+            'save_as_utc' => $options['save_as_utc'] ?? false
         ];
     }
 }

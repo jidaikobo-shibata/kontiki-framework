@@ -4,8 +4,8 @@ namespace Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 
 use Jidaikobo\Log;
 use Jidaikobo\Kontiki\Utils\MessageUtils;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait CRUDTrait
 {
@@ -76,7 +76,6 @@ trait CRUDTrait
         $fields = $this->model->getFieldDefinitions();
         $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
         $validationResult = $this->model->validateByFields($fileData, $fields);
-
 
         if (!$validationResult['valid']) {
             return $this->messageResponse(
