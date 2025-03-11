@@ -1,10 +1,11 @@
+/admin/.htaccess
+/admin/index.php
 /app/Controllers/
 /app/Models/
 /app/views/
 /vendor/
 /logs/
 /public/
-/phpcs.xml
 /db/production/database.sqlite3
 /db/development/database.sqlite3
 /bin/phinx
@@ -16,3 +17,5 @@
 GPATH
 GRTAGS
 GTAGS
+scrutinizer.yml
+/phpcs.xml

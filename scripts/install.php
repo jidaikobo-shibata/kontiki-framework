@@ -40,6 +40,8 @@ function prompt($message, $default = null, $allowedValues = null) {
     }
 }
 
+$basePath = basename(diname(__DIR__));
+
 echo "Welcome to Kontiki CMS Setup.\n\n";
 
 // Prompt the user for input
@@ -48,6 +50,7 @@ do {
     $projectLang = prompt("Project language", "en", ['en', 'ja']);
     $projectTimezone = prompt("Project timezone", date_default_timezone_get());
     $projectEnv = prompt("Project environment", "production", ['staging', 'production']);
+    $projectAdminDir = prompt("Project Administration dir", "admin");
     $projectBaseurl = prompt("Base URL (ex: https://example.com)");
 
     echo "\nPlease check your input:\n";
@@ -56,6 +59,7 @@ do {
     echo " Project Language : $projectLang\n";
     echo " Project Timezone : $projectTimezone\n";
     echo " Project Environment : $projectEnv\n";
+    echo " Project Admin Dir : $projectAdminDir\n";
     echo " Project URL : $projectBaseurl\n";
     echo "----------------------------------\n";
 
@@ -80,14 +84,14 @@ BASEURL="$projectBaseurl"
 BASEURL_UPLOAD_DIR=/uploads
 
 # Base path for Slim's setBasePath
-BASEPATH=/cms
+BASEPATH=/$basePath
 
 # Database connection information
 DB_DATABASE=db/$projectEnv/database.sqlite3
 
 # Upload directory
 # Relative path from the project root
-UPLOADDIR=/../cms/uploads
+UPLOADDIR=/../uploads
 
 # Allowed MIME types (in JSON format)
 ALLOWED_MIME_TYPES=["image/jpeg","image/png","application/pdf"]
@@ -125,6 +129,64 @@ if (!file_exists($dbFile)) {
     touch($dbFile);
     echo "\n Created SQLite database file at $dbFile\n";
 }
+
+// Ensure the admin dir directory exists
+$adminDir = __DIR__ . "/../$projectAdminDir";
+if (!is_dir($adminDir)) {
+    mkdir($adminDir, 0777, true);
+    echo "\n Created administration directory at $adminDir\n";
+}
+
+// Create `.htaccess`
+$htaccessContent = <<<EOL
+Order allow,deny
+Allow from all
+
+# mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /$basepath/$projectAdminDir/
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# anti directly-index
+Options -Indexes
+
+# deny for dot file
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+EOL;
+
+$htaccessFilePath = __DIR__ . "/../{$projectAdminDir}/.htaccess";
+if (file_put_contents($htaccessFilePath, $htaccessContent) === false) {
+    echo "\n Error: Failed to create `.htaccess` file at $htaccessFilePath!\n";
+    exit(1);
+}
+echo "\n `.htaccess` file has been created at $htaccessFilePath!\n";
+
+// Create `index`
+$indexContent = <<<EOL
+<?php
+
+// autoload
+require __DIR__ . '/../vendor/autoload.php';
+
+// Execute Slim
+$env = "$projectEnv";
+$app = Jidaikobo\Kontiki\Bootstrap::init($env);
+Jidaikobo\Kontiki\Bootstrap::run($app);
+EOL;
+
+$indexFilePath = __DIR__ . "/../{$projectAdminDir}/index.php";
+if (file_put_contents($indexFilePath, $indexContent) === false) {
+    echo "\n Error: Failed to create `.index` file at $indexFilePath!\n";
+    exit(1);
+}
+echo "\n `.index` file has been created at $indexFilePath!\n";
 
 // Run Phinx migrations without `system()`
 try {
