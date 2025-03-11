@@ -19,7 +19,11 @@ class CreatePostsTable extends AbstractMigration
               ->addColumn('expired_at', 'timestamp', ['null' => true, 'default' => null])
               ->addColumn('deleted_at', 'timestamp', ['null' => true, 'default' => null])
               ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
-              ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
+              ->addColumn(
+                  'updated_at',
+                  'timestamp',
+                  ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP']
+              )
               ->addIndex(['post_type', 'slug'], ['unique' => true])
               ->addIndex(['sort_order'])
               ->create();
