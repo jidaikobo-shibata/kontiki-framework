@@ -32,9 +32,19 @@ class AdminController
      */
     public function serveJs(Request $request, Response $response): Response
     {
-        $content = $this->view->fetch('js/admin.js.php');
+        $content = $this->view->fetch(
+            'js/admin.js.php',
+            [
+                'published' => __('published'),
+                'reserved' => __('reserved'),
+                'expired' => __('expired'),
+            ]
+        );
         $response->getBody()->write($content);
-        return $response->withHeader('Content-Type', 'application/javascript; charset=utf-8')->withStatus(200);
+        return $response->withHeader(
+            'Content-Type',
+            'application/javascript; charset=utf-8'
+        )->withStatus(200);
     }
 
     /**
@@ -49,7 +59,7 @@ class AdminController
         $response->getBody()->write($content);
         return $response
             ->withHeader('Content-Type', 'image/x-icon')
-            ->withHeader('Cache-Control', 'public, max-age=86400') // 1日キャッシュ
+            ->withHeader('Cache-Control', 'public, max-age=86400')
             ->withStatus(200);
     }
 }

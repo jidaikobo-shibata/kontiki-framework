@@ -9,9 +9,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php
+    $basePath = env('BASEPATH', '');
     $faviconPath = env('ADMIN_FAVICON_PATH', '');
     if (!empty($faviconPath)) :
-        echo '  <link rel="shortcut icon" href="' . $faviconPath . '">';
+        echo '  <link rel="shortcut icon" href="' . $basePath . '/' . $faviconPath . '">';
     endif;
     ?>
 
@@ -26,9 +27,9 @@
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
   <!-- Scripts -->
-  <script src="<?= env('BASEPATH', '') ?>/fileManager.js"></script>
-  <script src="<?= env('BASEPATH', '') ?>/fileManagerInstance.js"></script>
-  <script src="<?= env('BASEPATH', '') ?>/admin.js"></script>
+  <script src="<?= $basePath ?>/fileManager.js"></script>
+  <script src="<?= $basePath ?>/fileManagerInstance.js"></script>
+  <script src="<?= $basePath ?>/admin.js"></script>
 
   <title><?= e($pageTitle) ?></title>
 </head>
@@ -40,7 +41,7 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= env('BASEPATH', '') ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
+    <a href="<?= $basePath ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->

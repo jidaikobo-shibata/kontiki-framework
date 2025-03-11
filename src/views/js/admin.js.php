@@ -1,4 +1,11 @@
-$(document).ready(function () {
+<?php
+
+/**
+  * @var string $published
+  * @var string $reserved
+  * @var string $expired
+  */
+?>$(document).ready(function () {
     /**
      * move button
      */
@@ -20,4 +27,37 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * update status (place bottom of this file)
+     */
+    let publishedAtInput = $("input[name=published_at]");
+    let expiredAtInput = $("input[name=expired_at]");
+
+    if (publishedAtInput.length === 0 && expiredAtInput.length === 0) {
+        return;
+    }
+
+    function updateStatusOption() {
+        let publishedAt = publishedAtInput.val();
+        let expiredAt = expiredAtInput.val();
+        let publishedOption = $("select[name=status] option[value=published]");
+
+        let publishedDate = publishedAt ? new Date(publishedAt) : null;
+        let expiredDate = expiredAt ? new Date(expiredAt) : null;
+        let now = new Date();
+
+        if (expiredDate && !isNaN(expiredDate.getTime()) && expiredDate <= now) {
+            publishedOption.text("<?= $expired ?>");
+        } else if (publishedDate && !isNaN(publishedDate.getTime()) && publishedDate > now) {
+            publishedOption.text("<?= $reserved ?>");
+        } else {
+            publishedOption.text("<?= $published ?>");
+        }
+    }
+
+    updateStatusOption();
+
+    $("input[name=published_at], input[name=expired_at]").on("input change", function () {
+        updateStatusOption();
+    });
 });

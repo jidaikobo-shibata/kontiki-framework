@@ -125,8 +125,22 @@ class TableRenderer
 
         $values = [__($row[$name]) ?: ''];
 
-        $this->addStatusIfConditionMet($values, $row, 'published_at', $currentTime, fn($time) => $time->greaterThan($currentTime), 'reserved');
-        $this->addStatusIfConditionMet($values, $row, 'expired_at', $currentTime, fn($time) => $currentTime->greaterThan($time), 'expired');
+        $this->addStatusIfConditionMet(
+            $values,
+            $row,
+            'published_at',
+            $currentTime,
+            fn($time) => $time->greaterThan($currentTime),
+            'reserved'
+        );
+        $this->addStatusIfConditionMet(
+            $values,
+            $row,
+            'expired_at',
+            $currentTime,
+            fn($time) => $currentTime->greaterThan($time),
+            'expired'
+        );
 
         return $values;
     }
@@ -141,12 +155,18 @@ class TableRenderer
      * @param callable $condition Callback that takes a Carbon instance and returns a boolean.
      * @param string $status      The status text to add if the condition is met.
      */
-    private function addStatusIfConditionMet(array &$values, array $row, string $key, Carbon $currentTime, callable $condition, string $status): void
-    {
+    private function addStatusIfConditionMet(
+        array &$values,
+        array $row,
+        string $key,
+        Carbon $currentTime,
+        callable $condition,
+        string $status
+    ): void {
         if (!empty($row[$key])) {
             $time = new Carbon($row[$key]);
             if ($condition($time)) {
-                $values[] = __($status);
+                $values[0] = __($status);
             }
         }
     }
