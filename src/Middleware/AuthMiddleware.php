@@ -25,7 +25,7 @@ class AuthMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $path = str_replace(env('BASEPATH', ''), '', $request->getUri()->getPath());
+        $path = '/' . basename($request->getUri()->getPath());
 
         // for guest routes
         if (in_array($path, $this->excludedRoutes, true)) {
