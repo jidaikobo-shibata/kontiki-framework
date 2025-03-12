@@ -40,7 +40,7 @@ function prompt($message, $default = null, $allowedValues = null) {
     }
 }
 
-$basePath = basename(diname(__DIR__));
+$basePath = basename(dirname(__DIR__));
 
 echo "Welcome to Kontiki CMS Setup.\n\n";
 
