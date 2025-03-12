@@ -138,14 +138,39 @@ if (!is_dir($adminDir)) {
 }
 
 // Create `.htaccess`
+# htaccessContent
+$indexContent = sprintf(
+    "Order allow,deny
+Allow from all
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /%s/%s/
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# anti directly-index
+Options -Indexes
+
+# deny for dot file
+<FilesMatch \"^\\.\">
+    Require all denied
+</FilesMatch>
+",
+    $basePath,
+    $projectAdminDir
+);
+
 $htaccessContent = <<<EOL
 Order allow,deny
 Allow from all
 
-# mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /$basepath/$projectAdminDir/
+    RewriteBase /$basePath/$projectAdminDir/
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -169,17 +194,19 @@ if (file_put_contents($htaccessFilePath, $htaccessContent) === false) {
 echo "\n `.htaccess` file has been created at $htaccessFilePath!\n";
 
 // Create `index`
-$indexContent = <<<EOL
-<?php
+$indexContent = sprintf(
+    "<?php
 
 // autoload
 require __DIR__ . '/../vendor/autoload.php';
 
 // Execute Slim
-$env = "$projectEnv";
-$app = Jidaikobo\Kontiki\Bootstrap::init($env);
-Jidaikobo\Kontiki\Bootstrap::run($app);
-EOL;
+\$env = \"%s\";
+\$app = Jidaikobo\Kontiki\Bootstrap::init(\$env);
+Jidaikobo\Kontiki\Bootstrap::run(\$app);
+",
+    $projectEnv
+);
 
 $indexFilePath = __DIR__ . "/../{$projectAdminDir}/index.php";
 if (file_put_contents($indexFilePath, $indexContent) === false) {
