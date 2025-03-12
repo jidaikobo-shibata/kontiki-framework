@@ -49,7 +49,7 @@ class Dependencies
         $container->set(
             PhpRenderer::class,
             function () {
-                return new PhpRenderer(env('PROJECT_PATH', '') . '/src/views');
+                return new PhpRenderer(__DIR__ . '/../../src/views');
             }
         );
 
