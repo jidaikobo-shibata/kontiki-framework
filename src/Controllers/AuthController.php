@@ -130,39 +130,63 @@ class AuthController extends BaseController
     function isIpBlocked(string $ip): bool
     {
         $db = Database::getInstance()->getConnection();
-
-        $now = time();
-        $blockDuration = 900; // block 15min
-        $limitDuration = 180; // in 3min
-        $maxAttempts = 5;     // max 5 attempts
-
-        // Get the current rate limit state
-        $record = $db->table('rate_limit')
-            ->where('ip_address', $ip)
-            ->first();
+        $record = $this->getRateLimitRecord($db, $ip);
 
         if (!$record) {
-            return false; // If no records, no limit
+            return false; // No record means no limit
         }
 
-        // Check if already blocked
-        if (!is_null($record->blocked_until) && $record->blocked_until > $now) {
+        if ($this->isCurrentlyBlocked($record)) {
             return true;
         }
 
-        // blocking process will be implemented.
-        if (
-            $record->attempt_count >= $maxAttempts &&
-            ($now - $record->first_attempt) <= $limitDuration
-        ) {
-            $db->table('rate_limit')
-                ->where('ip_address', $ip)
-                ->update(['blocked_until' => $now + $blockDuration]);
-
+        if ($this->shouldBlockIp($record)) {
+            $this->blockIp($db, $ip);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Get the rate limit record for the given IP.
+     */
+    private function getRateLimitRecord($db, string $ip)
+    {
+        return $db->table('rate_limit')
+            ->where('ip_address', $ip)
+            ->first();
+    }
+
+    /**
+     * Check if the IP is currently blocked.
+     */
+    private function isCurrentlyBlocked($record): bool
+    {
+        return !is_null($record->blocked_until) && $record->blocked_until > time();
+    }
+
+    /**
+     * Determine if the IP should be blocked based on rate limit conditions.
+     */
+    private function shouldBlockIp($record): bool
+    {
+        $limitDuration = 180; // 3 minutes
+        $maxAttempts = 5;     // max 5 attempts
+
+        return $record->attempt_count >= $maxAttempts &&
+               (time() - $record->first_attempt) <= $limitDuration;
+    }
+
+    /**
+     * Block the IP by updating the database.
+     */
+    private function blockIp($db, string $ip): void
+    {
+        $blockDuration = 900; // block for 15 minutes
+        $db->table('rate_limit')
+            ->where('ip_address', $ip)
+            ->update(['blocked_until' => time() + $blockDuration]);
     }
 
     private function resetRateLimit(string $ip): void
