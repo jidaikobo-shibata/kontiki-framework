@@ -19,7 +19,7 @@ class Bootstrap
         Log::getInstance()->registerHandlers();
 
         // load config
-        $projectPath = $env == 'production' ? dirname(__DIR__, 4) : dirname(__DIR__);
+        $projectPath = $env == 'development' ? dirname(__DIR__) : dirname(__DIR__, 4);
         $dotenv = Dotenv::createImmutable($projectPath . "/config/{$env}/");
         $dotenv->load();
 
