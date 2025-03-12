@@ -146,8 +146,8 @@ Allow from all
     RewriteEngine On
     RewriteBase /%s/%s/
 
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %%{REQUEST_FILENAME} !-f
+    RewriteCond %%{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L]
 </IfModule>
 
