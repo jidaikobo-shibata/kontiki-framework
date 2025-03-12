@@ -138,8 +138,7 @@ if (!is_dir($adminDir)) {
 }
 
 // Create `.htaccess`
-# htaccessContent
-$indexContent = sprintf(
+$htaccessContent = sprintf(
     "Order allow,deny
 Allow from all
 
@@ -163,28 +162,6 @@ Options -Indexes
     $basePath,
     $projectAdminDir
 );
-
-$htaccessContent = <<<EOL
-Order allow,deny
-Allow from all
-
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /$basePath/$projectAdminDir/
-
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
-</IfModule>
-
-# anti directly-index
-Options -Indexes
-
-# deny for dot file
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-EOL;
 
 $htaccessFilePath = __DIR__ . "/../{$projectAdminDir}/.htaccess";
 if (file_put_contents($htaccessFilePath, $htaccessContent) === false) {
