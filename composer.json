@@ -1,17 +1,12 @@
 {
-    "name": "jidaikobo/kontiki",
-    "type": "project",
+    "name": "jidaikobo/kontiki-framework",
+    "type": "library",
     "authors": [
         {
             "name": "jidaikobo-shibata",
             "email": "shibata@jidaikobo.com"
         }
     ],
-    "scripts": {
-        "post-create-project-cmd": [
-            "@php scripts/install.php"
-        ]
-    },
     "license": "MIT",
     "require": {
         "slim/slim": "^4.14",
@@ -29,8 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Jidaikobo\\Kontiki\\": "src/",
-            "App\\": "app/"
+            "Jidaikobo\\Kontiki\\": "src/"
         }
     },
     "config": {
