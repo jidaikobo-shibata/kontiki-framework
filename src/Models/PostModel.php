@@ -5,7 +5,9 @@ namespace Jidaikobo\Kontiki\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
+
 use Jidaikobo\Kontiki\Core\Auth;
+use Jidaikobo\Kontiki\Core\Database;
 
 class PostModel extends BaseModel
 {
@@ -21,6 +23,19 @@ class PostModel extends BaseModel
     protected string $table = 'posts';
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
+
+    private UserModel $userModel;
+    private Auth $auth;
+
+    public function __construct(
+        Database $db,
+        Auth $auth,
+        UserModel $userModel
+    ) {
+        $this->db = $db->getConnection();
+        $this->userModel = $userModel;
+        $this->auth = $auth;
+    }
 
     public function setFieldDefinitions(array $params = []): void
     {
@@ -92,10 +107,7 @@ class PostModel extends BaseModel
 
     private function getParentIdField(?int $id): array
     {
-        static $parentOptions = [];
-        if (empty($parentOptions)) {
-            $parentOptions = $this->getOptions('title', true, '', $id);
-        }
+        $parentOptions = $this->getOptions('title', true, '', $id);
         return $this->getField(
             'parent',
             [
@@ -159,12 +171,8 @@ class PostModel extends BaseModel
 
     private function getCreatorIdField(): array
     {
-        static $userOptions = [];
-        if (empty($userOptions)) {
-            $userModel = new UserModel();
-            $userOptions = $userModel->getOptions('username');
-        }
-        $user = Auth::getInstance()->getCurrentUser();
+        $userOptions = $this->userModel->getOptions('username');
+        $user = $this->auth->getCurrentUser();
         return $this->getField(
             'creator',
             [

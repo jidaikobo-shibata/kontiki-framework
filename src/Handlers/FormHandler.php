@@ -10,16 +10,20 @@ use Jidaikobo\Kontiki\Utils\FormUtils;
 class FormHandler
 {
     private DOMDocument $dom;
-    private ModelInterface $model;
+    private ?ModelInterface $model = null;
 
-    public function __construct(string $html, ModelInterface $model)
+    public function setModel(ModelInterface $model): void
+    {
+        $this->model = $model;
+    }
+
+    public function setHtml(string $html): void
     {
         $this->dom = new DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
         if (!empty($html)) {
             $this->loadHTML($html);
         }
-        $this->model = $model;
     }
 
     public function loadHTML(string $html): void

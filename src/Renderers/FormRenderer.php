@@ -7,13 +7,17 @@ use Slim\Views\PhpRenderer;
 
 class FormRenderer
 {
-    protected $fields;
-    protected $view;
+    private array $fields;
+    private PhpRenderer $view;
 
-    public function __construct(array $fields, PhpRenderer $view)
+    public function __construct(PhpRenderer $view)
+    {
+        $this->view = $view;
+    }
+
+    public function setFields(array $fields): void
     {
         $this->fields = $fields;
-        $this->view = $view;
     }
 
     public function render(): string

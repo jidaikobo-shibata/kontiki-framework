@@ -2,8 +2,11 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
+use Slim\App;
+
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Services\FormService;
 
 class UserController extends BaseController
 {
@@ -14,11 +17,19 @@ class UserController extends BaseController
 
     protected string $adminDirName = 'user';
     protected string $label = 'User';
-    protected UserModel $model;
 
-    protected function setModel(): void
-    {
-        $this->model = new UserModel();
+    private FormService $formService;
+    private UserModel $model;
+
+    public function __construct(
+        App $app,
+        FormService $formService,
+        UserModel $model
+    ) {
+        parent::__construct($app);
+        $this->formService = $formService;
+        $this->formService->setModel($model);
+        $this->model = $model;
     }
 
     private function hashPassword(string $password): string

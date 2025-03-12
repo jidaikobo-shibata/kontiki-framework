@@ -22,9 +22,9 @@ abstract class BaseModel implements ModelInterface
     protected string $deleteType = 'hardDelete';
     protected Connection $db;
 
-    public function __construct()
+    public function __construct(Database $db)
     {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = $db->getConnection();
     }
 
     public function getDeleteType(): string

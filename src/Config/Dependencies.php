@@ -5,10 +5,12 @@ namespace Jidaikobo\Kontiki\Config;
 use Aura\Session\SessionFactory;
 use Aura\Session\Session;
 use DI\Container;
-use Jidaikobo\Kontiki\Services\FileService;
-use Jidaikobo\Kontiki\Services\RoutesService;
 use Slim\App;
 use Slim\Views\PhpRenderer;
+
+use Jidaikobo\Kontiki\Services\FileService;
+use Jidaikobo\Kontiki\Services\RoutesService;
+use Jidaikobo\Kontiki\Core\Database;
 
 class Dependencies
 {
@@ -26,6 +28,20 @@ class Dependencies
 
         // Set up App
         $container->set(App::class, $this->app);
+
+        // database
+        $container->set(
+            Database::class,
+            function () {
+                return new Database([
+                        'driver' => 'sqlite',
+                        'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
+                        'charset' => 'utf8',
+                        'collation' => 'utf8_unicode_ci',
+                        'prefix' => '',
+                    ]);
+            }
+        );
 
         // Set up a Aura\Session instance
         $container->set(

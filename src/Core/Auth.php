@@ -8,30 +8,14 @@ use Jidaikobo\Kontiki\Models\UserModel;
 
 class Auth
 {
-    private static ?Auth $instance = null;
     private UserModel $userModel;
     private Session $session;
     private string $segment = 'jidaikobo\kontiki\auth';
 
-    private function __construct(Session $session)
+    public function __construct(Session $session, UserModel $userModel)
     {
         $this->session = $session;
-        $this->userModel = new UserModel();
-    }
-
-    public static function setInstance(Session $session): void
-    {
-        if (self::$instance === null) {
-            self::$instance = new self($session);
-        }
-    }
-
-    public static function getInstance(): Auth
-    {
-        if (self::$instance === null) {
-            throw new \RuntimeException("Call setInstance() first.");
-        }
-        return self::$instance;
+        $this->userModel = $userModel;
     }
 
     /**

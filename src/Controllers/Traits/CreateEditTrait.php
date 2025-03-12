@@ -2,7 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Controllers\Traits;
 
-use Jidaikobo\Kontiki\Services\FormService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -28,15 +27,14 @@ trait CreateEditTrait
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
 
-        $formService = new FormService($this->view, $this->model);
-        $formHtml = $formService->formHtml(
+        $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/create",
             $fields,
             $this->csrfManager->getToken(),
             '',
             __("x_save", 'Save :name', ['name' => __($this->label)]),
         );
-        $formHtml = $formService->addMessages(
+        $formHtml = $this->formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );
@@ -64,15 +62,14 @@ trait CreateEditTrait
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
 
-        $formService = new FormService($this->view, $this->model);
-        $formHtml = $formService->formHtml(
+        $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
             '',
             __("x_save", 'Save :name', ['name' => __($this->label)]),
         );
-        $formHtml = $formService->addMessages(
+        $formHtml = $this->formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', []),
             $this->flashManager->getData('success', [])

@@ -51,16 +51,6 @@ class Bootstrap
         $dependencies = new Config\Dependencies($app);
         $dependencies->register();
 
-        // Set Singleton - use it minimum!
-        Core\Database::setInstance([
-                'driver' => 'sqlite',
-                'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
-                'charset' => 'utf8',
-                'collation' => 'utf8_unicode_ci',
-                'prefix' => '',
-            ]);
-        Core\Auth::setInstance($app->getContainer()->get(\Aura\Session\Session::class));
-
         // Set Route
         $routesClass = class_exists('App\Config\Routes')
             ? new \App\Config\Routes()

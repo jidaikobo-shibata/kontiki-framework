@@ -12,14 +12,18 @@ use Slim\Views\PhpRenderer;
 class AuthMiddleware implements MiddlewareInterface
 {
     private PhpRenderer $view;
+    private Auth $auth;
     private array $excludedRoutes = [
         '/favicon.ico',
         '/login',
         '/logout',
     ];
 
-    public function __construct(PhpRenderer $view)
-    {
+    public function __construct(
+        PhpRenderer $view,
+        Auth $auth
+    ) {
+        $this->auth = $auth;
         $this->view = $view;
     }
 
@@ -33,7 +37,7 @@ class AuthMiddleware implements MiddlewareInterface
         }
 
         // for login users
-        if (!Auth::getInstance()->isLoggedIn()) {
+        if (!$this->auth->isLoggedIn()) {
             $response = new \Slim\Psr7\Response();
             $content = $this->view->fetch('error/404.php');
             return $this->view->render(

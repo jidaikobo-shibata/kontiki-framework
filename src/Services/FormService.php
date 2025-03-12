@@ -14,20 +14,23 @@ use Slim\Views\PhpRenderer;
  */
 class FormService
 {
-    private ModelInterface $model;
     private PhpRenderer $view;
+    private FormRenderer $formRenderer;
+    private FormHandler $formHandler;
+    private ?ModelInterface $model = null;
 
-    /**
-     * Constructor
-     *
-     * @param PhpRenderer     $view  The view renderer.
-     * @param ModelInterface  $model The associated model.
-     */
     public function __construct(
-        PhpRenderer $view,
-        ModelInterface $model
+        FormRenderer $formRenderer,
+        FormHandler $formHandler,
+        PhpRenderer $view
     ) {
+        $this->formRenderer = $formRenderer;
+        $this->formHandler = $formHandler;
         $this->view = $view;
+    }
+
+    public function setModel(ModelInterface $model): void
+    {
         $this->model = $model;
     }
 
@@ -49,16 +52,14 @@ class FormService
         string $description = '',
         string $buttonText = 'Submit'
     ): string {
-//$this->model
-
-        $formRenderer = new FormRenderer($fields, $this->view);
+        $this->formRenderer->setFields($fields);
 
         return $this->view->fetch(
             'forms/edit.php',
             [
                 'actionAttribute' => env('BASEPATH', '') . $action,
                 'csrfToken' => $csrfToken,
-                'formHtml' => $formRenderer->render(),
+                'formHtml' => $this->formRenderer->render(),
                 'description' => $description,
                 'buttonText' => $buttonText,
             ]
@@ -72,12 +73,15 @@ class FormService
      *
      * @return string The processed HTML with errors and success messages.
      */
-    public function addMessages(string $formHtml, array $errors, array $success = array()): string
-    {
-        $formHandler = new FormHandler($formHtml, $this->model);
-        $formHandler->addErrors($errors);
-        $formHandler->addSuccessMessages($success);
-
-        return $formHandler->getHtml();
+    public function addMessages(
+        string $formHtml,
+        array $errors,
+        array $success = array()
+    ): string {
+        $this->formHandler->setHtml($formHtml);
+        $this->formHandler->setModel($this->model);
+        $this->formHandler->addErrors($errors);
+        $this->formHandler->addSuccessMessages($success);
+        return $this->formHandler->getHtml();
     }
 }

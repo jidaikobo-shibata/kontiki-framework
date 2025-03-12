@@ -2,9 +2,11 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
+use Slim\App;
+
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\PostModel;
-use Slim\App;
+use Jidaikobo\Kontiki\Services\FormService;
 
 class PostController extends BaseController
 {
@@ -22,10 +24,17 @@ class PostController extends BaseController
 
     protected string $adminDirName = 'post';
     protected string $label = 'Post';
-    protected PostModel $model;
 
-    protected function setModel(): void
-    {
-        $this->model = new PostModel();
+    private PostModel $model;
+
+    public function __construct(
+        App $app,
+        FormService $formService,
+        PostModel $model
+    ) {
+        parent::__construct($app);
+        $this->formService = $formService;
+        $this->formService->setModel($model);
+        $this->model = $model;
     }
 }
