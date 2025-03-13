@@ -58,8 +58,7 @@ trait TrashRestoreTrait
 
         $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;
 
-        $formService = new FormService($this->view, $this->model);
-        $formHtml = $formService->formHtml(
+        $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/{$actionType}/{$id}",
             $data,
             $this->csrfManager->getToken(),
@@ -70,7 +69,7 @@ trait TrashRestoreTrait
             ),
             __($buttonText),
         );
-        $formHtml = $formService->addMessages(
+        $formHtml = $this->formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );

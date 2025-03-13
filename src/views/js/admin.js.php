@@ -1,7 +1,7 @@
 <?php
 
 /**
-  * @var string $published
+  * @var string $publishing
   * @var string $reserved
   * @var string $expired
   */
@@ -51,7 +51,7 @@
         } else if (publishedDate && !isNaN(publishedDate.getTime()) && publishedDate > now) {
             publishedOption.text("<?= $reserved ?>");
         } else {
-            publishedOption.text("<?= $published ?>");
+            publishedOption.text("<?= $publishing ?>");
         }
     }
 
@@ -60,4 +60,5 @@
     $("input[name=published_at], input[name=expired_at]").on("input change", function () {
         updateStatusOption();
     });
+
 });

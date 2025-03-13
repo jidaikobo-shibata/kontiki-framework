@@ -193,12 +193,24 @@ trait CreateEditTrait
             $id = $this->saveData($actionType, $id, $data);
             $this->flashManager->addMessage(
                 'success',
-                __("x_save_success", ':name Saved successfully.', ['name' => __($this->label)])
+                __(
+                    "x_save_success",
+                    ':name Saved successfully.',
+                    ['name' => __($this->label)]
+                )
             );
-            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/edit/{$id}");
+            return $this->redirectResponse(
+                $request,
+                $response,
+                "/{$this->adminDirName}/edit/{$id}"
+            );
         } catch (\Exception $e) {
             $this->flashManager->addErrors([[$e->getMessage()]]);
-            return $this->redirectResponse($request, $response, $this->getDefaultRedirect($actionType, $id));
+            return $this->redirectResponse(
+                $request,
+                $response,
+                $this->getDefaultRedirect($actionType, $id)
+            );
         }
     }
 

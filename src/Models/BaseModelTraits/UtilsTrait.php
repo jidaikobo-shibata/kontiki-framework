@@ -9,7 +9,7 @@ trait UtilsTrait
     public function processDataBeforeSave(array $data): array
     {
         foreach ($data as $field => $value) {
-            $saveAsUtc = $this->fieldDefinitions[$field]['save_as_utc'] ?? false;
+            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
             if ($saveAsUtc) {
                 if (empty($value)) {
                     $data[$field] = null;
@@ -22,10 +22,11 @@ trait UtilsTrait
         return $data;
     }
 
+
     public function processDataBeforeGet(array $data): array
     {
         foreach ($data as $field => $value) {
-            $saveAsUtc = $this->fieldDefinitions[$field]['save_as_utc'] ?? false;
+            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
             if ($saveAsUtc && !empty($value)) {
                 $date = Carbon::parse($value, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
                 $data[$field] = $date->format('Y-m-d H:i:s');

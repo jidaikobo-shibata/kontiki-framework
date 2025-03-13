@@ -19,18 +19,17 @@ class FileController extends BaseController
     use FileControllerTraits\ListTrait;
     use FileControllerTraits\MessagesTrait;
 
-    protected FileService $fileService;
-    protected FileModel $model;
+    private FileModel $model;
+    private FileService $fileService;
 
-    public function __construct(App $app, FileService $fileService)
-    {
+    public function __construct(
+        App $app,
+        FileModel $model,
+        FileService $fileService
+    ) {
         parent::__construct($app);
+        $this->model = $model;
         $this->fileService = $fileService;
-    }
-
-    protected function setModel(): void
-    {
-        $this->model = new FileModel();
     }
 
     public static function registerRoutes(App $app, string $basePath = ''): void

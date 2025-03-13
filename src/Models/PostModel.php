@@ -107,7 +107,8 @@ class PostModel extends BaseModel
 
     private function getParentIdField(?int $id): array
     {
-        $parentOptions = $this->getOptions('title', true, '', $id);
+        // $parentOptions = $this->getOptions('title', true, '', $id);
+        $parentOptions = [];
         return $this->getField(
             'parent',
             [
@@ -131,7 +132,8 @@ class PostModel extends BaseModel
                 'description' => __('published_at_exp'),
                 'default' => $now,
                 'group' => 'meta',
-                'save_as_utc' => true
+                'save_as_utc' => true,
+                'display_in_list' => true
             ]
         );
     }
@@ -157,9 +159,10 @@ class PostModel extends BaseModel
                 'type' => 'select',
                 'options' => [
                     'draft' => __('draft'),
-                    'published' => __('published'),
+                    'published' => __('publishing'),
                     'pending' => __('pending'),
                 ],
+                'default' => 'published',
                 'attributes' => [
                     'class' => 'form-control form-select'
                 ],
@@ -192,7 +195,6 @@ class PostModel extends BaseModel
         return $this->getReadOnlyField(
             __('created_at', 'Created'),
             [
-                'display_in_list' => true,
                 'save_as_utc' => true
             ]
         );

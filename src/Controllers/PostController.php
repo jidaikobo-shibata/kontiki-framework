@@ -26,6 +26,7 @@ class PostController extends BaseController
     protected string $label = 'Post';
 
     private PostModel $model;
+    private FormService $formService;
 
     public function __construct(
         App $app,

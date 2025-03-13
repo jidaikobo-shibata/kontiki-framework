@@ -13,9 +13,10 @@ use Slim\App;
 
 class AuthController extends BaseController
 {
-    private UserModel $model;
-    private RateLimitService $rateLimitService;
+    private Auth $auth;
     private FormService $formService;
+    private RateLimitService $rateLimitService;
+    private UserModel $model;
 
     public function __construct(
         App $app,

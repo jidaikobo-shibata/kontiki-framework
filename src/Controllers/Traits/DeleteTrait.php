@@ -37,8 +37,7 @@ trait DeleteTrait
         $data = $this->model->getFieldDefinitionsWithDefaults($data);
         $data = $this->processFieldForDelete($data);
 
-        $formService = new FormService($this->view, $this->model);
-        $formHtml = $formService->formHtml(
+        $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/delete/{$id}",
             $data,
             $this->csrfManager->getToken(),
@@ -49,7 +48,7 @@ trait DeleteTrait
             ),
             __("delete", "Delete"),
         );
-        $formHtml = $formService->addMessages(
+        $formHtml = $this->formService->addMessages(
             $formHtml,
             $this->flashManager->getData('errors', [])
         );
