@@ -52,8 +52,9 @@ class PostModel extends BaseModel
             'expired_at' => $this->getExpiredAtField(),
             'published_at' => $this->getPublishedAtField(),
             'creator_id' => $this->getCreatorIdField(),
-            'created_at' => $this->getCreatedAtField(),
             'updated_at' => $this->getUpdatedAtField(),
+            'deleted_at' => $this->getDeletedAtField(),
+            'created_at' => $this->getCreatedAtField(),
         ];
         $MetaData = $this->getMetaDataFieldDefinitions($params);
         $this->fieldDefinitions = array_merge($fields, $MetaData);
@@ -133,8 +134,8 @@ class PostModel extends BaseModel
                 'default' => $now,
                 'group' => 'meta',
                 'save_as_utc' => true,
-                'display_in_list' => true,
-                'fieldset_template' => 'forms/fieldset/details.php'
+                'fieldset_template' => 'forms/fieldset/details.php',
+                'display_in_list' => 'reserved'
             ]
         );
     }
@@ -148,8 +149,8 @@ class PostModel extends BaseModel
                 'description' => __('expired_at_exp'),
                 'group' => 'meta',
                 'save_as_utc' => true,
-                'fieldset_template' => 'forms/fieldset/details.php'
-
+                'fieldset_template' => 'forms/fieldset/details.php',
+                'display_in_list' => 'expired'
             ]
         );
     }
@@ -198,7 +199,8 @@ class PostModel extends BaseModel
         return $this->getReadOnlyField(
             __('created_at', 'Created'),
             [
-                'save_as_utc' => true
+                'save_as_utc' => true,
+                'display_in_list' => true
             ]
         );
     }
@@ -209,6 +211,17 @@ class PostModel extends BaseModel
             __('updated_at', 'Updated'),
             [
                 'save_as_utc' => true
+            ]
+        );
+    }
+
+    private function getDeletedAtField(): array
+    {
+        return $this->getReadOnlyField(
+            __('deleted_at', 'deleted'),
+            [
+                'save_as_utc' => true,
+                'display_in_list' => 'trash'
             ]
         );
     }

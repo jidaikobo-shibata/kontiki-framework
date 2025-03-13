@@ -31,7 +31,8 @@ class TableRenderer
 
         $this->fields = array_filter(
             $model->getFieldDefinitions(),
-            fn($field) => !empty($field['display_in_list'])
+            fn($field) => isset($field['display_in_list']) &&
+                ($field['display_in_list'] === true || $field['display_in_list'] == $context)
         );
 
         $this->data = $data;
