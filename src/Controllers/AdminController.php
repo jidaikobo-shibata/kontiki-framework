@@ -35,7 +35,7 @@ class AdminController
         $content = $this->view->fetch(
             'js/admin.js.php',
             [
-                'published' => __('published'),
+                'publishing' => __('publishing'),
                 'reserved' => __('reserved'),
                 'expired' => __('expired'),
             ]

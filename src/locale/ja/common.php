@@ -45,13 +45,14 @@ return [
     'draft' => '下書き',
     'reserved' => '予約',
     'expired' => '公開終了',
+    'publishing' => '公開',
     'published' => '公開中',
     'pending' => '非公開',
     'parent' => '親',
     'publishing_settings' => '公開設定',
     'display_filter' => '表示フィルタ',
 
-    'management_portal' => '管理画面',
+    'management_portal' => '管理項目一覧',
 
     // placeholders
     'x_management' => ':nameの管理',

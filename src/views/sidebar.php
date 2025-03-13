@@ -4,13 +4,11 @@
   */
 ?>
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <a href="<?= env('BASEPATH', '') ?>/dashboard" class="brand-link">
-    <span class="brand-text font-weight-light"><?= env('COPYRIGHT', '') ?></span>
-  </a>
-
+  <a href="<?= env('BASEURL', '#') ?>" class="brand-link" target="homepage"><span class="brand-text font-weight-light"><?= env('COPYRIGHT', '') ?></span></a>
   <div class="sidebar">
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <li class="nav-item"><a class="nav-link" href="<?= env('BASEPATH', '') ?>/dashboard"><?= __('management_portal') ?></a></li>
       <?php
         foreach ($sidebarItems as $controller => $links) :
             $dataPath = env('BASEPATH') . '/' . $controller;
