@@ -48,9 +48,9 @@ class PostModel extends BaseModel
             'content' => $this->getContentField(__('content')),
             'slug' => $this->getSlugField($id),
             'parent_id' => $this->getParentIdField($id),
-            'published_at' => $this->getPublishedAtField(),
-            'expired_at' => $this->getExpiredAtField(),
             'status' => $this->getStatusField(),
+            'expired_at' => $this->getExpiredAtField(),
+            'published_at' => $this->getPublishedAtField(),
             'creator_id' => $this->getCreatorIdField(),
             'created_at' => $this->getCreatedAtField(),
             'updated_at' => $this->getUpdatedAtField(),
@@ -126,14 +126,15 @@ class PostModel extends BaseModel
     {
         $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Y-m-d H:i');
         return $this->getField(
-            'published_at',
+            'reserved_at',
             [
                 'type' => 'datetime-local',
                 'description' => __('published_at_exp'),
                 'default' => $now,
                 'group' => 'meta',
                 'save_as_utc' => true,
-                'display_in_list' => true
+                'display_in_list' => true,
+                'fieldset_template' => 'forms/fieldset/details.php'
             ]
         );
     }
@@ -146,7 +147,9 @@ class PostModel extends BaseModel
                 'type' => 'datetime-local',
                 'description' => __('expired_at_exp'),
                 'group' => 'meta',
-                'save_as_utc' => true
+                'save_as_utc' => true,
+                'fieldset_template' => 'forms/fieldset/details.php'
+
             ]
         );
     }

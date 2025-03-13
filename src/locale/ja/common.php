@@ -36,6 +36,7 @@ return [
 
     'slug' => '記事ID（スラッグ）',
     'slug_exp' => 'URLの末尾で記事のIDとして用います。英単語（about-us）や日時（YYYYMMDD）などを指定します。半角英数字とハイフンが使えます。',
+    'reserved_at' => '公開予約日時',
     'published_at' => '公開日時',
     'published_at_exp' => '「公開日時」に未来の日時を入れると予約投稿になります。',
     'expired_at' => '公開終了日時',
