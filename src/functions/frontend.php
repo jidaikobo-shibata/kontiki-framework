@@ -1,5 +1,10 @@
 <?php
 
+use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Core\Auth;
+use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Models\PostModel;
+
 if (!function_exists('getIndex')) {
     /**
      * @param array $args Configuration for the request.
@@ -7,7 +12,16 @@ if (!function_exists('getIndex')) {
      */
     function getIndex(array $args): array
     {
-        $model = new \Jidaikobo\Kontiki\Models\PostModel();
+        $app = Jidaikobo\Kontiki\Bootstrap::init();
+        $container = $app->getContainer();
+        $userModel = new UserModel(
+            $container->get(Database::class)
+        );
+        $model = new PostModel(
+            $container->get(Database::class),
+            $container->get(Auth::class),
+            $userModel
+        );
         $retval = [];
         $retval['body'] = $model->getIndexData('published', $args);
         $retval['pagination'] = $model->getPagination();
@@ -22,7 +36,16 @@ if (!function_exists('getData')) {
      */
     function getData(array $args): array
     {
-        $model = new \Jidaikobo\Kontiki\Models\PostModel();
+        $app = Jidaikobo\Kontiki\Bootstrap::init();
+        $container = $app->getContainer();
+        $userModel = new UserModel(
+            $container->get(Database::class)
+        );
+        $model = new PostModel(
+            $container->get(Database::class),
+            $container->get(Auth::class),
+            $userModel
+        );
         $slug = $args['slug'] ?? '';
         $retval = [];
         $retval['body'] = $model->getByFieldWithCondtioned('slug', $slug, 'published');
