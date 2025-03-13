@@ -184,7 +184,7 @@ class PostModel extends BaseModel
             [
                     'type' => env('POST_HIDE_AUTHOR', false) ? 'hidden' : 'select',
                     'options' => $userOptions,
-                    'default' => $user['id'],
+                    'default' => $user['id'] ?? 0, // no logged in user: 0
                     'attributes' => [
                         'class' => 'form-control form-select'
                     ],

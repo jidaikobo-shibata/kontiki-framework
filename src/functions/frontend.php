@@ -8,11 +8,12 @@ use Jidaikobo\Kontiki\Models\PostModel;
 if (!function_exists('getIndex')) {
     /**
      * @param array $args Configuration for the request.
+     * @param string $env environment.
      * @return array
      */
-    function getIndex(array $args): array
+    function getIndex(array $args, string $env = 'production'): array
     {
-        $app = Jidaikobo\Kontiki\Bootstrap::init();
+        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
         $container = $app->getContainer();
         $userModel = new UserModel(
             $container->get(Database::class)
@@ -32,11 +33,12 @@ if (!function_exists('getIndex')) {
 if (!function_exists('getData')) {
     /**
      * @param array $args Configuration for the request.
+     * @param string $env environment.
      * @return array
      */
-    function getData(array $args): array
+    function getData(array $args, string $env = 'production'): array
     {
-        $app = Jidaikobo\Kontiki\Bootstrap::init();
+        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
         $container = $app->getContainer();
         $userModel = new UserModel(
             $container->get(Database::class)
