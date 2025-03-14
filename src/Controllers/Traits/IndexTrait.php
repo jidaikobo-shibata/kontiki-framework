@@ -18,28 +18,25 @@ trait IndexTrait
         $data = $this->model->getIndexData($context, $request->getQueryParams());
 
         // render table
-        $tableRenderer = new TableRenderer(
-            $this->model,
-            $this->view,
-            $this->adminDirName,
+        $content = $this->tableService->tableHtml(
             $data,
+            $this->adminDirName,
             $this->getRoutes(),
             $context
         );
-        $content = $tableRenderer->render();
 
         // set messages
         $error = $this->flashManager->getData('errors', []);
         $success = $this->flashManager->getData('success', []);
 
         // render messages
-        $tableHandler = new TableHandler();
-        if (!empty($error)) {
-            $content = $tableHandler->addErrors($content, $error, $this->model);
-        }
-        if (!empty($success)) {
-            $content = $tableHandler->addSuccessMessages($content, $success);
-        }
+        $content = $this->tableService->addMessages(
+            $content,
+            $error,
+            $success
+        );
+
+        // pagination
         $content .= $this->model->getPagination()->render(env('BASEPATH', '') . "/{$this->adminDirName}/index");
 
         $title = 'x_index_' . $context;

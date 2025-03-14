@@ -47,7 +47,8 @@ trait IndexTrait
         string $context = '',
         array $queryParams = []
     ): Builder {
-        $query = $this->buildSearchConditions($queryParams['s'] ?? '');
+        $query = $this->getQuery();
+        $query = $this->buildSearchConditions($query, $queryParams['s'] ?? '');
         $query = $this->getAdditionalConditions($query, $context);
         $query = $this->applySorting($query, $queryParams);
         $query = $this->applyPostTypeFilter($query);

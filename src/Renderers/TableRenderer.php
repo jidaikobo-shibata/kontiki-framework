@@ -4,7 +4,7 @@ namespace Jidaikobo\Kontiki\Renderers;
 
 use Carbon\Carbon;
 use Slim\Views\PhpRenderer;
-use Jidaikobo\Kontiki\Models\BaseModel;
+use Jidaikobo\Kontiki\Models\ModelInterface;
 
 class TableRenderer
 {
@@ -17,32 +17,36 @@ class TableRenderer
     protected $routes;
     protected $postType;
     protected $deleteType; // Context: "hardDelete" or "softDelete"
+    private ?ModelInterface $model = null;
 
-    public function __construct(
-        BaseModel $model,
-        PhpRenderer $view,
-        string $adminDirName,
+    public function __construct(PhpRenderer $view) {
+        $this->view = $view;
+    }
+
+    public function setModel(ModelInterface $model): void
+    {
+        $this->model = $model;
+    }
+
+    public function render(
         array $data,
+        string $adminDirName,
         array $routes = [],
         string $context = 'all'
-    ) {
-        $this->deleteType = $model->getDeleteType();
+    ): string
+    {
+        $this->deleteType = $this->model->getDeleteType();
+        $this->data = $data;
         $this->adminDirName = $adminDirName;
+        $this->routes = $routes;
+        $this->context = $context;
 
         $this->fields = array_filter(
-            $model->getFieldDefinitions(),
+            $this->model->getFieldDefinitions(),
             fn($field) => isset($field['display_in_list']) &&
                 ($field['display_in_list'] === true || $field['display_in_list'] == $context)
         );
 
-        $this->data = $data;
-        $this->view = $view;
-        $this->context = $context;
-        $this->routes = $routes;
-    }
-
-    public function render(): string
-    {
         $createButton = $this->renderCreateButton();
         $displayModes = $this->renderDisplayModes();
         $headers = $this->renderHeaders();

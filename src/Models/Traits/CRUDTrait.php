@@ -45,7 +45,7 @@ trait CRUDTrait
         mixed $value,
         string $context = 'published'
     ): ?array {
-        $query = $this->buildSearchConditions();
+        $query = $this->getQuery();
         $query = $this->getAdditionalConditions($query, $context);
         $result = $query
             ->where($field, $value)

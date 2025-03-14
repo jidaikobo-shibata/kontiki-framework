@@ -7,14 +7,33 @@ use Jidaikobo\Kontiki\Utils\MessageUtils;
 
 class TableHandler
 {
-    public function addErrors(string $content, array $errors, ModelInterface $model): string
+    private ?ModelInterface $model = null;
+    private string $tableHtml = '';
+
+    public function setModel(ModelInterface $model): void
     {
-        return MessageUtils::errorHtml($errors, $model) . $content;
+        $this->model = $model;
+    }
+    public function setHtml(string $html): void
+    {
+        $this->tableHtml = $html;
     }
 
-    public function addSuccessMessages(string $content, array $successMessages): string
+    public function addErrors(array $errors): void
     {
+        if (empty($errors)) return;
+        $this->tableHtml = MessageUtils::errorHtml($errors, $this->model) . $this->tableHtml;
+    }
+
+    public function addSuccessMessages(array $successMessages): void
+    {
+        if (empty($successMessages)) return;
         $successMessage = join($successMessages);
-        return MessageUtils::alertHtml($successMessage) . $content;
+        $this->tableHtml = MessageUtils::alertHtml($successMessage) . $this->tableHtml;
+    }
+
+    public function getHtml(): string
+    {
+        return $this->tableHtml;
     }
 }

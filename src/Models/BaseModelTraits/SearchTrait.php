@@ -27,11 +27,8 @@ trait SearchTrait
         return $query;
     }
 
-    public function buildSearchConditions(string $keyword = ''): Builder
+    public function buildSearchConditions(Builder $query, string $keyword = ''): Builder
     {
-        $query = $this->db->table($this->table);
-
-        // キーワード条件
         if (!empty($keyword)) {
             $searchableColumns = $this->getSearchableFields();
 

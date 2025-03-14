@@ -24,7 +24,8 @@ trait ListTrait
         $pagination = new Pagination($page, $itemsPerPage);
 
         $keyword = $request->getQueryParams()['s'] ?? '';
-        $query = $this->model->buildSearchConditions($keyword);
+        $query = $this->model->getQuery();
+        $query = $this->model->buildSearchConditions($query, $keyword);
         $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);

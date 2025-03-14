@@ -3,6 +3,8 @@
 namespace Jidaikobo\Kontiki\Models;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
+
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\BaseModelTraits;
 
@@ -25,6 +27,11 @@ abstract class BaseModel implements ModelInterface
     public function __construct(Database $db)
     {
         $this->db = $db->getConnection();
+    }
+
+    public function getQuery(): Builder
+    {
+        return $this->db->table($this->table);
     }
 
     public function getDeleteType(): string
