@@ -87,7 +87,6 @@ trait IndexTrait
         return $query;
     }
 
-
     public function getPagination(): Pagination
     {
         return $this->pagination;

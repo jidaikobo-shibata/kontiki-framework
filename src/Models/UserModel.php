@@ -54,6 +54,38 @@ class UserModel extends BaseModel
         $this->fieldDefinitions = array_merge($fields, $MetaData);
     }
 
+    private function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }
+
+    protected function processDataForForm(string $actionType, array $data): array
+    {
+        if ($actionType == 'edit') {
+            $data['password'] = '';
+        }
+        return $data;
+    }
+
+    protected function afterProcessDataBeforeSave(string $context, array $data): array
+    {
+        if ($context == 'create') {
+            $data['password'] = $this->hashPassword($data['password']);
+        }
+
+        if ($context == 'update') {
+            // Branching password processing
+            if (isset($data['password'])) {
+                if (trim($data['password']) === '') {
+                    unset($data['password']);
+                } else {
+                    $data['password'] = $this->hashPassword($data['password']);
+                }
+            }
+        }
+        return $data;
+    }
+
     public function processFieldDefinitionsForSave(string $context, array $fieldDefinitions): array
     {
         if ($context == 'create') {

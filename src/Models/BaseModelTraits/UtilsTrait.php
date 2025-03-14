@@ -2,39 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
 
-use Carbon\Carbon;
-
 trait UtilsTrait
 {
-    public function processDataBeforeSave(array $data): array
-    {
-        foreach ($data as $field => $value) {
-            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
-            if ($saveAsUtc) {
-                if (empty($value)) {
-                    $data[$field] = null;
-                } else {
-                    $date = Carbon::parse($value, env('TIMEZONE', 'UTC'))->setTimezone('UTC');
-                    $data[$field] = $date->format('Y-m-d H:i:s');
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    public function processDataBeforeGet(array $data): array
-    {
-        foreach ($data as $field => $value) {
-            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
-            if ($saveAsUtc && !empty($value)) {
-                $date = Carbon::parse($value, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
-                $data[$field] = $date->format('Y-m-d H:i:s');
-            }
-        }
-        return $data;
-    }
-
     /**
      * Get options in the form of id => field value, excluding a specific ID.
      *

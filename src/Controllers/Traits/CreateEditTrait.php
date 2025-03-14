@@ -9,21 +9,11 @@ trait CreateEditTrait
 {
     private array $pendingMetaData;
 
-    public function prepareDataForRenderForm(array $default = []): array
-    {
-        return $this->flashManager->getData('data', $default);
-    }
-
-    public function processDataForRenderForm(string $actionType, array $data): array
-    {
-        return $data;
-    }
-
-    public function renderCreateForm(Request $request, Response $response): Response
-    {
-        $data = $this->prepareDataForRenderForm();
-        $data = $this->processDataForRenderForm('create', $data);
-
+    public function renderCreateForm(
+        Request $request,
+        Response $response
+    ): Response {
+        $data = $this->model->getDataForForm('create', $this->flashManager);
         $fields = $this->model->getFieldDefinitionsWithDefaults($data);
         $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
 
@@ -52,8 +42,7 @@ trait CreateEditTrait
         array $args
     ): Response {
         $id = $args['id'];
-        $data = $this->prepareDataForRenderForm($this->model->getById($id));
-        $data = $this->processDataForRenderForm('edit', $data);
+        $data = $this->model->getDataForForm('edit', $this->flashManager, $id);
 
         if (!$data) {
             return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
@@ -93,11 +82,6 @@ trait CreateEditTrait
         return $this->handleSave($request, $response, 'edit', $id);
     }
 
-    public function processDataForSave(string $actionType, array $data): array
-    {
-        return $data;
-    }
-
     protected function getDefaultRedirect(string $actionType, ?int $id = null): string
     {
         return $actionType === 'create'
@@ -116,7 +100,6 @@ trait CreateEditTrait
 
     protected function saveData(string $actionType, ?int $id, array $data): int
     {
-        $data = $this->processDataForSave($actionType, $data);
         $data = $this->divideMetaData($data);
 
         if ($actionType === 'create') {

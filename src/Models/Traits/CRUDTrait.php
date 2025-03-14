@@ -2,33 +2,12 @@
 
 namespace Jidaikobo\Kontiki\Models\Traits;
 
+use Carbon\Carbon;
+
+use  Jidaikobo\Kontiki\Managers\FlashManager;
+
 trait CRUDTrait
 {
-    public function setPosttypeBeforeSave(array $data): array
-    {
-        $post_type = $data['post_type'] ?? '';
-        if (!empty($post_type)) {
-            return $data;
-        }
-        if (!empty($this->postType)) {
-            $data['post_type'] = $this->postType;
-        }
-        return $data;
-    }
-
-    /**
-     * Filter the given data array to include only allowed fields.
-     *
-     * @param array $data The data to filter.
-     *
-     * @return array The filtered data.
-     */
-    public function filterAllowedFields(array $data): array
-    {
-        $allowedFields = array_keys($this->getFieldDefinitions());
-        return array_intersect_key($data, array_flip($allowedFields));
-    }
-
     public function getById(int $id): ?array
     {
         $result = $this->db->table($this->table)
@@ -81,6 +60,84 @@ trait CRUDTrait
         return $result ? (array)$result : null;
     }
 
+    public function getDataForForm(
+        string $actionType,
+        FlashManager $flashManager,
+        ?int $id = null
+    ): array {
+        $data = $flashManager->getData('data') ?: ($id ? $this->getById($id) : []);
+        return $this->processDataForForm($actionType, $data);
+    }
+
+    protected function processDataForForm(string $actionType, array $data): array
+    {
+        return $data;
+    }
+
+    protected function setPosttypeBeforeSave(array $data): array
+    {
+        $post_type = $data['post_type'] ?? '';
+        if (!empty($post_type)) {
+            return $data;
+        }
+        if (!empty($this->postType)) {
+            $data['post_type'] = $this->postType;
+        }
+        return $data;
+    }
+
+    protected function processDataBeforeSave(string $context, array $data): array
+    {
+        foreach ($data as $field => $value) {
+            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
+            if ($saveAsUtc) {
+                if (empty($value)) {
+                    $data[$field] = null;
+                } else {
+                    $date = Carbon::parse($value, env('TIMEZONE', 'UTC'))->setTimezone('UTC');
+                    $data[$field] = $date->format('Y-m-d H:i:s');
+                }
+            }
+        }
+        return $this->afterProcessDataBeforeSave($context, $data);
+    }
+
+    protected function processDataBeforeGet(array $data): array
+    {
+        foreach ($data as $field => $value) {
+            $saveAsUtc = $this->getFieldDefinitions()[$field]['save_as_utc'] ?? false;
+            if ($saveAsUtc && !empty($value)) {
+                $date = Carbon::parse($value, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
+                $data[$field] = $date->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $this->afterProcessDataBeforeGet($data);;
+    }
+
+    protected function afterProcessDataBeforeSave(string $context, array $data): array
+    {
+        return $data;
+    }
+
+    protected function afterProcessDataBeforeGet(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * Filter the given data array to include only allowed fields.
+     *
+     * @param array $data The data to filter.
+     *
+     * @return array The filtered data.
+     */
+    public function filterAllowedFields(array $data): array
+    {
+        $allowedFields = array_keys($this->getFieldDefinitions());
+        return array_intersect_key($data, array_flip($allowedFields));
+    }
+
     /**
      * Create a new record in the table.
      *
@@ -94,7 +151,7 @@ trait CRUDTrait
             $data = $this->filterAllowedFields($data);
         }
 
-        $data = $this->processDataBeforeSave($data);
+        $data = $this->processDataBeforeSave('create', $data);
         $data = $this->setPosttypeBeforeSave($data);
 
         $success = $this->db->table($this->table)->insert($data);
@@ -115,7 +172,7 @@ trait CRUDTrait
             $data = $this->filterAllowedFields($data);
         }
 
-        $data = $this->processDataBeforeSave($data);
+        $data = $this->processDataBeforeSave('update', $data);
         $data = $this->setPosttypeBeforeSave($data);
 
         return (bool) $this->db->table($this->table)
