@@ -4,6 +4,7 @@ namespace Jidaikobo\Kontiki\Models;
 
 interface ModelInterface
 {
+    public function getFields(): array;
     public function getFieldDefinitions(): array;
-    public function setFieldDefinitions(array $params = []): void;
+    public function getMetaDataFieldDefinitions(): array;
 }

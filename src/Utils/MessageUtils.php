@@ -3,13 +3,14 @@
 namespace Jidaikobo\Kontiki\Utils;
 
 use Jidaikobo\Kontiki\Models\ModelInterface;
+use Jidaikobo\MarkdownExtra;
 
 class MessageUtils
 {
     public static function errorHtml(array $errors, ModelInterface $model): string
     {
         // フィールド定義を取得
-        $fieldDefinitions = $model->getFieldDefinitions();
+        $fieldDefinitions = $model->getFields();
 
         $html = '<div class="errormessages">';
         $html .= '<ul class="alert alert-danger p-3 ps-5 pt-0 mt-3 mb-3 fs-6">';
@@ -67,8 +68,11 @@ class MessageUtils
      * @param bool $escape Whether to escape the message.
      * @return string HTML output for the status section.
      */
-    public static function alertHtml(string $message, string $status = "success", bool $escape = true): string
-    {
+    public static function alertHtml(
+        string $message,
+        string $status = "success",
+        bool $escape = true
+    ): string {
         // Define a status-class mapping table
         $statusClasses = [
             'success' => 'alert alert-success',
@@ -82,6 +86,10 @@ class MessageUtils
 
         // Escape message if required
         $message = $escape ? e($message) : $message;
+
+        // apply markdown instead of using HTML
+        $message = MarkdownExtra::defaultTransform($message);
+        $message = strip_tags($message, '<a>');
 
         // Generate and return the HTML
         return sprintf(

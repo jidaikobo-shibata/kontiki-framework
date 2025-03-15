@@ -34,7 +34,7 @@ trait DeleteTrait
             return $this->redirectResponse($request, $response, "{$this->label}_index");
         }
 
-        $data = $this->model->getFieldDefinitionsWithDefaults($data);
+        $data = $this->model->getFields('delete', $data);
         $data = $this->processFieldForDelete($data);
 
         $formHtml = $this->formService->formHtml(

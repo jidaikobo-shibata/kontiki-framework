@@ -8,9 +8,9 @@ class FileModel extends BaseModel
 
     protected string $table = 'files';
 
-    public function setFieldDefinitions(array $params = []): void
+    protected function defineFieldDefinitions(array $params = []): void
     {
-        $fields = [
+        $this->fieldDefinitions = [
             'id' => [
                 'label' => 'ID',
             ],
@@ -39,7 +39,7 @@ class FileModel extends BaseModel
                 'default' => '',
                 'searchable' => true,
                 'rules' => [
-                    ['lengthMin', 3]
+                    // ['lengthMin', 3]
                 ],
                 'filter' => FILTER_UNSAFE_RAW,
                 'template' => 'default',
@@ -47,6 +47,5 @@ class FileModel extends BaseModel
                 'fieldset_template' => 'forms/fieldset/flat.php',
             ],
         ];
-        $this->fieldDefinitions = $fields;
     }
 }

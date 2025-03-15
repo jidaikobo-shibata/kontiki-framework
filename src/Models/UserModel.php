@@ -10,11 +10,10 @@ class UserModel extends BaseModel
 
     protected string $table = 'users';
 
-    public function setFieldDefinitions(array $params = []): void
+    protected function defineFieldDefinitions(): void
     {
-        $id = $params['id'] ?? null;
-
-        $fields = [
+        // add dynamic rules at $this->processFieldDefinitions()
+        $this->fieldDefinitions = [
             'id' => $this->getIdField(),
 
             'username' => $this->getField(
@@ -22,8 +21,7 @@ class UserModel extends BaseModel
                 [
                     'rules' => [
                         'required',
-                        ['lengthMin', 3],
-                        ['unique', $this->table, 'username', $id]
+                        ['lengthMin', 3]
                     ],
                     'display_in_list' => true
                 ]
@@ -33,7 +31,6 @@ class UserModel extends BaseModel
                 __('password', 'password'),
                 [
                     'type' => 'password',
-                    'description' => __('users_edit_message', 'If the password is blank, the password will not be changed.'),
                     'rules' => [
                         'required',
                         ['lengthMin', 8]
@@ -49,9 +46,33 @@ class UserModel extends BaseModel
                 ]
             ),
         ];
+    }
 
-        $MetaData = $this->getMetaDataFieldDefinitions($params);
-        $this->fieldDefinitions = array_merge($fields, $MetaData);
+    protected function processFieldDefinitions(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        // add rule
+        $this->fieldDefinitions['username']['rules'][] = [
+            'unique',
+            $this->table,
+            'username',
+            $id
+        ];
+
+        if ($context == 'create') {
+            return;
+        }
+
+        // Exclude `required` from password's rules
+        // No password specified means no change
+        $this->fieldDefinitions['password']['rules'] = array_filter(
+            $this->fieldDefinitions['password']['rules'],
+            fn($rule) => $rule !== 'required'
+        );
+
+        $this->fieldDefinitions['password']['description'] = __('users_edit_message');
     }
 
     private function hashPassword(string $password): string
@@ -84,23 +105,5 @@ class UserModel extends BaseModel
             }
         }
         return $data;
-    }
-
-    public function processFieldDefinitionsForSave(string $context, array $fieldDefinitions): array
-    {
-        if ($context == 'create') {
-            return $fieldDefinitions;
-        }
-
-        // Exclude `required` from password's rules
-        // No password specified means no change
-        if (isset($fieldDefinitions['password']['rules'])) {
-            $fieldDefinitions['password']['rules'] = array_filter(
-                $fieldDefinitions['password']['rules'],
-                fn($rule) => $rule !== 'required'
-            );
-        }
-
-        return $fieldDefinitions;
     }
 }

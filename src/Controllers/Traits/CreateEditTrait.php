@@ -14,8 +14,7 @@ trait CreateEditTrait
         Response $response
     ): Response {
         $data = $this->model->getDataForForm('create', $this->flashManager);
-        $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
+        $fields = $this->model->getFields('create', $data);
 
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/create",
@@ -45,11 +44,14 @@ trait CreateEditTrait
         $data = $this->model->getDataForForm('edit', $this->flashManager, $id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
+            return $this->redirectResponse(
+                $request,
+                $response,
+                "/{$this->adminDirName}/index"
+            );
         }
 
-        $fields = $this->model->getFieldDefinitionsWithDefaults($data);
-        $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
+        $fields = $this->model->getFields('edit', $data);
 
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/edit/{$id}",
@@ -82,55 +84,32 @@ trait CreateEditTrait
         return $this->handleSave($request, $response, 'edit', $id);
     }
 
-    protected function getDefaultRedirect(string $actionType, ?int $id = null): string
+    private function getDefaultRedirect(string $context, ?int $id = null): string
     {
-        return $actionType === 'create'
+        return $context === 'create'
             ? "/{$this->adminDirName}/create"
             : "/{$this->adminDirName}/edit/{$id}";
     }
 
-    protected function getFieldDefinitionsForAction(string $actionType, ?int $id = null): array
-    {
-        $fields = $actionType === 'create'
-            ? $this->model->getFieldDefinitions()
-            : $this->model->getFieldDefinitions(['id' => $id]);
-
-        return $this->model->processFieldDefinitionsForSave($actionType, $fields);
-    }
-
-    protected function saveData(string $actionType, ?int $id, array $data): int
-    {
-        $data = $this->divideMetaData($data);
-
-        if ($actionType === 'create') {
-            $newId = $this->model->create($data);
-            if ($newId === null) {
-                throw new \RuntimeException('Failed to create record. No ID returned.');
-            }
-            $this->saveMetaData($newId);
-            return $newId;
-        }
-
-        if ($actionType === 'edit' && $id !== null) {
-            $this->model->update($id, $data);
-            $this->saveMetaData($id);
-            return $id;
-        }
-
-        throw new \InvalidArgumentException('Invalid action type or missing ID.');
-    }
-
-    protected function handleSave(Request $request, Response $response, string $actionType, ?int $id = null): Response
-    {
+    private function handleSave(
+        Request $request,
+        Response $response,
+        string $context,
+        ?int $id = null
+    ): Response {
         $data = $request->getParsedBody() ?? [];
         $this->flashManager->setData('data', $data);
 
         // redirect preview
         if (isset($data['preview']) && $data['preview'] === '1') {
-            return $this->redirectResponse($request, $response, "/{$this->adminDirName}/preview");
+            return $this->redirectResponse(
+                $request,
+                $response,
+                "/{$this->adminDirName}/preview"
+            );
         }
 
-        $defaultRedirect = $this->getDefaultRedirect($actionType, $id);
+        $defaultRedirect = $this->getDefaultRedirect($context, $id);
 
         // validate csrf token
         $errorResponse = $this->validateCsrfToken($data, $request, $response, $defaultRedirect);
@@ -139,19 +118,20 @@ trait CreateEditTrait
         }
 
         // Validate post data
-        if (!$this->isValidData($data, $actionType, $id)) {
+        if (!$this->isValidData($data, $context, $id)) {
             return $this->redirectResponse($request, $response, $defaultRedirect);
         }
 
-        return $this->processAndRedirect($request, $response, $actionType, $id, $data);
+        return $this->processAndRedirect($request, $response, $context, $id, $data);
     }
 
     /**
      * Validate input data against the field definitions.
      */
-    private function isValidData(array $data, string $actionType, ?int $id): bool
+    private function isValidData(array $data, string $context, ?int $id): bool
     {
-        $fields = $this->getFieldDefinitionsForAction($actionType, $id);
+        $fields = $this->model->getFields($context, $data, $id);
+
         $validationResult = $this->model->validateByFields($data, $fields);
 
         if (!$validationResult['valid']) {
@@ -168,18 +148,21 @@ trait CreateEditTrait
     private function processAndRedirect(
         Request $request,
         Response $response,
-        string $actionType,
+        string $context,
         ?int $id,
         array $data
     ): Response {
         try {
-            $id = $this->saveData($actionType, $id, $data);
+            $id = $this->saveData($context, $id, $data);
             $this->flashManager->addMessage(
                 'success',
                 __(
-                    "x_save_success",
-                    ':name Saved successfully.',
-                    ['name' => __($this->label)]
+                    "x_save_success_and_redirect",
+                    ':name Saved successfully. [Go to Index](:url)',
+                    [
+                        'name' => __($this->label),
+                        'url' => env('BASEPATH') . "/{$this->adminDirName}/index"
+                    ]
                 )
             );
             return $this->redirectResponse(
@@ -192,12 +175,34 @@ trait CreateEditTrait
             return $this->redirectResponse(
                 $request,
                 $response,
-                $this->getDefaultRedirect($actionType, $id)
+                $this->getDefaultRedirect($context, $id)
             );
         }
     }
 
-    protected function divideMetaData(array $data): array
+    private function saveData(string $context, ?int $id, array $data): int
+    {
+        $data = $this->divideMetaData($data);
+
+        if ($context === 'create') {
+            $newId = $this->model->create($data);
+            if ($newId === null) {
+                throw new \RuntimeException('Failed to create record. No ID returned.');
+            }
+            $this->saveMetaData($newId);
+            return $newId;
+        }
+
+        if ($context === 'edit' && $id !== null) {
+            $this->model->update($id, $data);
+            $this->saveMetaData($id);
+            return $id;
+        }
+
+        throw new \InvalidArgumentException('Invalid action type or missing ID.');
+    }
+
+    private function divideMetaData(array $data): array
     {
         $MetaData = [];
         foreach ($this->model->getMetaDataFieldDefinitions() as $key => $definition) {
@@ -214,7 +219,7 @@ trait CreateEditTrait
         return $data;
     }
 
-    protected function saveMetaData(int $id): void
+    private function saveMetaData(int $id): void
     {
         if (empty($this->pendingMetaData)) {
             return;

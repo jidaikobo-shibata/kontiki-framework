@@ -13,8 +13,12 @@ trait UtilsTrait
      * @param int|null $excludeId The ID to exclude from the results (default: null).
      * @return array Associative array of id => field value.
      */
-    public function getOptions(string $fieldName, bool $includeEmpty = false, string $emptyLabel = '', ?int $excludeId = null): array
-    {
+    public function getOptions(
+        string $fieldName,
+        bool $includeEmpty = false,
+        string $emptyLabel = '',
+        ?int $excludeId = null
+    ): array {
         $query = $this->db->table($this->table)->select(['id', $fieldName]);
 
         if ($excludeId !== null) {

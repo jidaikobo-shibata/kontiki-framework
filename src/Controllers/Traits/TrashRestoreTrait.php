@@ -53,7 +53,7 @@ trait TrashRestoreTrait
             return $this->redirectResponse($request, $response, "{$this->label}_index");
         }
 
-        $data = $this->model->getFieldDefinitionsWithDefaults($data);
+        $data = $this->model->getFields('trash', $data);
         $data = $this->processFieldForTrashRestore($data);
 
         $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;

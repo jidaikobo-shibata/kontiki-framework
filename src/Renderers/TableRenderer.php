@@ -42,7 +42,7 @@ class TableRenderer
         $this->context = $context;
 
         $this->fields = array_filter(
-            $this->model->getFieldDefinitions(),
+            $this->model->getFields(),
             fn($field) => isset($field['display_in_list']) &&
                 ($field['display_in_list'] === true || $field['display_in_list'] == $context)
         );

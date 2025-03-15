@@ -66,7 +66,9 @@ trait IndexTrait
     {
         if (!empty($queryParams['orderby']) && !empty($queryParams['order'])) {
             $validColumns = ['id', 'name', 'created_at']; // いったんハードコーディング
-            $column = in_array($queryParams['orderby'], $validColumns, true) ? $queryParams['orderby'] : 'id';
+            $column = in_array($queryParams['orderby'], $validColumns, true) ?
+                $queryParams['orderby'] :
+                'id';
             $direction = strtoupper($queryParams['order']) === 'DESC' ? 'DESC' : 'ASC';
             return $query->orderBy($column, $direction);
         }

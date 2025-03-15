@@ -32,22 +32,19 @@ class PostModel extends BaseModel
         Auth $auth,
         UserModel $userModel
     ) {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
         $this->userModel = $userModel;
         $this->auth = $auth;
     }
 
-    public function setFieldDefinitions(array $params = []): void
+    protected function defineFieldDefinitions(): void
     {
-        // defaults
-        $id = $params['id'] ?? null;
-
-        $fields = [
+        $this->fieldDefinitions = [
             'id' => $this->getIdField(),
             'title' => $this->getTitleField(),
             'content' => $this->getContentField(__('content')),
-            'slug' => $this->getSlugField($id),
-            'parent_id' => $this->getParentIdField($id),
+            'slug' => $this->getSlugField(),
+            'parent_id' => $this->getParentIdField(),
             'status' => $this->getStatusField(),
             'expired_at' => $this->getExpiredAtField(),
             'published_at' => $this->getPublishedAtField(),
@@ -56,8 +53,101 @@ class PostModel extends BaseModel
             'deleted_at' => $this->getDeletedAtField(),
             'created_at' => $this->getCreatedAtField(),
         ];
-        $MetaData = $this->getMetaDataFieldDefinitions($params);
-        $this->fieldDefinitions = array_merge($fields, $MetaData);
+    }
+
+    protected function defineMetaDataFieldDefinitions(): void
+    {
+        $hide_excerpt = env('POST_HIDE_METADATA_EXCERPT', false);
+        $hide_eyecatch = env('POST_HIDE_METADATA_EYECATCH', false);
+
+        if (!$hide_excerpt) {
+            $this->metaDataFieldDefinitions['excerpt'] = $this->getField(
+                __('excerpt'),
+                [
+                    'type' => 'textarea',
+                    'attributes' => [
+                        'class' => 'form-control',
+                        'row' => 3,
+                    ]
+                ]
+            );
+        }
+
+        if (!$hide_eyecatch) {
+            $this->metaDataFieldDefinitions['eyecatch'] = $this->getField(
+                __('eyecatch'),
+                [
+                    'attributes' => [
+                        'class' => 'form-control font-monospace kontiki-file-upload',
+                    ],
+                    'fieldset_template' => 'forms/fieldset/input-group.php',
+                ]
+            );
+        }
+    }
+
+    protected function getTaxonomyDefinitions(array $params = []): array
+    {
+        $taxonomies = [
+            'category' => [
+                'label' => __('category'),
+                'Model' => 'CategoryModel',
+            ],
+        ];
+        return $taxonomies;
+    }
+
+    protected function getAdditionalConditions(Builder $query, string $context = 'all'): Builder
+    {
+        $contextConditions = [
+            'all'       => ['applyNotSoftDeletedConditions'],
+            'published' => [
+                'applyNotSoftDeletedConditions',
+                'applyNotExpiredConditions',
+                'applyPublisedConditions',
+                'applyNotDraftConditions'
+            ],
+            'trash'     => ['applySoftDeletedConditions'],
+            'reserved'  => ['applyNotPublisedConditions'],
+            'expired'   => ['applyExpiredConditions'],
+            'draft'     => ['applyDraftConditions'],
+        ];
+
+        if (isset($contextConditions[$context])) {
+            foreach ($contextConditions[$context] as $method) {
+                $query = $this->$method($query);
+            }
+        }
+
+        // jlog($context);
+        // jlog($query->toSql());
+        // jlog($query->getBindings());
+
+        return $query;
+    }
+
+    protected function processFieldDefinitions(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        // add rule
+        $this->fieldDefinitions['slug']['rules'][] = [
+            'unique',
+            $this->table,
+            'slug',
+            $id
+        ];
+
+        // add options
+        $parents = $this->getOptions('title', true, '', $id);
+        $this->fieldDefinitions['parent']['options'] = $parents;
+
+        // add options and default value
+        $userOptions = $this->userModel->getOptions('username');
+        $user = $this->auth->getCurrentUser();
+        $this->fieldDefinitions['creator']['options'] = $userOptions;
+        $this->fieldDefinitions['creator']['default'] = $user['id'] ?? 0; // no logged in user: 0
     }
 
     private function getTitleField(): array
@@ -73,12 +163,11 @@ class PostModel extends BaseModel
 
     private function getContentField(string $label): array
     {
-        $content_exp = __('content_exp', 'Please enter the content in <a href="' . env('BASEPATH') . '/posts/markdown-help" target="markdown-help">Markdown format</a>. You can add files using "File Upload".');
         return $this->getField(
             $label,
             [
                 'type' => 'textarea',
-                'description' => $content_exp,
+                'description' => __('content_exp'),
                 'attributes' => [
                     'class' => 'form-control font-monospace kontiki-file-upload',
                     'data-button-class' => 'mt-2',
@@ -88,33 +177,31 @@ class PostModel extends BaseModel
         );
     }
 
-    private function getSlugField(?int $id): array
+    private function getSlugField(): array
     {
-        $slug_exp = __('slug_exp', 'The "slug" is used as the URL. It can contain alphanumeric characters and hyphens.');
-
+        // add dynamic rules at $this->setRulesFieldDefinitions()
+        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Ymd');
         return $this->getField(
             __('slug'),
             [
-                'description' => $slug_exp,
+                'description' => __('slug_exp'),
+                'default' => $this->postType . '-' . $now,
                 'rules' => [
                     'required',
                     'slug',
                     ['lengthMin', 3],
-                    ['unique', $this->table, 'slug', $id]
                 ],
             ]
         );
     }
 
-    private function getParentIdField(?int $id): array
+    private function getParentIdField(): array
     {
-        // $parentOptions = $this->getOptions('title', true, '', $id);
-        $parentOptions = [];
+        // add options at $this->processFieldDefinitions()
         return $this->getField(
             'parent',
             [
                 'type' => env('POST_HIDE_PARENT', false) ? 'hidden' : 'select',
-                'options' => $parentOptions,
                 'attributes' => [
                     'class' => 'form-control form-select'
                 ],
@@ -178,14 +265,11 @@ class PostModel extends BaseModel
 
     private function getCreatorIdField(): array
     {
-        $userOptions = $this->userModel->getOptions('username');
-        $user = $this->auth->getCurrentUser();
+        // add options and default at $this->processFieldDefinitions()
         return $this->getField(
             'creator',
             [
                     'type' => env('POST_HIDE_AUTHOR', false) ? 'hidden' : 'select',
-                    'options' => $userOptions,
-                    'default' => $user['id'] ?? 0, // no logged in user: 0
                     'attributes' => [
                         'class' => 'form-control form-select'
                     ],
@@ -224,80 +308,5 @@ class PostModel extends BaseModel
                 'display_in_list' => 'trash'
             ]
         );
-    }
-
-    public function getMetaDataFieldDefinitions(array $params = []): array
-    {
-        $fields = [];
-
-        $hide_excerpt = env('POST_HIDE_METADATA_EXCERPT', false);
-        $hide_eyecatch = env('POST_HIDE_METADATA_EYECATCH', false);
-
-        if (!$hide_excerpt) {
-            $fields['excerpt'] = $this->getField(
-                __('excerpt'),
-                [
-                    'type' => 'textarea',
-                    'attributes' => [
-                        'class' => 'form-control',
-                        'row' => 3,
-                    ]
-                ]
-            );
-        }
-
-        if (!$hide_eyecatch) {
-            $fields['eyecatch'] = $this->getField(
-                __('eyecatch'),
-                [
-                    'attributes' => [
-                        'class' => 'form-control font-monospace kontiki-file-upload',
-                    ],
-                    'fieldset_template' => 'forms/fieldset/input-group.php',
-                ]
-            );
-        }
-
-        return $fields;
-    }
-
-    public function getTaxonomyDefinitions(array $params = []): array
-    {
-        $taxonomies = [
-            'category' => [
-                'label' => __('category'),
-                'Model' => 'CategoryModel',
-            ],
-        ];
-        return $taxonomies;
-    }
-
-    public function getAdditionalConditions(Builder $query, string $context = 'all'): Builder
-    {
-        $contextConditions = [
-            'all'       => ['applyNotSoftDeletedConditions'],
-            'published' => [
-                'applyNotSoftDeletedConditions',
-                'applyNotExpiredConditions',
-                'applyPublisedConditions',
-                'applyNotDraftConditions'
-            ],
-            'trash'     => ['applySoftDeletedConditions'],
-            'reserved'  => ['applyNotPublisedConditions'],
-            'expired'   => ['applyExpiredConditions'],
-            'draft'     => ['applyDraftConditions'],
-        ];
-
-        if (isset($contextConditions[$context])) {
-            foreach ($contextConditions[$context] as $method) {
-                $query = $this->$method($query);
-            }
-        }
-
-        // jlog($context);
-        // jlog($query->toSql());
-        // jlog($query->getBindings());
-
-        return $query;
     }
 }

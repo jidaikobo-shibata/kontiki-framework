@@ -10,85 +10,102 @@ namespace Jidaikobo\Kontiki\Models\BaseModelTraits;
 trait FieldDefinitionTrait
 {
     protected ?array $fieldDefinitions = null;
+    protected ?array $metaDataFieldDefinitions = null;
 
-    abstract function setFieldDefinitions(array $params = []): void;
-
-    /**
-     * Get the field definitions.
-     *
-     * This method must be implemented by the class using this trait.
-     *
-     * @param array $params Optional parameters for dynamic adjustments.
-     * @return array Field definitions where each key represents a field name
-     *               and its value contains field metadata.
-     */
-    public function getFieldDefinitions(array $params = []): array
-    {
-        if ($this->fieldDefinitions === null) {
-            $this->setFieldDefinitions($params);
+    public function getFields(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): array {
+        if (!empty($context)) {
+            $this->processFields($context, $data, $id);
         }
+
+        return array_merge($this->fieldDefinitions, $this->metaDataFieldDefinitions);
+    }
+
+    public function getFieldDefinitions(): array
+    {
         return $this->fieldDefinitions;
     }
 
-    /**
-     * Get the metadata field definitions.
-     *
-     * This method allows models to define additional metadata fields.
-     *
-     * @param array $params Optional parameters for dynamic adjustments.
-     * @return array Metadata field definitions.
-     */
-    public function getMetaDataFieldDefinitions(array $params = []): array
+    public function getMetaDataFieldDefinitions(): array
     {
-        return [];
+        return $this->metaDataFieldDefinitions;
     }
 
-    /**
-     * Get field definitions with default values.
-     *
-     * This method populates field definitions with default values
-     * extracted from the provided data.
-     *
-     * @param array $data Associative array where keys are field names
-     *                    and values are the default values to be set.
-     * @return array Updated field definitions with default values applied.
-     */
-    public function getFieldDefinitionsWithDefaults(array $data): array
+    protected function defineFieldDefinitions(): void
     {
-        $fields = $this->getFieldDefinitions();
+        $this->fieldDefinitions = [];
+    }
 
-        foreach ($fields as $fieldName => &$field) {
+    protected function defineMetaDataFieldDefinitions(): void
+    {
+        $this->metaDataFieldDefinitions = [];
+    }
+
+    protected function processFieldDefinitions(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        return;
+    }
+
+    protected function processMetaDataFieldDefinitions(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        return;
+    }
+
+    private function fillValueFieldDefinitions(
+        bool $is_meta = false,
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        $target = $is_meta ? 'metaDataFieldDefinitions' : 'fieldDefinitions';
+        foreach ($this->$target as $fieldName => &$field) {
             if (isset($data[$fieldName])) {
-                $field['default'] = $data[$fieldName];
+                $this->$target[$fieldName]['default'] = $data[$fieldName];
             }
         }
-
-        return $fields;
     }
 
-    /**
-     * Process field definitions before saving.
-     *
-     * This method allows dynamic modifications of field definitions
-     * based on the provided context before saving.
-     *
-     * @param string $context The context in which the data is being saved.
-     * @param array  $fieldDefinitions The current field definitions.
-     * @return array Processed field definitions ready for saving.
-     */
-    public function processFieldDefinitionsForSave(
-        string $context,
-        array $fieldDefinitions
-    ): array {
-        return $fieldDefinitions;
+    private function initializeFields(): void
+    {
+        if ($this->fieldDefinitions === null) {
+            $this->defineFieldDefinitions();
+        }
     }
 
+    private function initializeMetaDataFields(): void
+    {
+        if ($this->metaDataFieldDefinitions === null) {
+            $this->defineMetaDataFieldDefinitions();
+        }
+    }
+
+    private function processFields(
+        string $context = '',
+        array $data = [],
+        int $id = null
+    ): void {
+        // set values for save / form
+        $this->fillValueFieldDefinitions(false, $context, $data, $id);
+        $this->fillValueFieldDefinitions(true, $context, $data, $id);
+
+        // process definitions for various purpose
+        $this->processFieldDefinitions($context, $data, $id);
+        $this->processMetaDataFieldDefinitions($context, $data, $id);
+    }
 
     /**
      * Get the definition for Id field.
      *
      * wrapper of read-only field.
-     *
      */
     protected function getIdField(): array
     {

@@ -73,8 +73,7 @@ trait CRUDTrait
 
     private function validateAndSave(array $fileData, Response $response): ?Response
     {
-        $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processFieldDefinitionsForSave('create', $fields);
+        $fields = $this->model->getFields('create');
         $validationResult = $this->model->validateByFields($fileData, $fields);
 
         if (!$validationResult['valid']) {
@@ -146,8 +145,7 @@ trait CRUDTrait
      */
     protected function update(array $data, int $id = null)
     {
-        $fields = $this->model->getFieldDefinitions();
-        $fields = $this->model->processFieldDefinitionsForSave('edit', $fields);
+        $fields = $this->model->getFields('create', $data, $id);
         $results = $this->model->validateByFields($data, $fields);
 
         if ($results['valid'] !== true) {

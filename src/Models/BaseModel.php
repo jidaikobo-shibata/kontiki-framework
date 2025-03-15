@@ -27,6 +27,8 @@ abstract class BaseModel implements ModelInterface
     public function __construct(Database $db)
     {
         $this->db = $db->getConnection();
+        $this->initializeFields();
+        $this->initializeMetaDataFields();
     }
 
     public function getQuery(): Builder

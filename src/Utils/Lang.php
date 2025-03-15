@@ -28,11 +28,6 @@ class Lang
      */
     private static function loadLanguage(): void
     {
-        if (self::$language == 'en') {
-            self::$messages = [];
-            return;
-        }
-
         self::$messages = [];
         foreach ([self::$langPath, self::$appLangPath] as $langPath) {
             $langDir = $langPath . '/' . self::$language;

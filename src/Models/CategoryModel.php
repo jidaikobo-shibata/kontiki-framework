@@ -13,7 +13,7 @@ class CategoryModel extends BaseModel
 
     protected string $table = 'terms';
 
-    public function setFieldDefinitions(array $params = []): void
+    protected function defineFieldDefinitions(array $params = []): void
     {
         $id = 1;
         $fields = [
