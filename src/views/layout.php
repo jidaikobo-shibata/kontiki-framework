@@ -31,6 +31,9 @@
   <script src="<?= $basePath ?>/fileManagerInstance.js"></script>
   <script src="<?= $basePath ?>/admin.js"></script>
 
+  <!-- CSS -->
+  <link rel="stylesheet" href="<?= $basePath ?>/admin.css">
+
   <title><?= e($pageTitle) ?></title>
 </head>
 

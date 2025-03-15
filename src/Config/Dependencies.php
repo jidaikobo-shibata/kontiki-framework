@@ -51,6 +51,7 @@ class Dependencies
                 $request_uri = $_SERVER['REQUEST_URI'];
                 if (
                     strpos($request_uri, '.js') !== false ||
+                    strpos($request_uri, '.css') !== false ||
                     strpos($request_uri, '.ico') !== false
                 ) {
                     session_cache_limiter('private_no_expire');

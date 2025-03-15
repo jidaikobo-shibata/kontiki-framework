@@ -22,6 +22,7 @@ class AdminController
     public static function registerRoutes(App $app): void
     {
         $app->get('/admin.js', AdminController::class . ':serveJs');
+        $app->get('/admin.css', AdminController::class . ':serveCss');
         $app->get('/favicon.ico', AdminController::class . ':serveFavicon');
     }
 
@@ -44,6 +45,28 @@ class AdminController
         return $response->withHeader(
             'Content-Type',
             'application/javascript; charset=utf-8'
+        )->withStatus(200);
+    }
+
+
+    /**
+     * Serve the requested CSS file.
+     *
+     * @return Response
+     */
+    public function serveCss(Request $request, Response $response): Response
+    {
+        $content = $this->view->fetch(
+            'css/admin.css.php',
+            [
+                'color' => env('ADMIN_THEME_COLOR', '#ffffff'),
+                'bgcolor' => env('ADMIN_THEME_BGCOLOR', '#343a40')
+            ]
+        );
+        $response->getBody()->write($content);
+        return $response->withHeader(
+            'Content-Type',
+            'text/css; charset=utf-8'
         )->withStatus(200);
     }
 
