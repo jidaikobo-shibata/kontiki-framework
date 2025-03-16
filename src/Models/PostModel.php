@@ -17,6 +17,7 @@ class PostModel extends BaseModel
     use Traits\SoftDeleteTrait;
     use Traits\PublishedTrait;
     use Traits\DraftTrait;
+    use Traits\PendingTrait;
     use Traits\ExpiredTrait;
     use Traits\TaxonomyTrait;
 
@@ -59,6 +60,7 @@ class PostModel extends BaseModel
     {
         $hide_excerpt = env('POST_HIDE_METADATA_EXCERPT', false);
         $hide_eyecatch = env('POST_HIDE_METADATA_EYECATCH', false);
+        $this->metaDataFieldDefinitions = [];
 
         if (!$hide_excerpt) {
             $this->metaDataFieldDefinitions['excerpt'] = $this->getField(
@@ -110,6 +112,7 @@ class PostModel extends BaseModel
             'trash'     => ['applySoftDeletedConditions'],
             'reserved'  => ['applyNotPublisedConditions'],
             'expired'   => ['applyExpiredConditions'],
+            'pending'     => ['applyPendingConditions'],
             'draft'     => ['applyDraftConditions'],
         ];
 
@@ -149,10 +152,34 @@ class PostModel extends BaseModel
         $this->fieldDefinitions['creator']['options'] = $userOptions;
         $this->fieldDefinitions['creator']['default'] = $user['id'] ?? 0; // no logged in user: 0
 
+        // add default value
+        if (in_array($context, ['create'])) {
+            $this->addDefaultSlug($data);
+        }
+
         // disable form elements
         if (in_array($context, ['trash', 'restore', 'delete'])) {
             $this->disableFormFieldsForContext();
         }
+    }
+
+    private function addDefaultSlug(array $data): void
+    {
+        // Give priority to POST values
+        if (!empty($data['slug'])) {
+            $this->fieldDefinitions['slug']['default'] = $data['slug'];
+            return;
+        }
+
+        // recommend non exists slug
+        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Ymd');
+        $slug = $this->postType . '-' . $now;
+        $n = 1;
+        while ($this->getByField('slug', $slug)) {
+            $n++;
+            $slug = $slug . '-' . $n;
+        }
+        $this->fieldDefinitions['slug']['default'] = $slug;
     }
 
     private function disableFormFieldsForContext(): void
@@ -204,13 +231,11 @@ class PostModel extends BaseModel
 
     private function getSlugField(): array
     {
-        // add dynamic rules at $this->setRulesFieldDefinitions()
-        $now = Carbon::now(env('TIMEZONE', 'UTC'))->format('Ymd');
+        // add dynamic rules at $this->processFieldDefinitions()
         return $this->getField(
             __('slug'),
             [
                 'description' => __('slug_exp'),
-                'default' => $this->postType . '-' . $now,
                 'rules' => [
                     'required',
                     'slug',
