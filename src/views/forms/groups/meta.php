@@ -9,6 +9,7 @@
     <?= __('publishing_settings') ?>
   </h2>
   <div class="card-body">
+    <p class="form-text"><?= __('publishing_settings_exp') ?></p>
     <?php echo $fields_html; ?>
   </div>
 </div>

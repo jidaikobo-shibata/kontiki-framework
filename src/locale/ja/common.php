@@ -35,9 +35,9 @@ return [
 
     'reserved_at' => '公開予約日時',
     'published_at' => '公開日時',
-    'published_at_exp' => '「公開日時」に未来の日時を入れると予約投稿になります。',
+    'published_at_exp' => '未来の日時を入れると予約投稿になります。',
     'expired_at' => '公開終了日時',
-    'expired_at_exp' => '「公開終了日時」が空の場合は永続的に公開されます。',
+    'expired_at_exp' => '未設定の場合は永続的に公開されます。',
     'status' => 'ステータス',
     'index' => 'すべて',
     'draft' => '下書き',
@@ -48,6 +48,7 @@ return [
     'pending' => '非公開',
     'parent' => '親',
     'publishing_settings' => '公開設定',
+    'publishing_settings_exp' => '「公開終了日時」と「公開予約日時」で、記事の表示終了日と、公開予約日が設定できます。',
     'display_filter' => '表示フィルタ',
 
     'management_portal' => '管理項目一覧',

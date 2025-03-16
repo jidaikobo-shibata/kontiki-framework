@@ -32,6 +32,8 @@
      */
     let publishedAtInput = $("input[name=published_at]");
     let expiredAtInput = $("input[name=expired_at]");
+    let publishedDetails = publishedAtInput.closest("details");
+    let expiredDetails = expiredAtInput.closest("details");
 
     if (publishedAtInput.length === 0 && expiredAtInput.length === 0) {
         return;
@@ -55,10 +57,31 @@
         }
     }
 
+    function updateDetailsState() {
+        let publishedAt = publishedAtInput.val();
+        let expiredAt = expiredAtInput.val();
+        let publishedDate = publishedAt ? new Date(publishedAt) : null;
+        let now = new Date();
+
+        if (expiredAt) {
+            expiredDetails.attr("open", true);
+        } else {
+            expiredDetails.removeAttr("open");
+        }
+
+        if (publishedDate && !isNaN(publishedDate.getTime()) && publishedDate > now) {
+            publishedDetails.attr("open", true);
+        } else {
+            publishedDetails.removeAttr("open");
+        }
+    }
+
     updateStatusOption();
+    updateDetailsState();
 
     $("input[name=published_at], input[name=expired_at]").on("input change", function () {
         updateStatusOption();
+        updateDetailsState();
     });
 
 });
