@@ -16,6 +16,7 @@ class PostController extends BaseController
     use Traits\IndexTrait;
     use Traits\IndexAllTrait;
     use Traits\IndexPublishedTrait;
+    use Traits\IndexPendingTrait;
     use Traits\IndexDraftTrait;
     use Traits\IndexReservedTrait;
     use Traits\IndexExpiredTrait;

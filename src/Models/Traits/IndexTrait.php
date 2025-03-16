@@ -2,7 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Models\Traits;
 
-use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Jidaikobo\Kontiki\Utils\Pagination;
 
