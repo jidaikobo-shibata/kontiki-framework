@@ -135,7 +135,7 @@ trait CreateEditTrait
     {
         $fields = $this->model->getFields($context, $data, $id);
 
-        $validationResult = $this->model->validateByFields($data, $fields);
+        $validationResult = $this->model->validateByFields($data, $fields, $id);
 
         if (!$validationResult['valid']) {
             $this->flashManager->addErrors($validationResult['errors']);

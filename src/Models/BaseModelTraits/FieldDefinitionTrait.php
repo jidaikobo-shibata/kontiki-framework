@@ -52,6 +52,26 @@ trait FieldDefinitionTrait
         return;
     }
 
+    protected function disableFormFieldsForContext(): void
+    {
+        foreach (['metaDataFieldDefinitions', 'fieldDefinitions'] as $fieldType) {
+            foreach ($this->$fieldType as &$field) {
+                // Set input fields to readonly
+                $field['attributes']['readonly'] = 'readonly';
+
+                // Remove file upload class and add "form-control-plaintext"
+                $existingClass = $field['attributes']['class'] ?? '';
+                $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
+                $field['attributes']['class'] = trim(
+                    $existingClass . ' form-control-plaintext p-2'
+                );
+
+                // Remove descriptions
+                $field['description'] = '';
+            }
+        }
+    }
+
     private function fillValueFieldDefinitions(
         string $context = '',
         array $data = [],

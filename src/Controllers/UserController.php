@@ -2,6 +2,8 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\PhpRenderer;
 
 use Jidaikobo\Kontiki\Managers\CsrfManager;
@@ -45,5 +47,23 @@ class UserController extends BaseController
         $this->tableService = $tableService;
         $this->tableService->setModel($model);
         $this->model = $model;
+    }
+
+    public function canDelete(
+        Request $request,
+        Response $response,
+        array $args
+    ): ?Response {
+        $id = $args['id'];
+        $data = $this->model->getById($id);
+
+        if ($data['role'] !== 'admin') return null;
+        $this->flashManager->addErrors([['messages' => [__('cannot_delete_admin')]]]);
+
+        return $this->redirectResponse(
+            $request,
+            $response,
+            "/{$this->adminDirName}/index"
+        );
     }
 }

@@ -11,10 +11,11 @@ trait ValidateTrait
      *
      * @param  array $data The data to validate.
      * @param  array $fieldDefinitions The field definitions.
+     * @param  ?int $id id.
      *
      * @return array An array with 'valid' (bool) and 'errors' (array of errors).
      */
-    public function validateByFields(array $data, array $fieldDefinitions): array
+    public function validateByFields(array $data, array $fieldDefinitions, ?int $id = NULL): array
     {
         $validationService = new ValidationService($this->db);
         return $validationService->validate($data, $fieldDefinitions);

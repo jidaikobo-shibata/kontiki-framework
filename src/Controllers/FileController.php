@@ -2,15 +2,18 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
-use Jidaikobo\Kontiki\Core\Database;
-use Jidaikobo\Kontiki\Models\FileModel;
-use Jidaikobo\Kontiki\Services\FileService;
-
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use Slim\App;
+use Slim\Views\PhpRenderer;
+
+use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
+use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Managers\CsrfManager;
+use Jidaikobo\Kontiki\Managers\FlashManager;
+use Jidaikobo\Kontiki\Models\FileModel;
+use Jidaikobo\Kontiki\Services\RoutesService;
+use Jidaikobo\Kontiki\Services\FileService;
 
 class FileController extends BaseController
 {
@@ -23,11 +26,19 @@ class FileController extends BaseController
     private FileService $fileService;
 
     public function __construct(
-        App $app,
+        CsrfManager $csrfManager,
+        FlashManager $flashManager,
+        PhpRenderer $view,
+        RoutesService $routesService,
         FileModel $model,
         FileService $fileService
     ) {
-        parent::__construct($app);
+        parent::__construct(
+            $csrfManager,
+            $flashManager,
+            $view,
+            $routesService
+        );
         $this->model = $model;
         $this->fileService = $fileService;
     }
