@@ -148,6 +148,31 @@ class PostModel extends BaseModel
         $user = $this->auth->getCurrentUser();
         $this->fieldDefinitions['creator']['options'] = $userOptions;
         $this->fieldDefinitions['creator']['default'] = $user['id'] ?? 0; // no logged in user: 0
+
+        // disable form elements
+        if (in_array($context, ['trash', 'restore', 'delete'])) {
+            $this->disableFormFieldsForContext();
+        }
+    }
+
+    private function disableFormFieldsForContext(): void
+    {
+        foreach (['metaDataFieldDefinitions', 'fieldDefinitions'] as $fieldType) {
+            foreach ($this->$fieldType as &$field) {
+                // Set input fields to readonly
+                $field['attributes']['readonly'] = 'readonly';
+
+                // Remove file upload class and add "form-control-plaintext"
+                $existingClass = $field['attributes']['class'] ?? '';
+                $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
+                $field['attributes']['class'] = trim(
+                    $existingClass . ' form-control-plaintext p-2'
+                );
+
+                // Remove descriptions
+                $field['description'] = '';
+            }
+        }
     }
 
     private function getTitleField(): array

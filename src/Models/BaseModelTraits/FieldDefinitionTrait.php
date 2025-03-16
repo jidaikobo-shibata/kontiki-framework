@@ -52,24 +52,16 @@ trait FieldDefinitionTrait
         return;
     }
 
-    protected function processMetaDataFieldDefinitions(
-        string $context = '',
-        array $data = [],
-        int $id = null
-    ): void {
-        return;
-    }
-
     private function fillValueFieldDefinitions(
-        bool $is_meta = false,
         string $context = '',
         array $data = [],
         int $id = null
     ): void {
-        $target = $is_meta ? 'metaDataFieldDefinitions' : 'fieldDefinitions';
-        foreach ($this->$target as $fieldName => &$field) {
-            if (isset($data[$fieldName])) {
-                $this->$target[$fieldName]['default'] = $data[$fieldName];
+        foreach (['metaDataFieldDefinitions', 'fieldDefinitions'] as $fieldType) {
+            foreach (array_keys($this->$fieldType) as $fieldName) {
+                if (isset($data[$fieldName])) {
+                    $this->$fieldType[$fieldName]['default'] = $data[$fieldName];
+                }
             }
         }
     }
@@ -94,12 +86,10 @@ trait FieldDefinitionTrait
         int $id = null
     ): void {
         // set values for save / form
-        $this->fillValueFieldDefinitions(false, $context, $data, $id);
-        $this->fillValueFieldDefinitions(true, $context, $data, $id);
+        $this->fillValueFieldDefinitions($context, $data, $id);
 
         // process definitions for various purpose
         $this->processFieldDefinitions($context, $data, $id);
-        $this->processMetaDataFieldDefinitions($context, $data, $id);
     }
 
     /**

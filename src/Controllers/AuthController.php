@@ -2,14 +2,18 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Jidaikobo\Kontiki\Core\Auth;
-use Jidaikobo\Kontiki\Models\UserModel;
-use Jidaikobo\Kontiki\Services\FormService;
-use Jidaikobo\Kontiki\Services\RateLimitService;
-
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
+use Slim\Views\PhpRenderer;
+
+use Jidaikobo\Kontiki\Core\Auth;
+use Jidaikobo\Kontiki\Managers\CsrfManager;
+use Jidaikobo\Kontiki\Managers\FlashManager;
+use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Services\FormService;
+use Jidaikobo\Kontiki\Services\RateLimitService;
+use Jidaikobo\Kontiki\Services\RoutesService;
 
 class AuthController extends BaseController
 {
@@ -19,13 +23,21 @@ class AuthController extends BaseController
     private UserModel $model;
 
     public function __construct(
-        App $app,
+        CsrfManager $csrfManager,
+        FlashManager $flashManager,
+        PhpRenderer $view,
+        RoutesService $routesService,
         Auth $auth,
         FormService $formService,
         RateLimitService $rateLimitService,
         UserModel $model
     ) {
-        parent::__construct($app);
+        parent::__construct(
+            $csrfManager,
+            $flashManager,
+            $view,
+            $routesService
+        );
         $this->auth = $auth;
         $this->formService = $formService;
         $this->formService->setModel($model);

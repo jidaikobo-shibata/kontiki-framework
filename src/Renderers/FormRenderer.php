@@ -8,11 +8,15 @@ use Slim\Views\PhpRenderer;
 class FormRenderer
 {
     private array $fields;
+    private FormUtils $formUtils;
     private PhpRenderer $view;
 
-    public function __construct(PhpRenderer $view)
-    {
+    public function __construct(
+        PhpRenderer $view,
+        FormUtils $formUtils
+    ) {
         $this->view = $view;
+        $this->formUtils = $formUtils;
     }
 
     public function setFields(array $fields): void
@@ -77,7 +81,7 @@ class FormRenderer
             return ''; // Hidden fields do not need labels
         }
 
-        $id = FormUtils::nameToId($name);
+        $id = $this->formUtils->nameToId($name);
         $labelAttributes = $this->renderAttributes(array_merge(
             $config['label_attributes'] ?? [],
             ['for' => $id]
@@ -97,7 +101,7 @@ class FormRenderer
 
     protected function renderField(string $name, array $config): string
     {
-        $id = FormUtils::nameToId($name);
+        $id = $this->formUtils->nameToId($name);
 
         $attributes = $config['attributes'] ?? [];
 

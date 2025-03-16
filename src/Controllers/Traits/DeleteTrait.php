@@ -8,38 +8,27 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 trait DeleteTrait
 {
-    public function processFieldForDelete(array $data): array
-    {
-        foreach ($data as &$field) {
-            $field['attributes']['readonly'] = 'readonly';
-
-            $existingClass = $field['attributes']['class'] ?? '';
-            $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
-
-            $field['attributes']['class'] = trim($existingClass . ' form-control-plaintext p-2');
-
-            $field['description'] = '';
-        }
-        unset($field);
-
-        return $data;
-    }
-
-    public function delete(Request $request, Response $response, array $args): Response
-    {
+    public function delete(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
         $id = $args['id'];
         $data = $this->model->getById($id);
 
         if (!$data) {
-            return $this->redirectResponse($request, $response, "{$this->label}_index");
+            return $this->redirectResponse(
+                $request,
+                $response,
+                "{$this->label}_index"
+            );
         }
 
-        $data = $this->model->getFields('delete', $data);
-        $data = $this->processFieldForDelete($data);
+        $fields = $this->model->getFields('delete', $data);
 
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/delete/{$id}",
-            $data,
+            $fields,
             $this->csrfManager->getToken(),
             __(
                 "x_delete_confirm",
@@ -64,8 +53,11 @@ trait DeleteTrait
         );
     }
 
-    public function handleDelete(Request $request, Response $response, array $args): Response
-    {
+    public function handleDelete(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
         $id = $args['id'];
         $data = $request->getParsedBody() ?? [];
 
@@ -87,11 +79,19 @@ trait DeleteTrait
                         ['name' => __($this->label)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
+                return $this->redirectResponse(
+                    $request,
+                    $response,
+                    "/{$this->adminDirName}/index"
+                );
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_delete_failed", "Failed to delete :name", ['name' => __($this->label)])
+                __(
+                    "x_delete_failed",
+                    "Failed to delete :name",
+                    ['name' => __($this->label)]
+                )
               ]);
         }
 

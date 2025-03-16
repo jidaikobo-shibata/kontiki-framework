@@ -14,13 +14,13 @@ trait PreviewTrait
         array $args
     ): Response {
         $id = $args['id'];
-        $data = $this->prepareDataForRenderForm($this->model->getById($id));
+        $data = $this->model->getById($id);
         return static::renderPreview($response, $data);
     }
 
     public function handlePreview(Request $request, Response $response): Response
     {
-        $data = $this->prepareDataForRenderForm();
+        $data = $this->model->getDataForForm('preview', $this->flashManager);
         return static::renderPreview($response, $data);
     }
 
@@ -37,8 +37,8 @@ trait PreviewTrait
         if (!isset($data['title']) || !isset($data['content'])) {
             return $this->renderResponse(
                 $response,
-                __('cannot_preview_title', 'Cannot Render Preview'),
-                __('cannot_preview_desc', 'Preview cannot be reloaded. Please close the preview window and preview again.'),
+                __('cannot_preview_title'),
+                __('cannot_preview_desc'),
                 'preview/content.php'
             );
         } else {

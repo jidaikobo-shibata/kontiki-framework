@@ -16,8 +16,10 @@ class DashboardController
     private PhpRenderer $view;
     private array $routes;
 
-    public function __construct(PhpRenderer $view, RoutesService $routesService)
-    {
+    public function __construct(
+        PhpRenderer $view,
+        RoutesService $routesService
+    ) {
         $this->view = $view;
         $this->routes = $routesService->getRoutesByType('dashboard');
         $this->view->setAttributes([

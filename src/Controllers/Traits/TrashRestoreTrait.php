@@ -13,22 +13,6 @@ trait TrashRestoreTrait
         return $this->index($request, $response, 'trash');
     }
 
-    public function processFieldForTrashRestore(array $data): array
-    {
-        foreach ($data as &$field) {
-            $field['attributes']['readonly'] = 'readonly';
-
-            $existingClass = $field['attributes']['class'] ?? '';
-            $existingClass = str_replace('kontiki-file-upload', '', $existingClass);
-            $field['attributes']['class'] = trim($existingClass . ' form-control-plaintext p-2');
-
-            $field['description'] = '';
-        }
-        unset($field);
-
-        return $data;
-    }
-
     public function trash(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
@@ -53,14 +37,13 @@ trait TrashRestoreTrait
             return $this->redirectResponse($request, $response, "{$this->label}_index");
         }
 
-        $data = $this->model->getFields('trash', $data);
-        $data = $this->processFieldForTrashRestore($data);
+        $fields = $this->model->getFields($actionType, $data);
 
         $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;
 
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/{$actionType}/{$id}",
-            $data,
+            $fields,
             $this->csrfManager->getToken(),
             __(
                 "x_{$actionType}_confirm",
@@ -119,11 +102,19 @@ trait TrashRestoreTrait
                         ['name' => __($this->label)]
                     )
                 );
-                return $this->redirectResponse($request, $response, "/{$this->adminDirName}/index");
+                return $this->redirectResponse(
+                    $request,
+                    $response,
+                    "/{$this->adminDirName}/index"
+                );
             }
         } catch (\Exception $e) {
             $this->flashManager->addErrors([
-                __("x_{$actionType}_failed", "Failed to {$actionType} :name", ['name' => __($this->label)])
+                __(
+                    "x_{$actionType}_failed",
+                    "Failed to {$actionType} :name",
+                    ['name' => __($this->label)]
+                )
               ]);
         }
 

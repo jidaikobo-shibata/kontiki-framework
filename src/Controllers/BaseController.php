@@ -11,10 +11,8 @@ use Jidaikobo\Kontiki\Services\RoutesService;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use Slim\App;
 use Slim\Routing\RouteContext;
-use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
 
 abstract class BaseController
@@ -36,14 +34,15 @@ abstract class BaseController
      *
      * @param App $app container
      */
-    public function __construct(App $app)
-    {
-        $this->app = $app;
-        $container = $app->getContainer();
-        $this->csrfManager = new CsrfManager($container->get(Session::class));
-        $this->flashManager = new FlashManager($container->get(Session::class));
-        $this->view = $container->get(PhpRenderer::class);
-        $routesService = $container->get(RoutesService::class);
+    public function __construct(
+        CsrfManager $csrfManager,
+        FlashManager $flashManager,
+        PhpRenderer $view,
+        RoutesService $routesService
+    ) {
+        $this->csrfManager = $csrfManager;
+        $this->flashManager = $flashManager;
+        $this->view = $view;
         $this->setRoutes($routesService);
         $this->view->setAttributes([
                 'sidebarItems' => $routesService->getRoutesByType('sidebar')

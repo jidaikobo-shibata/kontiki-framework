@@ -78,8 +78,11 @@ trait CreateEditTrait
         return $this->handleSave($request, $response, 'create');
     }
 
-    public function handleEdit(Request $request, Response $response, array $args): Response
-    {
+    public function handleEdit(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
         $id = $args['id'];
         return $this->handleSave($request, $response, 'edit', $id);
     }

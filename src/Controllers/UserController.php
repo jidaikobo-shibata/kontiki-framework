@@ -2,10 +2,12 @@
 
 namespace Jidaikobo\Kontiki\Controllers;
 
-use Slim\App;
+use Slim\Views\PhpRenderer;
 
-use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Managers\CsrfManager;
+use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Services\RoutesService;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\TableService;
 
@@ -24,12 +26,20 @@ class UserController extends BaseController
     private TableService $tableService;
 
     public function __construct(
-        App $app,
+        CsrfManager $csrfManager,
+        FlashManager $flashManager,
+        PhpRenderer $view,
+        RoutesService $routesService,
         FormService $formService,
         TableService $tableService,
         UserModel $model
     ) {
-        parent::__construct($app);
+        parent::__construct(
+            $csrfManager,
+            $flashManager,
+            $view,
+            $routesService
+        );
         $this->formService = $formService;
         $this->formService->setModel($model);
         $this->tableService = $tableService;

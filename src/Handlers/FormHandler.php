@@ -10,7 +10,13 @@ use Jidaikobo\Kontiki\Utils\FormUtils;
 class FormHandler
 {
     private DOMDocument $dom;
+    private FormUtils $formUtils;
     private ?ModelInterface $model = null;
+
+    public function __construct(FormUtils $formUtils)
+    {
+        $this->formUtils = $formUtils;
+    }
 
     public function setModel(ModelInterface $model): void
     {
@@ -44,8 +50,11 @@ class FormHandler
      * @param  string $value     The attribute value.
      * @return void
      */
-    public function setAttributeById(string $id, string $attribute, string $value): void
-    {
+    public function setAttributeById(
+        string $id,
+        string $attribute,
+        string $value
+    ): void {
         $element = $this->dom->getElementById($id);
         if ($element) {
             $element->setAttribute($attribute, $value);
@@ -76,7 +85,7 @@ class FormHandler
         }
 
         foreach ($errors as $field => $messages) {
-            $id = FormUtils::nameToId($field);
+            $id = $this->formUtils->nameToId($field);
 
             // Add ARIA attributes and classes to the element
             $this->setAttributeById($id, 'aria-invalid', 'true');

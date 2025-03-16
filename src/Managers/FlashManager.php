@@ -9,8 +9,10 @@ class FlashManager
     private Session $session;
     private string $segmentName;
 
-    public function __construct(Session $session, string $segmentName = 'jidaikobo\kontiki\flash')
-    {
+    public function __construct(
+        Session $session,
+        string $segmentName = 'jidaikobo\kontiki\flash'
+    ) {
         $this->session = $session;
         $this->segmentName = $segmentName;
     }
