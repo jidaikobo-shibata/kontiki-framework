@@ -4,9 +4,10 @@ namespace Jidaikobo\Kontiki;
 
 use DI\Container;
 use Dotenv\Dotenv;
-use Jidaikobo\Log;
 use Slim\Factory\AppFactory;
 use Slim\App;
+
+use Jidaikobo\Log;
 
 class Bootstrap
 {
@@ -52,10 +53,11 @@ class Bootstrap
         $dependencies->register();
 
         // Set Route
+        $auth = $app->getContainer()->get(Core\Auth::class);
         $routesClass = class_exists('App\Config\Routes')
             ? new \App\Config\Routes()
             : new \Jidaikobo\Kontiki\Config\Routes();
-        $routesClass->register($app, $container);
+        $routesClass->register($app, $container, $auth);
 
         return $app;
     }

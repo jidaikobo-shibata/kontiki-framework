@@ -9,6 +9,21 @@ trait CreateEditTrait
 {
     private array $pendingMetaData;
 
+    public function handleRenderCreateForm(
+        Request $request,
+        Response $response
+    ): Response {
+        return $this->renderCreateForm($request, $response);
+    }
+
+    public function handleRenderEditForm(
+        Request $request,
+        Response $response,
+        array $args
+    ): Response {
+        return $this->renderEditForm($request, $response, $args);
+    }
+
     public function renderCreateForm(
         Request $request,
         Response $response
@@ -73,8 +88,10 @@ trait CreateEditTrait
         );
     }
 
-    public function handleCreate(Request $request, Response $response): Response
-    {
+    public function handleCreate(
+        Request $request,
+        Response $response
+    ): Response {
         return $this->handleSave($request, $response, 'create');
     }
 

@@ -6,6 +6,8 @@ return [
     'logout'   => 'ログアウト',
     'username' => 'ユーザ名',
     'password' => 'パスワード',
+    'account' => 'アカウント',
+    'account_settings' => 'アカウント設定',
 
     'submit' => '送信する',
     'create' => '作成する',

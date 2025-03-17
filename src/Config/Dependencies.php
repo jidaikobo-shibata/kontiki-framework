@@ -10,7 +10,9 @@ use Slim\Views\PhpRenderer;
 
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\RoutesService;
+use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Models\UserModel;
 
 class Dependencies
 {
@@ -59,6 +61,25 @@ class Dependencies
 
                 $sessionFactory = new SessionFactory();
                 return $sessionFactory->newInstance($_COOKIE);
+            }
+        );
+
+        // Register UserModel
+        $container->set(
+            UserModel::class,
+            function ($container) {
+                return new UserModel($container->get(Database::class));
+            }
+        );
+
+        // Register Auth
+        $container->set(
+            Auth::class,
+            function ($container) {
+                return new Auth(
+                    $container->get(Session::class),
+                    $container->get(UserModel::class)
+                );
             }
         );
 

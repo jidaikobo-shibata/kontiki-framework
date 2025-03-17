@@ -11,10 +11,10 @@ class CreateEditRoutes
         string $basePath,
         string $controllerClass
     ): void {
-        $app->get("/{$basePath}/create", [$controllerClass, 'renderCreateForm'])
+        $app->get("/{$basePath}/create", [$controllerClass, 'handleRenderCreateForm'])
             ->setName("{$basePath}|x_create|dashboard,sidebar,createButton");
         $app->post("/{$basePath}/create", [$controllerClass, 'handleCreate']);
-        $app->get("/{$basePath}/edit/{id}", [$controllerClass, 'renderEditForm']);
+        $app->get("/{$basePath}/edit/{id}", [$controllerClass, 'handleRenderEditForm']);
         $app->post("/{$basePath}/edit/{id}", [$controllerClass, 'handleEdit']);
     }
 }

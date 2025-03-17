@@ -70,4 +70,15 @@ class Auth
     {
         return $this->getCurrentUser() !== null;
     }
+
+    /**
+     * Checks if a user is logged in.
+     *
+     * @return bool Returns true if a user is logged in, false otherwise.
+     */
+    public function isAdminLoggedIn(): bool
+    {
+        return $this->getCurrentUser() !== null &&
+            $this->getCurrentUser()["role"] === 'admin';
+    }
 }

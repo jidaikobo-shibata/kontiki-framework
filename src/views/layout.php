@@ -44,7 +44,10 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
   <ul class="navbar-nav ml-auto">
     <li class="nav-item d-none d-sm-inline-block">
-    <a href="<?= $basePath ?>/logout" class="nav-link"><?= __('logout', 'Logout') ?></a>
+    <a href="<?= $basePath ?>/account/settings" class="nav-link"><?= __('account_settings') ?></a>
+    </li>
+    <li class="nav-item d-none d-sm-inline-block">
+    <a href="<?= $basePath ?>/logout" class="nav-link"><?= __('logout') ?></a>
     </li>
   </ul>
   </nav><!-- /.main-header -->

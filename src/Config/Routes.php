@@ -2,21 +2,29 @@
 
 namespace Jidaikobo\Kontiki\Config;
 
-use Jidaikobo\Kontiki\Controllers;
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use DI\Container;
 use Slim\App;
 
+use Jidaikobo\Kontiki\Core\Auth;
+use Jidaikobo\Kontiki\Controllers;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+
 class Routes
 {
-    public function register(App $app, Container $_container): void
-    {
+    public function register(
+        App $app,
+        Container $_container,
+        Auth $auth
+    ): void {
         Controllers\AdminController::registerRoutes($app);
         Controllers\AuthController::registerRoutes($app);
         Controllers\DashboardController::registerRoutes($app);
         Controllers\FileController::registerRoutes($app);
-        Controllers\UserController::registerRoutes($app, 'user');
         Controllers\PostController::registerRoutes($app, 'post');
+        if ($auth->isAdminLoggedIn()) {
+            Controllers\UserController::registerRoutes($app, 'user');
+        }
+        Controllers\AccountController::registerRoutes($app);
 //        Controllers\CategoryController::registerRoutes($app, 'post/category');
 
         $app->add(AuthMiddleware::class);
