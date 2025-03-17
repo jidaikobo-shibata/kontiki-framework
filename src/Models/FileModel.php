@@ -2,11 +2,22 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
+use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Validation\BaseValidator;
+
 class FileModel extends BaseModel
 {
     use Traits\CRUDTrait;
 
     protected string $table = 'files';
+
+    public function __construct(
+        Database $db,
+        BaseValidator $validator
+    ) {
+        parent::__construct($db);
+        $this->setValidator($validator);
+    }
 
     protected function defineFieldDefinitions(array $params = []): void
     {

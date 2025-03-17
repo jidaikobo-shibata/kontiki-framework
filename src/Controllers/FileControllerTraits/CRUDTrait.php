@@ -73,8 +73,10 @@ trait CRUDTrait
 
     private function validateAndSave(array $fileData, Response $response): ?Response
     {
-        $fields = $this->model->getFields('create');
-        $validationResult = $this->model->validateByFields($fileData, $fields);
+        $validationResult = $this->model->getValidator()->validate(
+            $data,
+            ['context' => 'create']
+        );
 
         if (!$validationResult['valid']) {
             return $this->messageResponse(
@@ -145,8 +147,10 @@ trait CRUDTrait
      */
     protected function update(array $data, int $id = null)
     {
-        $fields = $this->model->getFields('create', $data, $id);
-        $results = $this->model->validateByFields($data, $fields);
+        $results = $this->model->getValidator()->validate(
+            $data,
+            ['id' => $id, 'context' => 'edit']
+        );
 
         if ($results['valid'] !== true) {
             if (isset($results['errors']['description'])) {

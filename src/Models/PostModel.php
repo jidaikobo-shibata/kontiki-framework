@@ -3,11 +3,11 @@
 namespace Jidaikobo\Kontiki\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Validation\BaseValidator;
 
 class PostModel extends BaseModel
 {
@@ -25,17 +25,19 @@ class PostModel extends BaseModel
     protected string $postType = 'post';
     protected string $deleteType = 'softDelete';
 
-    private UserModel $userModel;
     private Auth $auth;
+    private UserModel $userModel;
 
     public function __construct(
         Database $db,
         Auth $auth,
-        UserModel $userModel
+        UserModel $userModel,
+        BaseValidator $validator
     ) {
         parent::__construct($db);
-        $this->userModel = $userModel;
         $this->auth = $auth;
+        $this->userModel = $userModel;
+        $this->setValidator($validator);
     }
 
     protected function defineFieldDefinitions(): void

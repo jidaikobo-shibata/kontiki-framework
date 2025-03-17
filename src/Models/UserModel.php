@@ -2,6 +2,9 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
+use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Validation\UserValidator;
+
 class UserModel extends BaseModel
 {
     use Traits\CRUDTrait;
@@ -9,6 +12,14 @@ class UserModel extends BaseModel
     use Traits\IndexTrait;
 
     protected string $table = 'users';
+
+    public function __construct(
+        Database $db,
+        UserValidator $validator
+    ) {
+        parent::__construct($db);
+        $this->setValidator($validator);
+    }
 
     protected function defineFieldDefinitions(): void
     {

@@ -150,9 +150,10 @@ trait CreateEditTrait
      */
     private function isValidData(array $data, string $context, ?int $id): bool
     {
-        $fields = $this->model->getFields($context, $data, $id);
-
-        $validationResult = $this->model->validateByFields($data, $fields, $id);
+        $validationResult = $this->model->getValidator()->validate(
+            $data,
+            ['id' => $id, 'context' => $context]
+        );
 
         if (!$validationResult['valid']) {
             $this->flashManager->addErrors($validationResult['errors']);

@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Builder;
 
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\BaseModelTraits;
+use Jidaikobo\Kontiki\Validation\ValidatorInterface;
 
 /**
  * BaseModel provides common CRUD operations for database interactions.
@@ -17,12 +18,12 @@ abstract class BaseModel implements ModelInterface
     use BaseModelTraits\FieldDefinitionTrait;
     use BaseModelTraits\SearchTrait;
     use BaseModelTraits\UtilsTrait;
-    use BaseModelTraits\ValidateTrait;
 
     protected string $table;
     protected string $postType = '';
     protected string $deleteType = 'hardDelete';
     protected Connection $db;
+    public ?ValidatorInterface $validator = null;
 
     public function __construct(Database $db)
     {
@@ -34,6 +35,17 @@ abstract class BaseModel implements ModelInterface
     public function getQuery(): Builder
     {
         return $this->db->table($this->table);
+    }
+
+    public function setValidator(ValidatorInterface $validator): void
+    {
+        $this->validator = $validator;
+        $this->validator->setModel($this);
+    }
+
+    public function getValidator(): ValidatorInterface
+    {
+        return $this->validator;
     }
 
     public function getDeleteType(): string

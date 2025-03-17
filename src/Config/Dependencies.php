@@ -7,12 +7,14 @@ use Aura\Session\Session;
 use DI\Container;
 use Slim\App;
 use Slim\Views\PhpRenderer;
+use Valitron\Validator;
 
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\RoutesService;
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
+use Jidaikobo\Kontiki\Validation\UserValidator;
 
 class Dependencies
 {
@@ -68,7 +70,10 @@ class Dependencies
         $container->set(
             UserModel::class,
             function ($container) {
-                return new UserModel($container->get(Database::class));
+                return new UserModel(
+                    $container->get(Database::class),
+                    $container->get(UserValidator::class)
+                );
             }
         );
 
@@ -80,6 +85,14 @@ class Dependencies
                     $container->get(Session::class),
                     $container->get(UserModel::class)
                 );
+            }
+        );
+
+        // Register Validator
+        $container->set(
+            Validator::class,
+            function () {
+                return new Validator([], [], env('LANG', 'en'));
             }
         );
 
