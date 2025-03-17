@@ -23,6 +23,8 @@ class AccountController extends BaseController
     private AccountModel $model;
 
     use Traits\CreateEditTrait;
+    protected string $backStringAfterSaveKey = 'x_save_success';
+    protected string $backStringAfterSave = ':name Saved successfully.';
 
     public function __construct(
         CsrfManager $csrfManager,

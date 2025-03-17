@@ -175,11 +175,18 @@ trait CreateEditTrait
     ): Response {
         try {
             $id = $this->saveData($context, $id, $data);
+
+            // not so good...
+            $backStringAfterSaveKey = $this->backStringAfterSaveKey ??
+                'x_save_success_and_redirect';
+            $backStringAfterSave = $this->backStringAfterSave ??
+                ':name Saved successfully. [Go to Index](:url)';
+
             $this->flashManager->addMessage(
                 'success',
                 __(
-                    "x_save_success_and_redirect",
-                    ':name Saved successfully. [Go to Index](:url)',
+                    $backStringAfterSaveKey,
+                    $backStringAfterSave,
                     [
                         'name' => __($this->label),
                         'url' => env('BASEPATH') . "/{$this->adminDirName}/index"
