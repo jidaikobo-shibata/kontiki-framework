@@ -28,6 +28,17 @@
     });
 
     /**
+     * notice message updated
+     */
+    let $flashMessage = $('[role="status"]');
+    if ($flashMessage.length) {
+        $flashMessage.hide();
+        setTimeout(function () {
+            $flashMessage.slideDown(500);
+        }, 100);
+    }
+
+    /**
      * update status (place bottom of this file)
      */
     let publishedAtInput = $("input[name=published_at]");

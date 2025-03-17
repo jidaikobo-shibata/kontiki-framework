@@ -12,7 +12,7 @@ class MessageUtils
         // フィールド定義を取得
         $fieldDefinitions = $model->getFields();
 
-        $html = '<div class="errormessages">';
+        $html = '<div class="errormessages" role="status">';
         $html .= '<ul class="alert alert-danger p-3 ps-5 pt-0 mt-3 mb-3 fs-6">';
 
         foreach ($errors as $field => $errorDetails) {
