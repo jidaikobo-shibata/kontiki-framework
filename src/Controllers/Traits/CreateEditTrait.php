@@ -150,7 +150,7 @@ trait CreateEditTrait
      */
     private function isValidData(array $data, string $context, ?int $id): bool
     {
-        $validationResult = $this->model->getValidator()->validate(
+        $validationResult = $this->model->validate(
             $data,
             ['id' => $id, 'context' => $context]
         );

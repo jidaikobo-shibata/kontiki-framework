@@ -2,10 +2,11 @@
 
 namespace Jidaikobo\Kontiki\Services;
 
+use Slim\Views\PhpRenderer;
+
 use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Renderers\FormRenderer;
 use Jidaikobo\Kontiki\Handlers\FormHandler;
-use Slim\Views\PhpRenderer;
 
 /**
  * FormService

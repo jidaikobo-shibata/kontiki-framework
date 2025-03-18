@@ -1,6 +1,6 @@
 <?php
 
-namespace Jidaikobo\Kontiki\Validation;
+namespace Jidaikobo\Kontiki\Services;
 
 use Illuminate\Database\Connection;
 use Valitron\Validator;
@@ -8,23 +8,21 @@ use Valitron\Validator;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\ModelInterface;
 
-class BaseValidator implements ValidatorInterface
+class ValidationService
 {
-    protected Connection $db;
-    protected Validator $validator;
+    private Connection $db;
+    private Validator $validator;
     private ?ModelInterface $model = null;
 
     /**
      * ValidationService constructor.
      *
-     * @param Database $db Instance of Illuminate\Database\Connection
      * @param Validator $validator Instance of Valitron\Validator
      */
     public function __construct(
         Database $db,
         Validator $validator
-    )
-    {
+    ) {
         $this->db = $db->getConnection();
         $this->validator = $validator;
         $this->validator->setPrependLabels(false);
@@ -45,15 +43,19 @@ class BaseValidator implements ValidatorInterface
      */
     public function validate(
         array $data,
-        array $context = []
+        array $context
     ): array {
+        // set data/field to `valitron\validator`
         $validator = $this->validator->withData($data);
+
+        // get fieldDefinitions from model
         $fields = $this->model->getFields(
             $context['context'] ?? 'create',
             $data,
             $context['id'] ?? null,
         );
 
+        // Validation
         foreach ($fields as $field => $definition) {
             $rules = $definition['rules'] ?? [];
             foreach ($rules as $rule) {
@@ -64,8 +66,6 @@ class BaseValidator implements ValidatorInterface
                 }
             }
         }
-
-        $validator = $this->additionalvalidate($validator, $data, $context);
 
         $isValid = $validator->validate();
 

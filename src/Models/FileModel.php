@@ -2,22 +2,11 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
-use Jidaikobo\Kontiki\Core\Database;
-use Jidaikobo\Kontiki\Validation\BaseValidator;
-
 class FileModel extends BaseModel
 {
     use Traits\CRUDTrait;
 
     protected string $table = 'files';
-
-    public function __construct(
-        Database $db,
-        BaseValidator $validator
-    ) {
-        parent::__construct($db);
-        $this->setValidator($validator);
-    }
 
     protected function defineFieldDefinitions(array $params = []): void
     {
@@ -50,7 +39,7 @@ class FileModel extends BaseModel
                 'default' => '',
                 'searchable' => true,
                 'rules' => [
-                    // ['lengthMin', 3]
+                    ['lengthMin', 3]
                 ],
                 'filter' => FILTER_UNSAFE_RAW,
                 'template' => 'default',

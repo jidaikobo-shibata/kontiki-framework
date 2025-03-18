@@ -61,9 +61,18 @@ trait DeleteTrait
         $id = $args['id'];
         $data = $request->getParsedBody() ?? [];
 
-        $redirectResponse = $this->canDelete($request, $response, $args);
-        if ($redirectResponse) {
-            return $redirectResponse;
+        $results = $this->model->validate(
+            $data,
+            ['id' => $id, 'context' => 'delete']
+        );
+
+        if (!$results['valid']) {
+            $this->flashManager->addErrors($results['errors']);
+            return  $this->redirectResponse(
+                $request,
+                $response,
+                "/{$this->adminDirName}/index"
+            );
         }
 
         // validate csrf token
@@ -102,13 +111,5 @@ trait DeleteTrait
 
         $redirectTo = "/{$this->adminDirName}/edit/{$id}";
         return $this->redirectResponse($request, $response, $redirectTo);
-    }
-
-    protected function canDelete(
-        Request $request,
-        Response $response,
-        array $args
-    ): ?Response {
-        return null;
     }
 }

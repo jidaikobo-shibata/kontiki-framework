@@ -2,9 +2,6 @@
 
 namespace Jidaikobo\Kontiki\Models;
 
-use Jidaikobo\Kontiki\Core\Database;
-use Jidaikobo\Kontiki\Validation\UserValidator;
-
 class UserModel extends BaseModel
 {
     use Traits\CRUDTrait;
@@ -12,14 +9,6 @@ class UserModel extends BaseModel
     use Traits\IndexTrait;
 
     protected string $table = 'users';
-
-    public function __construct(
-        Database $db,
-        UserValidator $validator
-    ) {
-        parent::__construct($db);
-        $this->setValidator($validator);
-    }
 
     protected function defineFieldDefinitions(): void
     {
@@ -109,38 +98,72 @@ class UserModel extends BaseModel
         }
     }
 
-    /**
-     * Override the validation method to ensure that at least one "admin" remains in the system.
-     *
-     * @param array $data The data to validate.
-     * @param array $fieldDefinitions The field definitions used for validation.
-     * @return array An array containing 'valid' (boolean) and 'errors'.
-     */
-    public function validateByFields(array $data, array $fieldDefinitions, ?int $id = NULL): array
+    public function validate(array $data, array $context): array
     {
-        // Execute the parent validation logic
-        $result = parent::validateByFields($data, $fieldDefinitions, $id);
+        $result = parent::validate($data, $context);
+        $adminCheck = $this->atLeastOneAdmin($data, $context);
+        $deleteCheck = $this->cannotDeleteAdmin($context);
 
-        // Check if the "role" field is being modified
-        if (isset($data['role'])) {
-            // Retrieve the target user's data from the database
-            $targetUser = $this->getById($id ?? 0);
+        return [
+            'valid' => $result['valid'] && $adminCheck['valid'] && $deleteCheck['valid'],
+            'errors' => array_merge_recursive(
+                $result['errors'],
+                $adminCheck['errors'],
+                $deleteCheck['errors']
+            )
+        ];
+    }
 
-            // If the user is an "admin" and is attempting to change their role
-            if ($targetUser && $targetUser['role'] === 'admin' && $data['role'] !== 'admin') {
-                // Count the number of other admins in the system
-                $adminCount = $this->db->table($this->table)
-                    ->where('role', 'admin')
-                    ->where('id', '!=', $targetUser['id']) // Exclude the current user
-                    ->count();
+    private function atLeastOneAdmin(array $data, array $context): array
+    {
+        $result = [
+            'valid' => true,
+            'errors' => []
+        ];
 
-                // If no other admins remain, return a validation error
-                if ($adminCount === 0) {
-                    $result['valid'] = false;
-                    $result['errors']['role']['messages'] = [__('at_least_one_admin')];
-                }
+        $id = $context['id'] ?? 0;
+        if (!$id || !isset($data['role'])) {
+            return $result;
+        }
+
+        // Retrieve the target user's data from the database
+        $targetUser = $this->getById($id);
+
+        // If the user is an "admin" and is attempting to change their role
+        if ($targetUser && $targetUser['role'] === 'admin' && $data['role'] !== 'admin') {
+            // Count the number of other admins in the system
+            $adminCount = $this->db->table($this->table)
+                ->where('role', 'admin')
+                ->where('id', '!=', $targetUser['id']) // Exclude the current user
+                ->count();
+
+            // If no other admins remain, return a validation error
+            if ($adminCount === 0) {
+                $result['valid'] = false;
+                $result['errors']['role']['messages'] = [__('at_least_one_admin')];
             }
         }
+
+        return $result;
+    }
+
+    private function cannotDeleteAdmin(array $context): array
+    {
+        $result = [
+            'valid' => true,
+            'errors' => []
+        ];
+
+        if (($context['context'] ?? '') !== 'delete') {
+            return $result;
+        }
+
+        $id = $context['id'] ?? 0;
+        $targetUser = $this->getById($id);
+
+        if ($targetUser['role'] !== 'admin') return $result;
+        $result['valid'] = false;
+        $result['errors']['role']['messages'] = [__('cannot_delete_admin')];
 
         return $result;
     }

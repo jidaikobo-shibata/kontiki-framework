@@ -11,10 +11,10 @@ use Valitron\Validator;
 
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\RoutesService;
+use Jidaikobo\Kontiki\Services\ValidationService;
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\UserModel;
-use Jidaikobo\Kontiki\Validation\UserValidator;
 
 class Dependencies
 {
@@ -72,7 +72,7 @@ class Dependencies
             function ($container) {
                 return new UserModel(
                     $container->get(Database::class),
-                    $container->get(UserValidator::class)
+                    $container->get(ValidationService::class)
                 );
             }
         );
@@ -90,9 +90,13 @@ class Dependencies
 
         // Register Validator
         $container->set(
-            Validator::class,
-            function () {
-                return new Validator([], [], env('LANG', 'en'));
+            ValidationService::class,
+            function ($container) {
+                $validator = new Validator([], [], env('LANG', 'en'));
+                return new ValidationService(
+                    $container->get(Database::class),
+                    $validator
+                );
             }
         );
 

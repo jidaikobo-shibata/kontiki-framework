@@ -9,9 +9,9 @@ use Slim\Views\PhpRenderer;
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Models\UserModel;
-use Jidaikobo\Kontiki\Services\RoutesService;
 use Jidaikobo\Kontiki\Services\FormService;
 use Jidaikobo\Kontiki\Services\TableService;
+use Jidaikobo\Kontiki\Services\RoutesService;
 
 class UserController extends BaseController
 {
@@ -47,23 +47,5 @@ class UserController extends BaseController
         $this->tableService = $tableService;
         $this->tableService->setModel($model);
         $this->model = $model;
-    }
-
-    public function canDelete(
-        Request $request,
-        Response $response,
-        array $args
-    ): ?Response {
-        $id = $args['id'];
-        $data = $this->model->getById($id);
-
-        if ($data['role'] !== 'admin') return null;
-        $this->flashManager->addErrors([['messages' => [__('cannot_delete_admin')]]]);
-
-        return $this->redirectResponse(
-            $request,
-            $response,
-            "/{$this->adminDirName}/index"
-        );
     }
 }

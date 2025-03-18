@@ -7,7 +7,7 @@ use Illuminate\Database\Query\Builder;
 
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
-use Jidaikobo\Kontiki\Validation\BaseValidator;
+use Jidaikobo\Kontiki\Services\ValidationService;
 
 class PostModel extends BaseModel
 {
@@ -30,14 +30,13 @@ class PostModel extends BaseModel
 
     public function __construct(
         Database $db,
+        ValidationService $validator,
         Auth $auth,
-        UserModel $userModel,
-        BaseValidator $validator
+        UserModel $userModel
     ) {
-        parent::__construct($db);
+        parent::__construct($db, $validator);
         $this->auth = $auth;
         $this->userModel = $userModel;
-        $this->setValidator($validator);
     }
 
     protected function defineFieldDefinitions(): void
