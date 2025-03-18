@@ -34,6 +34,7 @@ return [
     'deleted_at' => '削除日時',
     'excerpt' => '抜粋',
     'eyecatch' => '代表画像',
+    'open_in_new_window' => '新しいウィンドウ/タブで開く',
 
     'reserved_at' => '公開予約日時',
     'published_at' => '公開日時',
@@ -52,7 +53,6 @@ return [
     'publishing_settings' => '公開設定',
     'publishing_settings_exp' => '「公開終了日時」と「公開予約日時」で、記事の表示終了日と、公開予約日が設定できます。',
     'display_filter' => '表示フィルタ',
-
     'management_portal' => '管理項目一覧',
 
     // placeholders

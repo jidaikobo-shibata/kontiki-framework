@@ -11,10 +11,9 @@ This is another paragraph. It also has two sentences.
 <p>Line breaks inserted in the text are removed. This is because the design philosophy is that the web browser should be responsible for breaking lines according to the screen size. If you want to force a line break, leave two or more spaces at the end of the line and then break the line, which will result in <code>&lt;br&gt;</code>. </p>
 
 <h2>Headings</h2>
-<p>You can create headings by placing several <code>#</code> before your text. The number of <code>#</code> corresponds to the level of the heading, and up to six levels of headings are provided. </p>
+<p>You can create headings by placing several <code>#</code> before your text. The number of <code>#</code> corresponds to the level of the heading, and up to six levels of headings are provided. Heading level 1 is a special heading that represents the entire page. Please start using heading level 2.</p>
 
-<pre class="bg-light p-3 border rounded"><code># Level 1 heading
-## Level 2 heading
+<pre class="bg-light p-3 border rounded"><code>## Level 2 heading
 ### Level 3 heading
 #### Level 4 heading
 ##### Level 5 heading

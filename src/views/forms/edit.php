@@ -29,7 +29,10 @@
       strpos($actionAttribute, '/account/') === false
      ) :
   ?>
-  <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview"><?= __('preview') ?></button>
+  <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview">
+    <?= __('preview') ?>
+    <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= __('open_in_new_window') ?>"></span>
+  </button>
   <?php endif; ?>
   <button type="submit" class="btn btn-primary"><?= $buttonText ?></button>
 </form>
