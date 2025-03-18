@@ -74,7 +74,7 @@ trait CRUDTrait
     private function validateAndSave(array $fileData, Response $response): ?Response
     {
         $validationResult = $this->model->getValidator()->validate(
-            $data,
+            $fileData,
             ['context' => 'create']
         );
 
