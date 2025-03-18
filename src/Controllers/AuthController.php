@@ -60,6 +60,10 @@ class AuthController extends BaseController
             die("Access denied due to too many failed login attempts.");
         }
 
+        if ($this->auth->isLoggedIn()) {
+            return $this->redirectResponse($request, $response, 'dashboard');
+        }
+
         $data = $this->flashManager->getData('data', ['username' => '']);
 
         $content = $this->view->fetch('auth/login.php', $data);
@@ -68,7 +72,12 @@ class AuthController extends BaseController
             $this->flashManager->getData('errors', [])
         );
 
-        return $this->renderResponse($response, __('login', 'Login'), $content, 'layout-simple.php');
+        return $this->renderResponse(
+            $response,
+            __('login', 'Login'),
+            $content,
+            'layout-simple.php'
+        );
     }
 
     public function processLogin(Request $request, Response $response): Response
