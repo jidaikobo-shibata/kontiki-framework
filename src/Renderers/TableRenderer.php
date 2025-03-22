@@ -125,7 +125,7 @@ class TableRenderer
     protected function getRowValues(string $name, array $row, Carbon $currentTime): array
     {
         $type = $this->fields[$name]['type'] ?? 'text';
-        if (in_array($type, ['select', 'checkbox', 'radio'])) {
+        if ($name !== 'status' && in_array($type, ['select', 'checkbox', 'radio'])) {
             $options = $this->fields[$name]['options'] ?? [];
             return [$options[$row[$name]] ?? ''];
         }
