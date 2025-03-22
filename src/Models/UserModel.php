@@ -126,25 +126,31 @@ class UserModel extends BaseModel
             return $result;
         }
 
-        // Retrieve the target user's data from the database
         $targetUser = $this->getById($id);
 
-        // If the user is an "admin" and is attempting to change their role
-        if ($targetUser && $targetUser['role'] === 'admin' && $data['role'] !== 'admin') {
-            // Count the number of other admins in the system
-            $adminCount = $this->db->table($this->table)
-                ->where('role', 'admin')
-                ->where('id', '!=', $targetUser['id']) // Exclude the current user
-                ->count();
-
-            // If no other admins remain, return a validation error
-            if ($adminCount === 0) {
-                $result['valid'] = false;
-                $result['errors']['role']['messages'] = [__('at_least_one_admin')];
-            }
+        if ($this->isDemotingLastAdmin($targetUser, $data)) {
+            $result['valid'] = false;
+            $result['errors']['role']['messages'] = [__('at_least_one_admin')];
         }
 
         return $result;
+    }
+
+    /**
+     * Check if the given user is the last admin and being demoted.
+     */
+    private function isDemotingLastAdmin(?array $user, array $newData): bool
+    {
+        if (!$user || $user['role'] !== 'admin' || $newData['role'] === 'admin') {
+            return false;
+        }
+
+        $otherAdmins = $this->db->table($this->table)
+            ->where('role', 'admin')
+            ->where('id', '!=', $user['id'])
+            ->count();
+
+        return $otherAdmins === 0;
     }
 
     private function cannotDeleteAdmin(array $context): array

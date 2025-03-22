@@ -18,117 +18,85 @@ use Jidaikobo\Kontiki\Models\UserModel;
 
 class Dependencies
 {
-    private App $app;
-
-    public function __construct(App $app)
-    {
-        $this->app = $app;
-    }
+    public function __construct(private App $app) {}
 
     public function register(): void
     {
         /** @var Container $container */
         $container = $this->app->getContainer();
 
-        // Set up App
         $container->set(App::class, $this->app);
+        $container->set(Database::class, fn() => $this->createDatabase());
+        $container->set(Session::class, fn() => $this->createSession());
+        $container->set(UserModel::class, fn($c) => $this->createUserModel($c));
+        $container->set(Auth::class, fn($c) => $this->createAuth($c));
+        $container->set(ValidationService::class, fn($c) => $this->createValidationService($c));
+        $container->set(PhpRenderer::class, fn() => $this->createPhpRenderer());
+        $container->set(FileService::class, fn() => $this->createFileService());
+        $container->set(RoutesService::class, fn() => $this->createRoutesService());
+    }
 
-        // database
-        $container->set(
-            Database::class,
-            function () {
-                return new Database([
-                        'driver' => 'sqlite',
-                        'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
-                        'charset' => 'utf8',
-                        'collation' => 'utf8_unicode_ci',
-                        'prefix' => '',
-                    ]);
-            }
+    private function createDatabase(): Database
+    {
+        return new Database([
+            'driver' => 'sqlite',
+            'database' => env('PROJECT_PATH', '') . '/' . env('DB_DATABASE', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+        ]);
+    }
+
+    private function createSession(): Session
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if (
+            str_contains($uri, '.js') ||
+            str_contains($uri, '.css') ||
+            str_contains($uri, '.ico')
+        ) {
+            session_cache_limiter('private_no_expire');
+        }
+        return (new SessionFactory())->newInstance($_COOKIE);
+    }
+
+    private function createUserModel(Container $c): UserModel
+    {
+        return new UserModel(
+            $c->get(Database::class),
+            $c->get(ValidationService::class)
         );
+    }
 
-        // Set up a Aura\Session instance
-        $container->set(
-            Session::class,
-            function () {
-                // cache JavaScript and image
-                $request_uri = $_SERVER['REQUEST_URI'];
-                if (
-                    strpos($request_uri, '.js') !== false ||
-                    strpos($request_uri, '.css') !== false ||
-                    strpos($request_uri, '.ico') !== false
-                ) {
-                    session_cache_limiter('private_no_expire');
-                }
-
-                $sessionFactory = new SessionFactory();
-                return $sessionFactory->newInstance($_COOKIE);
-            }
+    private function createAuth(Container $c): Auth
+    {
+        return new Auth(
+            $c->get(Session::class),
+            $c->get(UserModel::class)
         );
+    }
 
-        // Register UserModel
-        $container->set(
-            UserModel::class,
-            function ($container) {
-                return new UserModel(
-                    $container->get(Database::class),
-                    $container->get(ValidationService::class)
-                );
-            }
-        );
+    private function createValidationService(Container $c): ValidationService
+    {
+        $validator = new Validator([], [], env('APPLANG', 'en'));
+        return new ValidationService($c->get(Database::class), $validator);
+    }
 
-        // Register Auth
-        $container->set(
-            Auth::class,
-            function ($container) {
-                return new Auth(
-                    $container->get(Session::class),
-                    $container->get(UserModel::class)
-                );
-            }
-        );
+    private function createPhpRenderer(): PhpRenderer
+    {
+        return new PhpRenderer(__DIR__ . '/../../src/views');
+    }
 
-        // Register Validator
-        $container->set(
-            ValidationService::class,
-            function ($container) {
-                $validator = new Validator([], [], env('APPLANG', 'en'));
-                return new ValidationService(
-                    $container->get(Database::class),
-                    $validator
-                );
-            }
-        );
+    private function createFileService(): FileService
+    {
+        $uploadDir = env('PROJECT_PATH', '') . env('UPLOADDIR', '');
+        $allowedTypes = json_decode(env('ALLOWED_MIME_TYPES', '[]'), true);
+        $maxSize = env('MAXSIZE', 5000000);
+        return new FileService($uploadDir, $allowedTypes, $maxSize);
+    }
 
-        // Register PhpRenderer
-        $container->set(
-            PhpRenderer::class,
-            function () {
-                return new PhpRenderer(__DIR__ . '/../../src/views');
-            }
-        );
-
-        // Register FileService
-        $container->set(
-            FileService::class,
-            function () {
-                $uploadDir = env('PROJECT_PATH', '') . env('UPLOADDIR', '');
-                $allowedTypesJson = env('ALLOWED_MIME_TYPES', '[]');
-                $allowedTypes = json_decode($allowedTypesJson, true);
-                $maxSize = env('MAXSIZE', 5000000);
-                return new FileService($uploadDir, $allowedTypes, $maxSize);
-            }
-        );
-
-        // Set up Routes
-        $container->set(
-            RoutesService::class,
-            function () {
-                return new RoutesService(
-                    $this->app->getRouteCollector()
-                );
-            }
-        );
-
+    private function createRoutesService(): RoutesService
+    {
+        return new RoutesService($this->app->getRouteCollector());
     }
 }
