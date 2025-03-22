@@ -1,11 +1,8 @@
+.phpunit.result.cache
 /admin/.htaccess
 /admin/index.php
 /app
-/bin/phinx
-/bin/phpcbf
-/bin/phpcs
-/bin/phpstan
-/bin/phpstan.phar
+/bin/*
 /db/development/database.sqlite3
 /db/production/database.sqlite3
 /logs/
