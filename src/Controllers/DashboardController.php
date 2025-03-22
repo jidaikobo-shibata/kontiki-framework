@@ -22,7 +22,13 @@ class DashboardController
     ) {
         $this->view = $view;
         $this->routes = $routesService->getRoutesByType('dashboard');
+        $this->setViewAttributes($routesService);
+    }
+
+    protected function setViewAttributes($routesService): void
+    {
         $this->view->setAttributes([
+                'lang' => env('APPLANG', 'en'),
                 'sidebarItems' => $routesService->getRoutesByType('sidebar')
             ]);
     }

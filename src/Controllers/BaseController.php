@@ -55,6 +55,7 @@ abstract class BaseController
     protected function setViewAttributes($routesService): void
     {
         $this->view->setAttributes([
+                'lang' => env('APPLANG', 'en'),
                 'sidebarItems' => $routesService->getRoutesByType('sidebar'),
                 'is_previewable' => method_exists($this, 'renderPreview')
             ]);

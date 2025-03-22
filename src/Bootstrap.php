@@ -34,7 +34,7 @@ class Bootstrap
         setenv('PROJECT_PATH', $projectPath);
 
         // Load default language on class load
-        $language = env('LANG', 'en');
+        $language = env('APPLANG', 'en');
         Utils\Lang::setLanguage($language);
 
         // Configure a PHP-DI container

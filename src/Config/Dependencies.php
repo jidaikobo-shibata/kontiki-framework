@@ -92,7 +92,7 @@ class Dependencies
         $container->set(
             ValidationService::class,
             function ($container) {
-                $validator = new Validator([], [], env('LANG', 'en'));
+                $validator = new Validator([], [], env('APPLANG', 'en'));
                 return new ValidationService(
                     $container->get(Database::class),
                     $validator

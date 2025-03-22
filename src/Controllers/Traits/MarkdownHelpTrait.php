@@ -9,7 +9,7 @@ trait MarkdownHelpTrait
 {
     public function showMarkdownHelp(Request $request, Response $response): Response
     {
-        $helpText = __DIR__ . '/../../locale/' . env('LANG') . '/file/markdown-help.php';
+        $helpText = __DIR__ . '/../../locale/' . env('APPLANG') . '/file/markdown-help.php';
         $content = file_get_contents($helpText);
 
         return $this->renderResponse(
