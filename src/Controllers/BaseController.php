@@ -56,6 +56,7 @@ abstract class BaseController
     {
         $this->view->setAttributes([
                 'lang' => env('APPLANG', 'en'),
+                'buttonPosition' => 'main',
                 'sidebarItems' => $routesService->getRoutesByType('sidebar'),
                 'is_previewable' => method_exists($this, 'renderPreview')
             ]);

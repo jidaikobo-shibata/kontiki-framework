@@ -54,4 +54,10 @@ class PostController extends BaseController
         $this->tableService->setModel($model);
         $this->model = $model;
     }
+
+    protected function setViewAttributes($routesService): void
+    {
+        parent::setViewAttributes($routesService);
+        $this->view->addAttribute('buttonPosition', 'meta');
+    }
 }

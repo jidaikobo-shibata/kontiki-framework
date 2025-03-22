@@ -13,4 +13,9 @@
     <?php echo $fields_html; ?>
   </div>
 </div>
+<?php
+if ($buttonPosition == 'meta') :
+    include(__DIR__ . '/../buttons.php');
+endif;
+?>
 </div>

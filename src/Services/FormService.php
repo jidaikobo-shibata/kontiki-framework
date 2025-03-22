@@ -52,14 +52,14 @@ class FormService
         array $formVars
     ): string {
         $this->formRenderer->setFields($fields);
+        $this->view->addAttribute('formVars', $formVars);
 
         return $this->view->fetch(
             'forms/edit.php',
             [
                 'actionAttribute' => env('BASEPATH', '') . $action,
                 'csrfToken' => $csrfToken,
-                'formHtml' => $this->formRenderer->render(),
-                'formVars' => $formVars,
+                'formHtml' => $this->formRenderer->render()
             ]
         );
     }

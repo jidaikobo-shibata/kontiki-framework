@@ -57,10 +57,13 @@ class FormRenderer
             return $this->renderFieldset($name, $config);
         }, array_keys($fields), $fields);
 
-        return $this->view->fetch($groupTemplate, [
-            'fields_html' => implode("\n", $fieldHtml),
-            'group' => $group,
-        ]);
+        return $this->view->fetch(
+            $groupTemplate,
+            [
+                'fields_html' => implode("\n", $fieldHtml),
+                'buttonPosition' => $this->view->getAttributes()['buttonPosition'] ?? 'main'
+            ]
+        );
     }
 
     protected function renderFieldset(string $name, array $config): string
