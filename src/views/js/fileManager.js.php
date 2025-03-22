@@ -480,10 +480,16 @@
 
             textarea.focus(); // Focus back on the textarea
 
+            const modalElement = document.getElementById('uploadModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+
             // Display success status
-            const codeElement = fileRow.find('td.text-break code');
-            fileRow.find('.insert-status').remove();
-            codeElement.after('<span role="status" class="insert-status ms-2 text-success"><?= $insert_success ?></span>');
+            // const codeElement = fileRow.find('td.text-break code');
+            // fileRow.find('.insert-status').remove();
+            // codeElement.after('<span role="status" class="insert-status ms-2 text-success"><?= $insert_success ?></span>');
         });
     }
 
