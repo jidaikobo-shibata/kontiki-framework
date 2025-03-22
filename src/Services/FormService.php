@@ -38,11 +38,10 @@ class FormService
     /**
      * Generate form HTML without additional processing.
      *
-     * @param string $action       The form action URL.
-     * @param array  $fields       The form fields definitions.
-     * @param string $csrfToken    CSRF Token.
-     * @param string $description  An optional description for the form.
-     * @param string $buttonText   The text to display on the submit button.
+     * @param string $action    The form action URL.
+     * @param array  $fields    The form fields definitions.
+     * @param string $csrfToken CSRF Token.
+     * @param string $vars      variables.
      *
      * @return string The generated HTML for the form.
      */
@@ -50,8 +49,7 @@ class FormService
         string $action,
         array $fields,
         string $csrfToken,
-        string $description = '',
-        string $buttonText = 'Submit'
+        array $formVars
     ): string {
         $this->formRenderer->setFields($fields);
 
@@ -61,8 +59,7 @@ class FormService
                 'actionAttribute' => env('BASEPATH', '') . $action,
                 'csrfToken' => $csrfToken,
                 'formHtml' => $this->formRenderer->render(),
-                'description' => $description,
-                'buttonText' => $buttonText,
+                'formVars' => $formVars,
             ]
         );
     }

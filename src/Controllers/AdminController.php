@@ -39,6 +39,10 @@ class AdminController
                 'publishing' => __('publishing'),
                 'reserved' => __('reserved'),
                 'expired' => __('expired'),
+                'do_publish' => __('do_publish', 'publish'),
+                'do_reserve' => __('do_reserve', 'reserve'),
+                'do_save_as_pending' => __('do_save_as_pending', 'save as pending'),
+                'do_save_as_draft' => __('do_save_as_draft', 'save as draft'),
             ]
         );
         $response->getBody()->write($content);

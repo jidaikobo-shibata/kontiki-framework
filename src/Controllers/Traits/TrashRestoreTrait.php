@@ -40,17 +40,24 @@ trait TrashRestoreTrait
         $fields = $this->model->getFields($actionType, $data);
 
         $buttonText = $actionType == 'trash' ? 'to_trash' : $actionType;
+        $buttonClass = $actionType == 'trash' ? 'btn-danger' : 'btn-success';
+
+        $formVars = [
+            'description' => __(
+                "x_{$actionType}_confirm",
+                "Are you sure you want to {$actionType} this :name?",
+                ['name' => __($this->label)]
+            ),
+            'buttonID' => "main{$actionType}Btn",
+            'buttonClass' => $buttonClass,
+            'buttonText' => __($buttonText)
+        ];
 
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/{$actionType}/{$id}",
             $fields,
             $this->csrfManager->getToken(),
-            __(
-                "x_{$actionType}_confirm",
-                "Are you sure you want to {$actionType} this :name?",
-                ['name' => __($this->label)]
-            ),
-            __($buttonText),
+            $formVars
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,

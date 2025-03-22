@@ -3,12 +3,12 @@
   * @var string $actionAttribute
   * @var string $csrfToken
   * @var string $formHtml
-  * @var string $buttonText
+  * @var string $formVars
   */
 ?>
 
-<?php if (!empty($description)) : ?>
-<p class="alert alert-primary"><?= e($description) ?></p>
+<?php if (isset($formVars['description'])) : ?>
+<p class="alert alert-primary"><?= e($formVars['description']) ?></p>
 <?php endif; ?>
 
 <!-- this <div> is for prevent DOMDocument from expanding a group of form elements -->
@@ -24,7 +24,7 @@
     <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= __('open_in_new_window') ?>"></span>
   </button>
   <?php endif; ?>
-  <button type="submit" class="btn btn-primary"><?= $buttonText ?></button>
+  <button id="<?= $formVars['buttonID'] ?? '' ?>" type="submit" class="btn <?= $formVars['buttonClass'] ?? 'btn-primary' ?>"><?= $formVars['buttonText'] ?? '' ?></button>
 </form>
 </div>
 

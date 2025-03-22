@@ -26,16 +26,22 @@ trait DeleteTrait
 
         $fields = $this->model->getFields('delete', $data);
 
-        $formHtml = $this->formService->formHtml(
-            "/{$this->adminDirName}/delete/{$id}",
-            $fields,
-            $this->csrfManager->getToken(),
-            __(
+        $formVars = [
+            'description' => __(
                 "x_delete_confirm",
                 "Are you sure you want to delete this :name?",
                 ['name' => __($this->label)]
             ),
-            __("delete", "Delete"),
+            'buttonClass' => 'btn-danger',
+            'buttonID' => 'mainDeleteBtn',
+            'buttonText' => __("delete", "Delete")
+        ];
+
+        $formHtml = $this->formService->formHtml(
+            "/{$this->adminDirName}/delete/{$id}",
+            $fields,
+            $this->csrfManager->getToken(),
+            $formVars
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,

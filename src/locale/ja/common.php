@@ -20,6 +20,11 @@ return [
     'delete' => '削除する',
     'close'  => '閉じる',
     'open'   => '開く',
+    'do_publish' => '公開する',
+    'do_reserve' => '公開予約する',
+    'do_save_as_pending' => '非公開状態で保存する',
+    'do_save_as_draft' => '下書き状態で保存する',
+
     'value' => '値',
     'title' => 'タイトル',
     'content' => '内容',

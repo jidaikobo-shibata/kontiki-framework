@@ -31,12 +31,16 @@ trait CreateEditTrait
         $data = $this->model->getDataForForm('create', $this->flashManager);
         $fields = $this->model->getFields('create', $data);
 
+        $formVars = [
+            'buttonID' => 'mainSubmitBtn',
+            'buttonText' => __("x_save", 'Save :name', ['name' => __($this->label)])
+        ];
+
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/create",
             $fields,
             $this->csrfManager->getToken(),
-            '',
-            __("x_save", 'Save :name', ['name' => __($this->label)]),
+            $formVars
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,
@@ -68,12 +72,16 @@ trait CreateEditTrait
 
         $fields = $this->model->getFields('edit', $data);
 
+        $formVars = [
+            'buttonID' => 'mainSubmitBtn',
+            'buttonText' => __("x_save", 'Save :name', ['name' => __($this->label)])
+        ];
+
         $formHtml = $this->formService->formHtml(
             "/{$this->adminDirName}/edit/{$id}",
             $fields,
             $this->csrfManager->getToken(),
-            '',
-            __("x_save", 'Save :name', ['name' => __($this->label)]),
+            $formVars,
         );
         $formHtml = $this->formService->addMessages(
             $formHtml,

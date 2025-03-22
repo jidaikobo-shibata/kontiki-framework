@@ -46,7 +46,7 @@
     <ul class="navbar-nav">
       <li class="nav-item d-none d-sm-inline-block">
     <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-      <i class="fas fa-bars"></i>
+      <span class="fas fa-bars"></span>
     </a>
       </li>
     </ul>
