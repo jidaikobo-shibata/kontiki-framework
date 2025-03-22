@@ -200,13 +200,15 @@ class TableRenderer
             'preview' => sprintf($tplPreview, 'preview', $id, 'info', __('preview')),
         ];
 
+        $previewBtn = $this->view->getAttributes()['is_previewable'] ? $actions['preview'] : '';
+
         $html = '';
         if ($this->deleteType == 'hardDelete') {
             $html .= $actions['edit'] . $actions['delete'];
         } elseif ($this->context == 'trash') {
-            $html .= $actions['restore'] . $actions['preview'] . $actions['delete'];
+            $html .= $actions['restore'] . $previewBtn . $actions['delete'];
         } elseif ($this->deleteType == 'softDelete') {
-            $html .= $actions['edit'] . $actions['preview'] . $actions['trash'];
+            $html .= $actions['edit'] . $previewBtn . $actions['trash'];
         } else {
             $html .= $actions['edit'];
         }

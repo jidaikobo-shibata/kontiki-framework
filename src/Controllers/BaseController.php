@@ -43,15 +43,21 @@ abstract class BaseController
         $this->csrfManager = $csrfManager;
         $this->flashManager = $flashManager;
         $this->view = $view;
-        $this->setRoutes($routesService);
-        $this->view->setAttributes([
-                'sidebarItems' => $routesService->getRoutesByType('sidebar')
-            ]);
         $this->setModel();
+        $this->setRoutes($routesService);
+        $this->setViewAttributes($routesService);
     }
 
     protected function setModel(): void
     {
+    }
+
+    protected function setViewAttributes($routesService): void
+    {
+        $this->view->setAttributes([
+                'sidebarItems' => $routesService->getRoutesByType('sidebar'),
+                'is_previewable' => method_exists($this, 'renderPreview')
+            ]);
     }
 
     protected function setRoutes($routesService): void

@@ -18,17 +18,7 @@
   <div class="row">
      <?= $formHtml ?>
   </div>
-  <?php
-     // もっときれいにする
-     if (
-      (
-          strpos($actionAttribute, '/create') !== false ||
-          strpos($actionAttribute, '/edit') !== false
-      ) &&
-      strpos($actionAttribute, '/user/') === false &&
-      strpos($actionAttribute, '/account/') === false
-     ) :
-  ?>
+  <?php if ($is_previewable === true) : ?>
   <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview">
     <?= __('preview') ?>
     <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= __('open_in_new_window') ?>"></span>
