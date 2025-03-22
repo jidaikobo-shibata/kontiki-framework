@@ -8,6 +8,8 @@ use Slim\Factory\AppFactory;
 use Slim\App;
 
 use Jidaikobo\Log;
+use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
+use Jidaikobo\Kontiki\Middleware\SecurityHeadersMiddleware;
 
 class Bootstrap
 {
@@ -45,8 +47,11 @@ class Bootstrap
         $basePath = env('BASEPATH', '/');
         $app->setBasePath($basePath);
 
-        // Add a header for security measures
-        $app->add(Middleware\SecurityHeadersMiddleware::class);
+        // Add auth check
+        $app->add(AuthMiddleware::class);
+
+        // Add headers for security measures
+        $app->add(SecurityHeadersMiddleware::class);
 
         // Set dependencies
         $dependencies = new Config\Dependencies($app);

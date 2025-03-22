@@ -7,7 +7,6 @@ use Slim\App;
 
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Controllers;
-use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 
 class Routes
 {
@@ -26,7 +25,5 @@ class Routes
         }
         Controllers\AccountController::registerRoutes($app);
 //        Controllers\CategoryController::registerRoutes($app, 'post/category');
-
-        $app->add(AuthMiddleware::class);
     }
 }
