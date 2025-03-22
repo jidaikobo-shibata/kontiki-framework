@@ -43,6 +43,29 @@
     }
 
     /**
+     * open details and forcus input
+     */
+    $('details > summary > label').on('click', function (e) {
+      e.preventDefault();
+
+      const $label = $(this);
+      const $details = $label.closest('details');
+
+      const isOpen = $details.prop('open');
+
+      if (isOpen) {
+        $details.prop('open', false);
+      } else {
+        $details.prop('open', true);
+
+        const $input = $details.find('input, textarea, select').first();
+        if ($input.length) {
+          setTimeout(() => $input.trigger('focus'), 50);
+        }
+      }
+    });
+
+    /**
      * update status (place bottom of this file)
      */
     let publishedAtInput = $("input[name=published_at]");
