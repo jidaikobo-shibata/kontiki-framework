@@ -53,7 +53,10 @@ trait UtilsTrait
             return null;
         }
 
-        $processedRow = $this->processDataBeforeGet((array)$row);
+        $processedRow = (array)$row;
+        if (method_exists($this, 'processDataBeforeGet')) {
+            $processedRow = $this->processDataBeforeGet($processedRow);
+        }
 
         return [$row->id, $processedRow[$fieldName]];
     }

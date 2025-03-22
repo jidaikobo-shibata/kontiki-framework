@@ -4,7 +4,6 @@ namespace Jidaikobo\Kontiki\Config;
 
 use DI\Container;
 use Slim\App;
-
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Controllers;
 

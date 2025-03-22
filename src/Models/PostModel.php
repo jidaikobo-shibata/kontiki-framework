@@ -4,7 +4,6 @@ namespace Jidaikobo\Kontiki\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
-
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Services\ValidationService;
@@ -145,13 +144,13 @@ class PostModel extends BaseModel
 
         // add options
         $parents = $this->getOptions('title', true, '', $id);
-        $this->fieldDefinitions['parent']['options'] = $parents;
+        $this->fieldDefinitions['parent_id']['options'] = $parents;
 
         // add options and default value
         $userOptions = $this->userModel->getOptions('username');
         $user = $this->auth->getCurrentUser();
-        $this->fieldDefinitions['creator']['options'] = $userOptions;
-        $this->fieldDefinitions['creator']['default'] = $user['id'] ?? 0; // no logged in user: 0
+        $this->fieldDefinitions['creator_id']['options'] = $userOptions;
+        $this->fieldDefinitions['creator_id']['default'] = $user['id'] ?? 0; // no logged in user: 0
 
         // add default value
         if (in_array($context, ['create'])) {

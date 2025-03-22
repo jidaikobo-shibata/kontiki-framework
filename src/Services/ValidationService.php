@@ -4,7 +4,6 @@ namespace Jidaikobo\Kontiki\Services;
 
 use Illuminate\Database\Connection;
 use Valitron\Validator;
-
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\ModelInterface;
 

@@ -1,7 +1,7 @@
 <?php
 /**
-  * @var string $is_previewable
-  * @var string $formVars
+  * @var bool $is_previewable
+  * @var array $formVars
   */
 ?>
 
@@ -11,10 +11,10 @@ $buttonGroupClass = $is_previewable === true
     : 'd-flex gap-2';
 
 if ($is_previewable === true) :
-?>
+    ?>
 <div class="<?= $buttonGroupClass ?>">
 <button type="submit" class="btn btn-info" name="preview" value="1" formtarget="preview">
-  <?= __('preview') ?>
+    <?= __('preview') ?>
   <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= __('open_in_new_window') ?>"></span>
 </button>
 <?php endif; ?>

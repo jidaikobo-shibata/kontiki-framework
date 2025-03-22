@@ -1,6 +1,7 @@
 <?php
 
 /**
+  * @var string $color
   * @var string $bgcolor
   */
 ?>/* sidebar */

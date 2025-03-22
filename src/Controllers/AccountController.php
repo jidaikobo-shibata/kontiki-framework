@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Views\PhpRenderer;
-
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
@@ -16,13 +15,14 @@ use Jidaikobo\Kontiki\Services\RoutesService;
 
 class AccountController extends BaseController
 {
+    use Traits\CreateEditTrait;
+
     protected string $adminDirName = 'account';
     protected string $label = 'account';
     private Auth $auth;
     private FormService $formService;
     private AccountModel $model;
 
-    use Traits\CreateEditTrait;
     protected string $backStringAfterSaveKey = 'x_save_success';
     protected string $backStringAfterSave = ':name Saved successfully.';
 

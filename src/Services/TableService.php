@@ -33,7 +33,7 @@ class TableService
         array $data,
         string $adminDirName,
         array $routes = [],
-        string $context
+        string $context = 'all'
     ): string {
         $this->tableRenderer->setModel($this->model);
         return $this->tableRenderer->render(

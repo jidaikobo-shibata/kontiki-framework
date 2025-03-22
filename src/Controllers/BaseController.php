@@ -3,12 +3,10 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Aura\Session\Session;
-
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Services\RoutesService;
-
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -32,7 +30,10 @@ abstract class BaseController
      *
      * Initializes the BaseController with its dependencies.
      *
-     * @param App $app container
+     * @param CsrfManager   $csrfManager csrfManager
+     * @param FlashManager  $flashManager flashManager
+     * @param PhpRenderer   $view view
+     * @param RoutesService $routesService routesService
      */
     public function __construct(
         CsrfManager $csrfManager,

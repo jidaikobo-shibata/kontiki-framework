@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Slim\Views\PhpRenderer;
-
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Models\CategoryModel;
@@ -21,6 +20,9 @@ class CategoryController extends BaseController
     protected string $adminDirName = 'post/category';
     protected string $label = 'Post/Category';
     protected CategoryModel $model;
+
+    private FormService $formService;
+    private TableService $tableService;
 
     public function __construct(
         CsrfManager $csrfManager,

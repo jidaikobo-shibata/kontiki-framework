@@ -4,7 +4,6 @@ namespace Jidaikobo\Kontiki\Models;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
-
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Models\BaseModelTraits;
 use Jidaikobo\Kontiki\Services\ValidationService;

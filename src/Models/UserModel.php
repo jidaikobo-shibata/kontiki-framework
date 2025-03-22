@@ -167,7 +167,9 @@ class UserModel extends BaseModel
         $id = $context['id'] ?? 0;
         $targetUser = $this->getById($id);
 
-        if ($targetUser['role'] !== 'admin') return $result;
+        if ($targetUser['role'] !== 'admin') {
+            return $result;
+        }
         $result['valid'] = false;
         $result['errors']['role']['messages'] = [__('cannot_delete_admin')];
 

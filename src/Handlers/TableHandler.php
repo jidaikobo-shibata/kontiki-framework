@@ -21,13 +21,17 @@ class TableHandler
 
     public function addErrors(array $errors): void
     {
-        if (empty($errors)) return;
+        if (empty($errors)) {
+            return;
+        }
         $this->tableHtml = MessageUtils::errorHtml($errors, $this->model) . $this->tableHtml;
     }
 
     public function addSuccessMessages(array $successMessages): void
     {
-        if (empty($successMessages)) return;
+        if (empty($successMessages)) {
+            return;
+        }
         $successMessage = join($successMessages);
         $this->tableHtml = MessageUtils::alertHtml($successMessage) . $this->tableHtml;
     }

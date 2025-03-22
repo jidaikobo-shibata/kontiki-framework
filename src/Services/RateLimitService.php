@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Services;
 
 use Illuminate\Database\Connection;
-
 use Jidaikobo\Kontiki\Core\Database;
 
 class RateLimitService
@@ -43,9 +42,13 @@ class RateLimitService
     public function isIpBlocked(string $ip): bool
     {
         $record = $this->getRateLimitRecord($ip);
-        if (!$record) return false;
+        if (!$record) {
+            return false;
+        }
 
-        if ($this->isCurrentlyBlocked($record)) return true;
+        if ($this->isCurrentlyBlocked($record)) {
+            return true;
+        }
         if ($this->shouldBlockIp($record)) {
             $this->blockIp($ip);
             return true;

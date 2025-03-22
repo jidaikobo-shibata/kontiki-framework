@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Views\PhpRenderer;
-
 use Jidaikobo\Kontiki\Controllers\FileControllerTraits;
 use Jidaikobo\Kontiki\Core\Database;
 use Jidaikobo\Kontiki\Managers\CsrfManager;

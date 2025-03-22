@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Slim\Views\PhpRenderer;
-
 use Jidaikobo\Kontiki\Managers\CsrfManager;
 use Jidaikobo\Kontiki\Managers\FlashManager;
 use Jidaikobo\Kontiki\Models\PostModel;

@@ -12,4 +12,5 @@
 GPATH
 GRTAGS
 GTAGS
+phpstan.neon
 scrutinizer.yml

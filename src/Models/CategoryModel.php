@@ -24,8 +24,8 @@ class CategoryModel extends BaseModel
             'term_order' => $this->getTermOrederField(),
         ];
 
-        $MetaData = $this->getMetaDataFieldDefinitions($params);
-        $this->fieldDefinitions = array_merge($fields, $MetaData);
+        // $MetaData = $this->getMetaDataFieldDefinitions($params);
+        // $this->fieldDefinitions = array_merge($fields, $MetaData);
     }
 
     private function getNameField(): array

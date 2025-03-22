@@ -6,7 +6,6 @@ use DI\Container;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
 use Slim\App;
-
 use Jidaikobo\Log;
 use Jidaikobo\Kontiki\Middleware\AuthMiddleware;
 use Jidaikobo\Kontiki\Middleware\SecurityHeadersMiddleware;

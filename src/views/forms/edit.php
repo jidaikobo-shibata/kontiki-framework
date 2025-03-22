@@ -3,7 +3,8 @@
   * @var string $actionAttribute
   * @var string $csrfToken
   * @var string $formHtml
-  * @var string $formVars
+  * @var array $formVars
+  * @var string $buttonPosition
   */
 ?>
 

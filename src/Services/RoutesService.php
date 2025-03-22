@@ -72,6 +72,6 @@ class RoutesService
     private function extractControllerFromPattern(string $pattern): string
     {
         $segments = explode('/', trim($pattern, '/'));
-        return $segments[0] ?? 'general';
+        return $segments[0];
     }
 }

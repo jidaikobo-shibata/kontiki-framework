@@ -3,10 +3,8 @@
 namespace Jidaikobo\Kontiki\Controllers;
 
 use Jidaikobo\Kontiki\Services\RoutesService;
-
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;

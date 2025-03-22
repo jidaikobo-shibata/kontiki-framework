@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Models\Traits;
 
 use Carbon\Carbon;
-
 use  Jidaikobo\Kontiki\Managers\FlashManager;
 
 trait CRUDTrait
@@ -14,7 +13,11 @@ trait CRUDTrait
             ->where('id', $id)
             ->first();
 
-        $result = is_array($result) ? $result : (array)$result;
+        if ($result === null) {
+            return null;
+        }
+
+        $result = (array)$result;
 
         if (method_exists($this, 'getAllMetaData')) {
             $metaData = $this->getAllMetaData($id);
@@ -32,10 +35,12 @@ trait CRUDTrait
             ->where($field, $value)
             ->first();
 
-        if (is_object($result)) {
-            $result = (array)$result;
-            $result = $this->processDataBeforeGet($result);
+        if ($result === null) {
+            return null;
         }
+
+        $result = (array)$result;
+        $result = $this->processDataBeforeGet($result);
 
         return $result ? (array)$result : null;
     }
@@ -112,7 +117,8 @@ trait CRUDTrait
             }
         }
 
-        return $this->afterProcessDataBeforeGet($data);;
+        return $this->afterProcessDataBeforeGet($data);
+        ;
     }
 
     protected function afterProcessDataBeforeSave(string $context, array $data): array

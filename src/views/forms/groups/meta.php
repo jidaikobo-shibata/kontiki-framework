@@ -1,6 +1,7 @@
 <?php
 /**
   * @var string $fields_html
+  * @var string $buttonPosition
   */
 ?>
 <div class="col-lg-4 col-12 ">

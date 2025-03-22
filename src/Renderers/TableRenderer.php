@@ -19,7 +19,8 @@ class TableRenderer
     protected $deleteType; // Context: "hardDelete" or "softDelete"
     private ?ModelInterface $model = null;
 
-    public function __construct(PhpRenderer $view) {
+    public function __construct(PhpRenderer $view)
+    {
         $this->view = $view;
     }
 
@@ -33,8 +34,7 @@ class TableRenderer
         string $adminDirName,
         array $routes = [],
         string $context = 'all'
-    ): string
-    {
+    ): string {
         $this->deleteType = $this->model->getDeleteType();
         $this->data = $data;
         $this->adminDirName = $adminDirName;
@@ -190,7 +190,7 @@ class TableRenderer
 
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
         $tplTrash = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s <span class="fa-solid fa-trash"></span></a> ';
-        $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s <span class="fa-solid fa-arrow-up-right-from-square" aria-label="' . __('open_in_new_window') .'"></span></a> ';
+        $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s <span class="fa-solid fa-arrow-up-right-from-square" aria-label="' . __('open_in_new_window') . '"></span></a> ';
 
         $actions = [
             'edit' => sprintf($tpl, 'edit', $id, 'primary', __('edit')),

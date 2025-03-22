@@ -8,7 +8,6 @@ use DI\Container;
 use Slim\App;
 use Slim\Views\PhpRenderer;
 use Valitron\Validator;
-
 use Jidaikobo\Kontiki\Services\FileService;
 use Jidaikobo\Kontiki\Services\RoutesService;
 use Jidaikobo\Kontiki\Services\ValidationService;
@@ -18,7 +17,9 @@ use Jidaikobo\Kontiki\Models\UserModel;
 
 class Dependencies
 {
-    public function __construct(private App $app) {}
+    public function __construct(private App $app)
+    {
+    }
 
     public function register(): void
     {

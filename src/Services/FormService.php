@@ -3,7 +3,6 @@
 namespace Jidaikobo\Kontiki\Services;
 
 use Slim\Views\PhpRenderer;
-
 use Jidaikobo\Kontiki\Models\ModelInterface;
 use Jidaikobo\Kontiki\Renderers\FormRenderer;
 use Jidaikobo\Kontiki\Handlers\FormHandler;
@@ -41,7 +40,7 @@ class FormService
      * @param string $action    The form action URL.
      * @param array  $fields    The form fields definitions.
      * @param string $csrfToken CSRF Token.
-     * @param string $vars      variables.
+     * @param array  $formVars  variables.
      *
      * @return string The generated HTML for the form.
      */
