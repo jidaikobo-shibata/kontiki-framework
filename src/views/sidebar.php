@@ -13,7 +13,7 @@
       <li class="nav-item">
         <a class="nav-link font-weight-bold" href="<?= env('BASEPATH', '') ?>/dashboard">
           <span class="nav-icon fas fa-house"></span>
-          <?= __('management_portal') ?>
+          <p><?= __('management_portal') ?></p>
         </a>
       </li>
       <?php
