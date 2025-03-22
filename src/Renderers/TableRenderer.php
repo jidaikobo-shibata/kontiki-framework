@@ -187,14 +187,17 @@ class TableRenderer
         $id = e($row['id']);
 
         $uri = env('BASEPATH', '') . "/{$this->adminDirName}/%s/%s";
+
         $tpl = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s</a> ';
-        $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s</a> ';
+        $tplTrash = '<a href="' . $uri . '" class="btn btn-%s btn-sm">%s <span class="fa-solid fa-trash"></span></a> ';
+        $tplPreview = '<a href="' . $uri . '" class="btn btn-%s btn-sm" target="preview">%s <span class="fa-solid fa-arrow-up-right-from-square" aria-label="' . __('open_in_new_window') .'"></span></a> ';
+
         $actions = [
             'edit' => sprintf($tpl, 'edit', $id, 'primary', __('edit')),
-            'delete' => sprintf($tpl, 'delete', $id, 'danger', __('delete')),
-            'trash' => sprintf($tpl, 'trash', $id, 'warning', __('to_trash')),
+            'delete' => sprintf($tplTrash, 'delete', $id, 'danger', __('delete')),
+            'trash' => sprintf($tplTrash, 'trash', $id, 'warning', __('to_trash')),
             'restore' => sprintf($tpl, 'restore', $id, 'success', __('restore')),
-            'preview' => sprintf($tplPreview, 'preview', $id, 'success', __('preview')),
+            'preview' => sprintf($tplPreview, 'preview', $id, 'info', __('preview')),
         ];
 
         $html = '';
