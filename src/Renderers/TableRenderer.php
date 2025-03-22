@@ -102,19 +102,19 @@ class TableRenderer
 
     protected function renderRow(array $row): string
     {
-        $cellsHtml = $this->renderStatus($row);
+        $cellsHtml = $this->renderValues($row);
         $cellsHtml .= $this->renderActions($row);
 
         return sprintf('<tr>%s</tr>', $cellsHtml);
     }
 
-    protected function renderStatus(array $row): string
+    protected function renderValues(array $row): string
     {
         $currentTime = Carbon::now('UTC')->setTimezone(env('TIMEZONE', 'UTC'));
         $cellsHtml = '';
 
         foreach (array_keys($this->fields) as $name) {
-            $values = $this->getStatusValues($name, $row, $currentTime);
+            $values = $this->getRowValues($name, $row, $currentTime);
             $value = implode(', ', array_filter($values));
             $cellsHtml .= sprintf('<td>%s</td>', e($value));
         }
@@ -122,8 +122,14 @@ class TableRenderer
         return $cellsHtml;
     }
 
-    protected function getStatusValues(string $name, array $row, Carbon $currentTime): array
+    protected function getRowValues(string $name, array $row, Carbon $currentTime): array
     {
+        $type = $this->fields[$name]['type'] ?? 'text';
+        if (in_array($type, ['select', 'checkbox', 'radio'])) {
+            $options = $this->fields[$name]['options'] ?? [];
+            return [$options[$row[$name]] ?? ''];
+        }
+
         if ($name !== 'status') {
             return [$row[$name] ?? ''];
         }
@@ -169,7 +175,7 @@ class TableRenderer
         string $status
     ): void {
         if (!empty($row[$key])) {
-            $time = new Carbon($row[$key]);
+            $time = Carbon::parse($row[$key]);
             if ($condition($time)) {
                 $values[0] = __($status);
             }
