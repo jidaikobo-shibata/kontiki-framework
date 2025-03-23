@@ -15,13 +15,7 @@ if (!function_exists('getIndex')) {
     function getIndex(array $args, string $env = 'production'): array
     {
         $app = Jidaikobo\Kontiki\Bootstrap::init($env);
-        $container = $app->getContainer();
-        $model = new PostModel(
-            $container->get(Database::class),
-            $container->get(ValidationService::class),
-            $container->get(Auth::class),
-            $container->get(UserModel::class)
-        );
+        $model = $app->getContainer()->get(PostModel::class);
         $retval = [];
         $retval['body'] = $model->getIndexData('published', $args);
         $retval['pagination'] = $model->getPagination();
@@ -38,16 +32,33 @@ if (!function_exists('getData')) {
     function getData(array $args, string $env = 'production'): array
     {
         $app = Jidaikobo\Kontiki\Bootstrap::init($env);
-        $container = $app->getContainer();
-        $model = new PostModel(
-            $container->get(Database::class),
-            $container->get(ValidationService::class),
-            $container->get(Auth::class),
-            $container->get(UserModel::class)
-        );
+        $model = $app->getContainer()->get(PostModel::class);
         $slug = $args['slug'] ?? '';
         $retval = [];
         $retval['body'] = $model->getByFieldWithCondtioned('slug', $slug, 'published');
         return $retval;
+    }
+}
+
+if (!function_exists('printEditDataLink')) {
+    /**
+     * @param array $args Configuration for the request.
+     * @param string $env environment.
+     * @return void
+     */
+    function printEditDataLink(array $args, string $env = 'production'): void
+    {
+        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
+        $model = $app->getContainer()->get(PostModel::class);
+        $slug = $args['slug'] ?? '';
+        $retval = [];
+        $data = $model->getByFieldWithCondtioned('slug', $slug, 'published');
+        $url = $app->getBasePath() . '/' . e($data['post_type']) . '/edit/' . e($data['id']);
+
+        $html = '';
+        $html .= '<p class="edit-this-page"><a href="' . $url . '">';
+        $html .= __('edit_this_content');
+        $html .= '</a></a>';
+        echo $html;
     }
 }

@@ -13,6 +13,7 @@ use Jidaikobo\Kontiki\Services\RoutesService;
 use Jidaikobo\Kontiki\Services\ValidationService;
 use Jidaikobo\Kontiki\Core\Auth;
 use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Models\PostModel;
 use Jidaikobo\Kontiki\Models\UserModel;
 
 class Dependencies
@@ -29,6 +30,7 @@ class Dependencies
         $container->set(App::class, $this->app);
         $container->set(Database::class, fn() => $this->createDatabase());
         $container->set(Session::class, fn() => $this->createSession());
+        $container->set(PostModel::class, fn($c) => $this->createPostModel($c));
         $container->set(UserModel::class, fn($c) => $this->createUserModel($c));
         $container->set(Auth::class, fn($c) => $this->createAuth($c));
         $container->set(ValidationService::class, fn($c) => $this->createValidationService($c));
@@ -59,6 +61,16 @@ class Dependencies
             session_cache_limiter('private_no_expire');
         }
         return (new SessionFactory())->newInstance($_COOKIE);
+    }
+
+    private function createPostModel(Container $c): PostModel
+    {
+        return new PostModel(
+            $c->get(Database::class),
+            $c->get(ValidationService::class),
+            $c->get(Auth::class),
+            $c->get(UserModel::class)
+        );
     }
 
     private function createUserModel(Container $c): UserModel

@@ -1,12 +1,23 @@
 <?php
 /**
+  * @var string $viewUrl
   * @var string $actionAttribute
   * @var string $csrfToken
   * @var string $formHtml
   * @var array $formVars
   * @var string $buttonPosition
   */
-?>
+
+if (!empty($viewUrl) && !empty($formVars['slug'])) :
+    $publishedUrl = e($viewUrl) . '/' . e($formVars['slug']);
+    $html = '';
+    $html .= '<p id="publishedUrl" class="form-text">' . __('published_url') . ': ';
+    $html .= '<a href="' . $publishedUrl . '" target="publishedPage">';
+    $html .= $publishedUrl . ' ';
+    $html .= '<span class="fa-solid fa-arrow-up-right-from-square" aria-label="';
+    $html .= __('open_in_new_window') . '"></span></a></p>';
+    echo $html;
+endif; ?>
 
 <?php if (isset($formVars['description'])) : ?>
 <p class="alert alert-primary"><?= e($formVars['description']) ?></p>

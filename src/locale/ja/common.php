@@ -13,6 +13,8 @@ return [
     'create' => '作成する',
     'edit' => '編集する',
     'preview' => 'プレビューする',
+    'published_url' => '公開URL',
+    'edit_this_content' => 'このページを編集する',
     'update' => '更新する',
     'trash' => 'ごみ箱',
     'to_trash' => 'ごみ箱へ',

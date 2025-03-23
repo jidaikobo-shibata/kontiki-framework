@@ -18,5 +18,6 @@ if ($is_previewable === true) :
   <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= __('open_in_new_window') ?>"></span>
 </button>
 <?php endif; ?>
+
 <button id="<?= $formVars['buttonID'] ?? '' ?>" type="submit" class="btn <?= $formVars['buttonClass'] ?? 'btn-primary' ?>"><?= $formVars['buttonText'] ?? '' ?></button>
 </div>
