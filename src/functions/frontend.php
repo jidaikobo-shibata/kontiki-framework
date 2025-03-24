@@ -1,10 +1,8 @@
 <?php
 
-use Jidaikobo\Kontiki\Core\Database;
+use Jidaikobo\Kontiki\Bootstrap;
 use Jidaikobo\Kontiki\Core\Auth;
-use Jidaikobo\Kontiki\Models\UserModel;
 use Jidaikobo\Kontiki\Models\PostModel;
-use Jidaikobo\Kontiki\Services\ValidationService;
 
 if (!function_exists('getIndex')) {
     /**
@@ -14,7 +12,7 @@ if (!function_exists('getIndex')) {
      */
     function getIndex(array $args, string $env = 'production'): array
     {
-        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
+        $app = Bootstrap::init($env);
         $model = $app->getContainer()->get(PostModel::class);
         $retval = [];
         $retval['body'] = $model->getIndexData('published', $args);
@@ -31,7 +29,7 @@ if (!function_exists('getData')) {
      */
     function getData(array $args, string $env = 'production'): array
     {
-        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
+        $app = Bootstrap::init($env);
         $model = $app->getContainer()->get(PostModel::class);
         $slug = $args['slug'] ?? '';
         $retval = [];
@@ -48,10 +46,15 @@ if (!function_exists('printEditDataLink')) {
      */
     function printEditDataLink(array $args, string $env = 'production'): void
     {
-        $app = Jidaikobo\Kontiki\Bootstrap::init($env);
+        $app = Bootstrap::init($env);
+        $auth = $app->getContainer()->get(Auth::class);
+        if (!$auth->isLoggedIn()) {
+            return;
+        }
+
+        $app = Bootstrap::init($env);
         $model = $app->getContainer()->get(PostModel::class);
         $slug = $args['slug'] ?? '';
-        $retval = [];
         $data = $model->getByFieldWithCondtioned('slug', $slug, 'published');
         $url = $app->getBasePath() . '/' . e($data['post_type']) . '/edit/' . e($data['id']);
 
