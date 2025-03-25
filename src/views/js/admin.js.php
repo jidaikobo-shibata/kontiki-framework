@@ -89,10 +89,6 @@
         let expiredDate = expiredAt ? new Date(expiredAt) : null;
         let now = new Date();
 
-        let urlLabel = document.getElementById("publishedUrlLabel");
-        let urlTextElement = document.getElementById("publishedUrlText");
-        let url = urlTextElement.textContent.trim();
-
         // butons and status options
         if (currentStatus === "draft") {
             mainSubmitBtn.text("<?= $do_save_as_draft ?>");
@@ -110,6 +106,15 @@
         }
 
         // update URL and its label
+        let urlLabel = document.getElementById("publishedUrlLabel");
+        let urlTextElement = document.getElementById("publishedUrlText");
+
+        if (!urlTextElement || !urlLabel) {
+            return;
+        }
+
+        let url = urlTextElement.textContent.trim();
+
         if (
             currentStatus === "pending" ||
             (expiredDate && !isNaN(expiredDate.getTime()) && expiredDate <= now)
