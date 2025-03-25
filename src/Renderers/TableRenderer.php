@@ -94,7 +94,7 @@ class TableRenderer
         $headerHtml = '';
         foreach ($this->fields as $name => $config) {
             $label = e($config['label']);
-            $headerHtml .= sprintf('<th>%s</th>', $label);
+            $headerHtml .= sprintf('<th class="text-nowrap">%s</th>', $label);
         }
         $headerHtml .= '<th>' . __('actions') . '</th>';
         return $headerHtml;
@@ -128,6 +128,23 @@ class TableRenderer
         if ($name !== 'status' && in_array($type, ['select', 'checkbox', 'radio'])) {
             $options = $this->fields[$name]['options'] ?? [];
             return [$options[$row[$name]] ?? ''];
+        }
+
+        $saveAsUtc = $this->fields[$name]['save_as_utc'] ?? false;
+        if ($saveAsUtc) {
+            $rawValue = $row[$name] ?? null;
+
+            if ($rawValue) {
+                try {
+                    $carbon = Carbon::parse($rawValue, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
+                    return [$carbon->format('Y-m-d H:i')];
+                } catch (\Exception $e) {
+                    // fallback in case of invalid datetime
+                    return [$rawValue];
+                }
+            }
+
+            return [''];
         }
 
         if ($name !== 'status') {
