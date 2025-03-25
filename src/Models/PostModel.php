@@ -110,10 +110,22 @@ class PostModel extends BaseModel
                 'applyNotDraftConditions'
             ],
             'trash'     => ['applySoftDeletedConditions'],
-            'reserved'  => ['applyNotPublisedConditions'],
-            'expired'   => ['applyExpiredConditions'],
-            'pending'     => ['applyPendingConditions'],
-            'draft'     => ['applyDraftConditions'],
+            'reserved'  => [
+                'applyNotPublisedConditions',
+                'applyNotSoftDeletedConditions'
+            ],
+            'expired'   => [
+                'applyExpiredConditions',
+                'applyNotSoftDeletedConditions'
+            ],
+            'pending'     => [
+                'applyPendingConditions',
+                'applyNotSoftDeletedConditions'
+            ],
+            'draft'     => [
+                'applyDraftConditions',
+                'applyNotSoftDeletedConditions'
+            ],
         ];
 
         if (isset($contextConditions[$context])) {
