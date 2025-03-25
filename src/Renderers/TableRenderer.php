@@ -124,34 +124,56 @@ class TableRenderer
 
     protected function getRowValues(string $name, array $row, Carbon $currentTime): array
     {
+        if ($name === 'status') {
+            return $this->getStatusValues($row, $currentTime);
+        }
+
+        if ($this->isSelectableField($name)) {
+            return [$this->resolveOptionLabel($name, $row[$name] ?? '')];
+        }
+
+        if ($this->isUtcField($name)) {
+            return [$this->formatUtcField($row[$name] ?? '')];
+        }
+
+        return [$row[$name] ?? ''];
+    }
+
+    private function isSelectableField(string $name): bool
+    {
         $type = $this->fields[$name]['type'] ?? 'text';
-        if ($name !== 'status' && in_array($type, ['select', 'checkbox', 'radio'])) {
-            $options = $this->fields[$name]['options'] ?? [];
-            return [$options[$row[$name]] ?? ''];
+        return in_array($type, ['select', 'checkbox', 'radio'], true) && $name !== 'status';
+    }
+
+    private function resolveOptionLabel(string $name, string|int|null $value): string
+    {
+        $options = $this->fields[$name]['options'] ?? [];
+        return $options[$value] ?? '';
+    }
+
+    private function isUtcField(string $name): bool
+    {
+        return !empty($this->fields[$name]['save_as_utc']);
+    }
+
+    private function formatUtcField(?string $value): string
+    {
+        if (empty($value)) {
+            return '';
         }
 
-        $saveAsUtc = $this->fields[$name]['save_as_utc'] ?? false;
-        if ($saveAsUtc) {
-            $rawValue = $row[$name] ?? null;
-
-            if ($rawValue) {
-                try {
-                    $carbon = Carbon::parse($rawValue, 'UTC')->setTimezone(env('TIMEZONE', 'UTC'));
-                    return [$carbon->format('Y-m-d H:i')];
-                } catch (\Exception $e) {
-                    // fallback in case of invalid datetime
-                    return [$rawValue];
-                }
-            }
-
-            return [''];
+        try {
+            return Carbon::parse($value, 'UTC')
+                ->setTimezone(env('TIMEZONE', 'UTC'))
+                ->format('Y-m-d H:i');
+        } catch (\Exception $e) {
+            return $value; // fallback to raw
         }
+    }
 
-        if ($name !== 'status') {
-            return [$row[$name] ?? ''];
-        }
-
-        $values = [__($row[$name]) ?: ''];
+    private function getStatusValues(array $row, Carbon $currentTime): array
+    {
+        $values = [__($row['status'] ?? '') ?: ''];
 
         $this->addStatusIfConditionMet(
             $values,
@@ -161,6 +183,7 @@ class TableRenderer
             fn($time) => $time->greaterThan($currentTime),
             'reserved'
         );
+
         $this->addStatusIfConditionMet(
             $values,
             $row,
