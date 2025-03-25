@@ -43,6 +43,10 @@ class AdminController
                 'do_reserve' => __('do_reserve', 'reserve'),
                 'do_save_as_pending' => __('do_save_as_pending', 'save as pending'),
                 'do_save_as_draft' => __('do_save_as_draft', 'save as draft'),
+                'published_url' => __('published_url'),
+                'reserved_url' => __('reserved_url'),
+                'banned_url' => __('banned_url'),
+                'open_in_new_window' => __('open_in_new_window'),
             ]
         );
         $response->getBody()->write($content);

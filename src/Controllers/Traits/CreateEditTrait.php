@@ -33,7 +33,8 @@ trait CreateEditTrait
 
         $formVars = [
             'buttonID' => 'mainSubmitBtn',
-            'buttonText' => __("x_save", 'Save :name', ['name' => __($this->label)])
+            'buttonText' => __("x_save", 'Save :name', ['name' => __($this->label)]),
+            'data' => $data
         ];
 
         $formHtml = $this->formService->formHtml(
@@ -75,7 +76,7 @@ trait CreateEditTrait
         $formVars = [
             'buttonID' => 'mainSubmitBtn',
             'buttonText' => __("x_save", 'Save :name', ['name' => __($this->label)]),
-            'slug' => $data['slug'] ?? ''
+            'data' => $data
         ];
 
         $formHtml = $this->formService->formHtml(

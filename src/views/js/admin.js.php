@@ -82,30 +82,71 @@
     function updateStatusOption() {
         let publishedAt = publishedAtInput.val();
         let expiredAt = expiredAtInput.val();
-        let publishedOption = $("select[name=status] option[value=published]");
+        let statusOptionPublished = $("select[name=status] option[value=published]");
         let currentStatus = statusSelect.val();
 
         let publishedDate = publishedAt ? new Date(publishedAt) : null;
         let expiredDate = expiredAt ? new Date(expiredAt) : null;
         let now = new Date();
 
+        let urlLabel = document.getElementById("publishedUrlLabel");
+        let urlTextElement = document.getElementById("publishedUrlText");
+        let url = urlTextElement.textContent.trim();
+
+        // butons and status options
         if (currentStatus === "draft") {
             mainSubmitBtn.text("<?= $do_save_as_draft ?>");
-            return;
         } else if (currentStatus === "pending") {
             mainSubmitBtn.text("<?= $do_save_as_pending ?>");
-            return;
-        }
-
-        if (expiredDate && !isNaN(expiredDate.getTime()) && expiredDate <= now) {
-            publishedOption.text("<?= $expired ?>");
+        } else if (expiredDate && !isNaN(expiredDate.getTime()) && expiredDate <= now) {
+            statusOptionPublished.text("<?= $expired ?>");
             mainSubmitBtn.text("<?= $do_save_as_pending ?>");
         } else if (publishedDate && !isNaN(publishedDate.getTime()) && publishedDate > now) {
-            publishedOption.text("<?= $reserved ?>");
+            statusOptionPublished.text("<?= $reserved ?>");
             mainSubmitBtn.text("<?= $do_reserve ?>");
         } else {
-            publishedOption.text("<?= $publishing ?>");
+            statusOptionPublished.text("<?= $publishing ?>");
             mainSubmitBtn.text("<?= $do_publish ?>");
+        }
+
+        // update URL and its label
+        if (
+            currentStatus === "pending" ||
+            (expiredDate && !isNaN(expiredDate.getTime()) && expiredDate <= now)
+        ) {
+            urlLabel.textContent = "<?= $banned_url ?>";
+            if (urlTextElement.tagName.toLowerCase() === "a") {
+                let span = document.createElement("span");
+                span.id = "publishedUrlText";
+                span.textContent = url;
+                urlTextElement.replaceWith(span);
+            }
+        } else if (
+            currentStatus === "draft" ||
+            (
+                currentStatus === "published" &&
+                publishedDate &&
+                !isNaN(publishedDate.getTime()) &&
+                publishedDate > now
+            )
+        ) {
+            urlLabel.textContent = "<?= $reserved_url ?>";
+            if (urlTextElement.tagName.toLowerCase() === "a") {
+                let span = document.createElement("span");
+                span.id = "publishedUrlText";
+                span.textContent = url;
+                urlTextElement.replaceWith(span);
+            }
+        } else {
+            urlLabel.textContent = "<?= $published_url ?>";
+            if (urlTextElement.tagName.toLowerCase() !== "a") {
+                let anchor = document.createElement("a");
+                anchor.id = "publishedUrlText";
+                anchor.href = url;
+                anchor.target = "publishedPage";
+                anchor.innerHTML = `${url} <span class="fa-solid fa-arrow-up-right-from-square" aria-label="<?= $open_in_new_window ?>"></span>`;
+                urlTextElement.replaceWith(anchor);
+            }
         }
     }
 

@@ -34,7 +34,8 @@ trait DeleteTrait
             ),
             'buttonClass' => 'btn-danger',
             'buttonID' => 'mainDeleteBtn',
-            'buttonText' => __("delete", "Delete")
+            'buttonText' => __("delete", "Delete"),
+            'data' => $data
         ];
 
         $formHtml = $this->formService->formHtml(

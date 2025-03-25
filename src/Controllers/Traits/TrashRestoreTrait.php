@@ -50,7 +50,8 @@ trait TrashRestoreTrait
             ),
             'buttonID' => "main{$actionType}Btn",
             'buttonClass' => $buttonClass,
-            'buttonText' => __($buttonText)
+            'buttonText' => __($buttonText),
+            'data' => $data
         ];
 
         $formHtml = $this->formService->formHtml(

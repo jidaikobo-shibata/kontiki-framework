@@ -14,6 +14,8 @@ return [
     'edit' => '編集する',
     'preview' => 'プレビューする',
     'published_url' => '公開URL',
+    'reserved_url' => '公開予定URL',
+    'banned_url' => '無効なURL',
     'edit_this_content' => 'このページを編集する',
     'update' => '更新する',
     'trash' => 'ごみ箱',

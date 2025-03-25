@@ -8,14 +8,15 @@
   * @var string $buttonPosition
   */
 
-if (!empty($viewUrl) && !empty($formVars['slug'])) :
-    $publishedUrl = e($viewUrl) . '/' . e($formVars['slug']);
+$slug = $formVars['data']['slug'] ?? '';
+if (!empty($viewUrl) && !empty($slug)) :
+    $publishedUrl = e($viewUrl) . '/' . e($slug);
     $html = '';
-    $html .= '<p id="publishedUrl" class="form-text">' . __('published_url') . ': ';
-    $html .= '<a href="' . $publishedUrl . '" target="publishedPage">';
+    $html .= '<p id="publishedUrl" class="form-text"><span id="publishedUrlLabel">';
+    $html .= __('published_url') . '</span>: ';
+    $html .= '<span id="publishedUrlText">';
     $html .= $publishedUrl . ' ';
-    $html .= '<span class="fa-solid fa-arrow-up-right-from-square" aria-label="';
-    $html .= __('open_in_new_window') . '"></span></a></p>';
+    $html .= '</span></p>';
     echo $html;
 endif; ?>
 
