@@ -8,6 +8,10 @@
   * @var string $do_reserve
   * @var string $do_save_as_pending
   * @var string $do_save_as_draft
+  * @var string $banned_url
+  * @var string $reserved_url
+  * @var string $published_url
+  * @var string $open_in_new_window
   */
 ?>$(document).ready(function () {
     /**

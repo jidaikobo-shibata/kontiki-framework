@@ -9,6 +9,7 @@ return [
     'account' => 'アカウント',
     'account_settings' => 'アカウント設定',
 
+    'help' => 'ヘルプ',
     'submit' => '送信する',
     'create' => '作成する',
     'edit' => '編集する',

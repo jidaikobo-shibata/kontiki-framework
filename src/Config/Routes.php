@@ -23,6 +23,7 @@ class Routes
             Controllers\UserController::registerRoutes($app, 'user');
         }
         Controllers\AccountController::registerRoutes($app);
+        Controllers\HelpController::registerRoutes($app);
 //        Controllers\CategoryController::registerRoutes($app, 'post/category');
     }
 }

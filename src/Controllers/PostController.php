@@ -22,7 +22,6 @@ class PostController extends BaseController
     use Traits\CreateEditTrait;
     use Traits\TrashRestoreTrait;
     use Traits\DeleteTrait;
-    use Traits\MarkdownHelpTrait;
     use Traits\PreviewTrait;
 
     protected string $adminDirName = 'post';

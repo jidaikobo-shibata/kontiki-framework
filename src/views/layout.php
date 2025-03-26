@@ -56,6 +56,9 @@
       <a href="<?= $basePath ?>/account/settings" class="nav-link"><?= __('account_settings') ?></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
+      <a href="<?= $basePath ?>/help" class="nav-link" target="helpWindow"><?= __('help') ?></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
       <a href="<?= $basePath ?>/logout" class="nav-link"><?= __('logout') ?></a>
       </li>
     </ul>

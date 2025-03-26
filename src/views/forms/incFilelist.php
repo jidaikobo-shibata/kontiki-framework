@@ -49,7 +49,7 @@
                         if ($file['isImage']) :
                             echo '!';
                         endif;
-                            echo '[' . e($file['description']). '](' . e($file['url']) . ')';
+                            echo '[' . e($file['description']) . '](' . e($file['url']) . ')';
                         ?></code>
                         </td>
                         <td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn"><?= __('insert') ?></a></td>
