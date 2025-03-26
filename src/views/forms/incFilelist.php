@@ -26,12 +26,12 @@
             <?php $fileId = intval($file['id']) ?>
             <tr>
                 <th class="text-center"><?= $fileId; ?></th>
-                <td>
+                <td class="align-middle">
                     <div class="text-center">
                     <?php
                     echo $file['imageOrLink'];
                     ?>
-                </div>
+                    </div>
                     <div class="text-center text-nowrap"><a href="#" class="text-danger file-delete-link" data-confirm="critical" data-delete-id="<?= $fileId ?>" data-csrf_token=""><?= __('delete_it_completely') ?></a></div>
                 </td>
                 <td class="eachFile">
@@ -44,7 +44,14 @@
                     </tr>
                     <tr>
                         <th class="text-nowrap align-middle" scope="row"><?= __('code') ?></th>
-                        <td class="text-break"><code>![<?= e($file['description']); ?>](<?= e($file['url']); ?>)</code></td>
+                        <td class="text-break"><code>
+                        <?php
+                        if ($file['isImage']) :
+                            echo '!';
+                        endif;
+                            echo '[' . e($file['description']). '](' . e($file['url']) . ')';
+                        ?></code>
+                        </td>
                         <td class="text-nowrap align-middle"><a href="#" class="fileInsertBtn"><?= __('insert') ?></a></td>
                     </tr>
                     <tr>

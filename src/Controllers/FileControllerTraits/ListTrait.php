@@ -59,8 +59,24 @@ trait ListTrait
             $items[$key]['imageOrLink'] = $this->renderImageOrLink($url, $items[$key]['description'] ?? '');
             $items[$key]['url'] = $url;
             $items[$key]['description'] = $items[$key]['description'] ?? ''; // don't use null
+            $items[$key]['isImage'] = $this->isImageUrl($url);
         }
         return $items;
+    }
+
+    /**
+     * Determine whether a given URL points to an image file based on its extension.
+     *
+     * @param string $url The URL to check.
+     * @return bool True if it's an image, false otherwise.
+     */
+    private function isImageUrl(string $url): bool
+    {
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
+
+        return isset($pathInfo['extension']) &&
+            in_array(strtolower($pathInfo['extension']), $imageExtensions, true);
     }
 
     /**
@@ -72,35 +88,30 @@ trait ListTrait
      */
     private function renderImageOrLink(string $url, ?string $desc): string
     {
-      // Check if the URL is an image URL (basic check based on file extension)
-        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
-
-        if (isset($pathInfo['extension']) && in_array(strtolower($pathInfo['extension']), $imageExtensions)) {
-          // Return an <img> tag for images
+        if ($this->isImageUrl($url)) {
             $descText = e($desc);
             $imgSrc = e($url);
             return '<img src="' . $imgSrc . '" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
         }
 
-      // Otherwise, return an <a> tag for links
+        // Otherwise, return an <a> tag for links
         $linkHref = e($url);
-
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
         $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : null;
 
         switch ($extension) {
             case 'pdf':
-                $class = 'bi-filetype-pdf';
+                $class = 'fa-file-pdf';
                 break;
             case 'zip':
-                $class = 'bi-file-zip';
+                $class = 'fa-file-zip';
                 break;
             default:
-                $class = 'bi-file-text';
+                $class = 'fa-file-text';
                 break;
         }
 
-        return '<a href="' . $linkHref . '" target="_blank" aria-label="' . __('downlaod') . '" download class="bi ' . $class . ' display-3"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) . '</span></a>';
+        return '<a href="' . $linkHref . '" target="_blank" aria-label="' . __('downlaod') . '" download class="fa-solid ' . $class . ' display-3 mb-2"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) . '</span></a>';
     }
 
     protected function pathToUrl(string $filePath): string
