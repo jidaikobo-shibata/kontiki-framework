@@ -1,6 +1,8 @@
 <?php
 
 /**
+  * @var string $open_sidebar
+  * @var string $close_sidebar
   * @var string $publishing
   * @var string $reserved
   * @var string $expired
@@ -15,7 +17,21 @@
   */
 ?>$(document).ready(function () {
     /**
-     * move button
+     * add aria-label to sidebar button
+     */
+    const $toggleBtn = $('[data-widget="pushmenu"]');
+    function updateAriaLabel() {
+        const isCollapsed = $('body').hasClass('sidebar-collapse');
+        const label = isCollapsed ? '<?= $open_sidebar ?>' : '<?= $close_sidebar ?>';
+        $toggleBtn.attr('aria-label', label);
+    }
+    updateAriaLabel();
+    $toggleBtn.on('click', function () {
+        setTimeout(updateAriaLabel, 10);
+    });
+
+    /**
+     * move create post button
      */
     $("#create_button_in_index").insertAfter("#content-header h1");
 

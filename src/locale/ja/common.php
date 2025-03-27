@@ -7,9 +7,12 @@ return [
     'username' => 'ユーザ名',
     'password' => 'パスワード',
     'account' => 'アカウント',
-    'account_settings' => 'アカウント設定',
 
+    'open_sidebar' => 'サイドバーを開く',
+    'close_sidebar' => 'サイドバーを閉じる',
+    'account_settings' => 'アカウント設定',
     'help' => 'ヘルプ',
+
     'submit' => '送信する',
     'create' => '作成する',
     'edit' => '編集する',

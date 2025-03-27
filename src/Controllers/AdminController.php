@@ -44,6 +44,8 @@ class AdminController
                 'reserved_url' => __('reserved_url'),
                 'banned_url' => __('banned_url'),
                 'open_in_new_window' => __('open_in_new_window'),
+                'open_sidebar' => __('open_sidebar'),
+                'close_sidebar' => __('close_sidebar'),
             ]
         );
         $response->getBody()->write($content);

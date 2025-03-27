@@ -15,27 +15,25 @@ if (isset($createButton['path'])) :
 endif;
 ?>
 
-<div class="container-fluid d-flex justify-content-between align-items-center bg-secondary-subtle py-0 p-2 mb-3">
-    <nav class="navbar navbar-expand-lg" aria-label="<?= __('display_filter') ?>">
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav">
-            <?php
-            $html = '';
-            foreach ($displayModes as $displayMode) :
-                $html .= '<li class="nav-item">';
-                $current = strpos($_SERVER['REQUEST_URI'], $displayMode['path']) !== false ?
-                    ' active" aria-current="page' :
-                    '';
+<div class="container-fluid d-flex flex-wrap justify-content-between align-items-center bg-secondary-subtle py-0 p-2 mb-3">
+    <nav class="navbar" aria-label="<?= __('display_filter') ?>">
+        <ul class="navbar-nav flex-row flex-wrap">
+          <?php
+          $html = '';
+          foreach ($displayModes as $displayMode) :
+              $html .= '<li class="nav-item me-3">';
+              $current = strpos($_SERVER['REQUEST_URI'], $displayMode['path']) !== false ?
+                  ' active" aria-current="page' :
+                  '';
 
-                $html .= '<a href="' . $displayMode['path'] . '" class="nav-link' . $current . '">';
-                $html .= $displayMode['name'];
-                $html .= '</a>';
-                $html .= '</li>';
-            endforeach;
-            echo $html;
-            ?>
-          </ul>
-        </div>
+              $html .= '<a href="' . $displayMode['path'] . '" class="nav-link text-nowrap' . $current . '">';
+              $html .= $displayMode['name'];
+              $html .= '</a>';
+              $html .= '</li>';
+          endforeach;
+          echo $html;
+          ?>
+        </ul>
     </nav>
 
     <nav class="navbar">
