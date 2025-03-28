@@ -64,7 +64,7 @@ trait IndexTrait
     private function applySorting(Builder $query, array $queryParams): Builder
     {
         if (!empty($queryParams['orderby']) && !empty($queryParams['order'])) {
-            $validColumns = ['id', 'name', 'created_at']; // いったんハードコーディング
+            $validColumns = array_keys($this->getFields());
             $column = in_array($queryParams['orderby'], $validColumns, true) ?
                 $queryParams['orderby'] :
                 'id';
