@@ -43,11 +43,6 @@
 
 /* .alert */
 
-.alert a {
-    color: var(--bs-link-color);
-    font-weight: bold;
-}
-
 .alert a:hover {
     text-decoration: none !important;
 }
