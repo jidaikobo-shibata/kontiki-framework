@@ -133,7 +133,7 @@ class TableRenderer
         }
 
         if ($this->isUtcField($name)) {
-            return [$this->formatUtcField($row[$name] ?? '')];
+            return [$this->formatDateTimeField($row[$name] ?? '')];
         }
 
         return [$row[$name] ?? ''];
@@ -156,16 +156,14 @@ class TableRenderer
         return !empty($this->fields[$name]['save_as_utc']);
     }
 
-    private function formatUtcField(?string $value): string
+    private function formatDateTimeField(?string $value): string
     {
         if (empty($value)) {
             return '';
         }
 
         try {
-            return Carbon::parse($value, 'UTC')
-                ->setTimezone(env('TIMEZONE', 'UTC'))
-                ->format('Y-m-d H:i');
+            return Carbon::parse($value)->format('Y-m-d H:i');
         } catch (\Exception $e) {
             return $value; // fallback to raw
         }
