@@ -87,4 +87,23 @@ class FileController extends BaseController
     {
         return $this->serveInstanceJs($request, $response);
     }
+
+    protected function pathToUrl(string $filePath): string
+    {
+        // $uploadBaseUrl included
+        $uploadBaseUrl = rtrim(env('BASEURL'), '/') . rtrim(env('BASEURL_UPLOAD_DIR'), '/');
+        if (strpos($filePath, $uploadBaseUrl) === 0) {
+            return $filePath;
+        }
+
+        // not $uploadBaseUrl included
+        $filePath = realpath($filePath);
+        $uploadDir = realpath(env('PROJECT_PATH', '') . env('UPLOADDIR'));
+
+        if (strpos($filePath, $uploadDir) === 0) {
+            $relativePath = ltrim(str_replace($uploadDir, '', $filePath), '/');
+            return $uploadBaseUrl . '/' . $relativePath;
+        }
+        throw new \InvalidArgumentException('The file path is not inside the upload directory.');
+    }
 }

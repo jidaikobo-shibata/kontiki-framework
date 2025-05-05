@@ -20,7 +20,7 @@ trait MessagesTrait
             ),
             'upload_success' => __(
                 'upload_success',
-                'The file has been successfully uploaded. check <a href="#" class="link-primary" id="switchToViewTab">Files Index</a>.'
+                'The file has been successfully uploaded. Input description and Insert.</a>.'
             ),
             'upload_error' => __(
                 'upload_error',

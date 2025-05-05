@@ -45,13 +45,19 @@ trait CRUDTrait
         }
 
         // update database
-        $fileData = ['path' => $uploadResult['path']];
-        if ($validationError = $this->validateAndSave($fileData, $response)) {
-            return $validationError;
+        $fileUrl = $this->pathToUrl($uploadResult['path']);
+        $fileData = ['path' => $fileUrl];
+        $validationResult = $this->validateAndSave($fileData, $response);
+        if ($validationResult instanceof Response) {
+            return $validationResult; // return error response
         }
+        $data = $validationResult; // this is the inserted data
 
         // success
-        return $this->successResponseHtml($response, $this->getMessages()['upload_success']);
+        return $this->jsonResponse($response, [
+                'message' => $this->getMessages()['upload_success'],
+                'data' => $data
+            ]);
     }
 
     protected function prepareUploadedFile(Request $request): ?array
@@ -71,7 +77,7 @@ trait CRUDTrait
         return null;
     }
 
-    private function validateAndSave(array $fileData, Response $response): ?Response
+    private function validateAndSave(array $fileData, Response $response): Response|array|null
     {
         $validationResult = $this->model->validate(
             $fileData,
@@ -85,14 +91,19 @@ trait CRUDTrait
                 405
             );
         }
-        if (!$this->model->create($fileData)) {
+
+        $insertId = $this->model->create($fileData);
+        if (!$insertId) {
             return $this->errorResponse(
                 $response,
                 $this->getMessages()['database_update_failed'],
                 500
             );
         }
-        return null;
+
+        $data = $this->model->getById($insertId);
+
+        return $data;
     }
 
     /**

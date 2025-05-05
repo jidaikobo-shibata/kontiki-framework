@@ -5,8 +5,11 @@ return [
     'file' => 'ファイル',
     'path' => '場所',
     'file_upload' => 'ファイルアップロード',
-    'file_upload_manage' => 'ファイルアップロード / 管理',
-    'multi_bytes_warn' => '全角文字は変更か、削除されます。',
+    'file_choose_upload' => 'ファイルを選択してアップロード',
+    'file_choose_from_uploaded' => 'アップロード済み一覧から選択',
+    'image_insert' => '画像挿入',
+    'file_manage_upload' => 'ファイル管理 / アップロード',
+    'multi_bytes_warn' => 'ファイル名の全角文字は変更か、削除されます。',
     'desc_for_description' => '「説明」は画像の場合は<code>alt属性</code>（画像の代替テキスト）、ファイルの場合は<code>リンク文字列</code>として使われます',
     'prepare_file_list' => 'ファイルの一覧を準備中です。',
 
@@ -35,7 +38,7 @@ return [
 
     'invalid_request' => 'リクエストが無効です。もう一度お試しください。',
     'validation_failed' => 'データの検証に失敗しました。入力内容をご確認ください。',
-    'upload_success' => 'ファイルのアップロードに成功しました。<a href="#" class="link-primary" id="switchToViewTab">ファイルの一覧</a>で記事への挿入や説明の追加ができます。',
+    'upload_success' => 'ファイルのアップロードに成功しました。説明を入力して、挿入してください。',
     'upload_error' => 'ファイルをアップロードできませんでした。もう一度お試しください。',
     'database_update_failed' => 'データベースの更新に失敗しました。もう一度お試しください。',
     'file_missing' => 'ファイルがアップロードされていないか、ファイルが壊れています。',

@@ -18,18 +18,21 @@
     /**
      * Initializes the FileManager instance.
      * @param {string} ajaxUrl The base URL for AJAX requests.
-     * @param {string} targetTextareaId - The ID of the target textarea for file insertion.
+     * @param {string} targetFieldId - The ID of the target targetField for file insertion.
      */
-    constructor(ajaxUrl, targetTextareaId) {
+    constructor(ajaxUrl, targetFieldId) {
         this.ajaxUrl = ajaxUrl || '/'; // Default to '/admin/' if no URL is provided
-        this.targetTextareaId = targetTextareaId || 'content'; // Default textarea ID
+        this.targetFieldId = targetFieldId || 'content'; // Default targetField ID
         this.init();
     }
 
     // Initialize events and functions
     init() {
         this.updateCsrfToken();
+        this.prepareModalDialog();
+        this.setupFileUploadButton();
         this.setupFileUpload();
+        this.setupUpdateDescAndInsert();
         this.setupFileList();
         this.setupPagination();
         this.setupImageModal();
@@ -62,6 +65,43 @@
     }
 
     /**
+     * prepare modal dialog.
+     */
+    prepareModalDialog() {
+        $(document).on('show.bs.modal', '#uploadModal', (event) => {
+            const button = $(event.relatedTarget);
+            const targetTab = button.data('tab-target');
+
+            if (targetTab === 'view') {
+                new bootstrap.Tab($('#view-tab')[0]).show();
+                this.fetchFiles();
+            } else {
+                new bootstrap.Tab($('#upload-tab')[0]).show();
+            }
+        });
+
+        // Remove the current focus from within the modal.
+        // because of accessibility error message of console
+        $('#uploadModal').on('hide.bs.modal', function () {
+            document.activeElement.blur();
+        });
+    }
+
+    /**
+     * Handles file upload button.
+     */
+    setupFileUploadButton() {
+        $('#fileAttachment').on('change', function () {
+            const hasFile = this.files.length > 0;
+            const button = $('#fileUploadButton');
+
+            button.prop('disabled', !hasFile);
+            button.toggleClass('btn-light', !hasFile);
+            button.toggleClass('btn-info', hasFile);
+        });
+    }
+
+    /**
      * Handles the file upload process.
      * @param {Event} event - The event object from the submit event.
      */
@@ -86,15 +126,33 @@
                 processData: false, // Prevent jQuery from processing data
                 success: (response) => {
                     // Handle successful upload
+                    $('#fileUploadStatus').addClass('alert alert-success');
                     $('#fileUploadStatus').html(response.message);
                     $('#fileAttachment').val('');
                     $('#fileAttachment').focus();
+
+                    // Set data-file-id on the textarea
+                    $('#uploadedDescription').attr('data-file-id', response.data.id);
+                    $('#uploadedDescription').attr('data-file-path', response.data.path);
+
+                    // Optionally also clear the textarea for fresh input
+                    $('#uploadedDescription').val('');
+
+                    // Smooth transition: hide uploadForm, show insertUploadedFile
+                    $('#uploadForm').fadeOut(300, function () {
+                        $('#insertUploadedFile').fadeIn(300).removeClass('d-none');
+                    });
+
+                    // Optional: show a prompt or focus
+                    $('#uploadedDescription').focus();
 
                     this.updateCsrfToken();
                 },
                 error: (xhr, status, error) => {
                     // Handle upload error
                     var response = xhr.responseJSON; // Get the JSON response
+
+                    $('#fileUploadStatus').addClass('alert alert-danger');
 
                     // Check if the response contains a message
                     if (response && response.message) {
@@ -103,6 +161,69 @@
                     } else {
                         // Default error message
                         $('#fileUploadStatus').text('<?= $couldnt_upload ?>');
+                    }
+                    this.updateCsrfToken();
+                }
+            });
+        });
+    }
+
+    /**
+     * Save file description via ajax.
+     * Insert markdown format/file path into input field.
+     *
+     * @event submit
+     * @param {Event} e - The event object for the form submission.
+     */
+    setupUpdateDescAndInsert() {
+        $(document).on('submit', '#insertUploadedFile', (e) => {
+            e.preventDefault(); // Prevent the default form submission
+
+            const form = $(e.target);
+
+            const description = $('#uploadedDescription').val();
+            const csrfToken = $('#uploadedDescription').attr('data-csrf_token');
+            const fileId = $('#uploadedDescription').attr('data-file-id');
+            const fileUrl = $('#uploadedDescription').attr('data-file-path');
+
+            // Prepare the data to be sent
+            const formData = {
+                description: description,
+                _csrf_value: csrfToken,
+                id: fileId
+            };
+
+            // Make the AJAX request
+            $.ajax({
+                url: `${this.ajaxUrl}update`, // The URL to handle the request
+                type: 'POST',
+                data: formData,
+                success: (response) => {
+                    const markdown = `![${description}](${fileUrl})`;
+                    this.insertTextAtCaret(markdown);
+                    this.closeModal();
+                },
+                error: (xhr, status, error) => {
+                    // Handle upload error
+                    var response = xhr.responseJSON; // Get the JSON response
+
+                    // reset
+                    $('#uploadedDescription').removeAttr('aria-invalid');
+                    $('#uploadedDescription').removeAttr('aria-errormessage');
+                    $('#uploadedDescription').removeClass('is-invalid');
+
+                    // Check if the response contains a message
+                    if (response && response.message) {
+                        // Add aria-invalid and aria-errormessage to input#eachDescription_<id>
+                        if (response.message.includes('errormessage_eachDescription_' + fileId)) {
+                            $('#uploadedDescription').attr('aria-invalid', 'true');
+                            $('#uploadedDescription').attr('aria-errormessage', 'insertStatusMsg');
+                            $('#uploadedDescription').addClass('is-invalid');
+                        }
+                        const replacedMessage = response.message.replace('#eachDescription_' + fileId, '#uploadedDescription');
+                        $('#insertStatusMsg').html(replacedMessage);
+                    } else {
+                        $('#insertStatusMsg').text('Update failed.');
                     }
                     this.updateCsrfToken();
                 }
@@ -451,7 +572,8 @@
     }
 
     /**
-     * Handles the "Insert" button click to insert a file reference into the textarea and display success status.
+     * Handles the "Insert" button click to insert a file reference
+     * into the targetField and display success status.
      */
     setupInsertFile() {
         $(document).off('click', '.fileInsertBtn'); // ensure reset click event
@@ -462,35 +584,46 @@
             const fileRow = $(e.target).closest('tr'); // The row containing the button
             const codeContent = fileRow.find('td.text-break code').text().trim(); // Get <code> content
 
-            // Insert the reference at the caret position in the textarea
-            const textarea = document.getElementById(this.targetTextareaId);
-            if (!textarea) return;
+            // Use the extracted method
+            this.insertTextAtCaret(codeContent);
 
-            const startPos = textarea.selectionStart; // Get cursor start position
-            const endPos = textarea.selectionEnd; // Get cursor end position
-            const textBefore = textarea.value.substring(0, startPos);
-            const textAfter = textarea.value.substring(endPos, textarea.value.length);
-
-            // Insert at caret position
-            textarea.value = textBefore + codeContent + textAfter;
-
-            // Restore caret position after inserted text
-            const newCaretPos = startPos + codeContent.length;
-            textarea.selectionStart = textarea.selectionEnd = newCaretPos;
-
-            textarea.focus(); // Focus back on the textarea
-
-            const modalElement = document.getElementById('uploadModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
+            // close modal
+            this.closeModal();
 
             // Display success status
             // const codeElement = fileRow.find('td.text-break code');
             // fileRow.find('.insert-status').remove();
             // codeElement.after('<span role="status" class="insert-status ms-2 text-success"><?= $insert_success ?></span>');
         });
+    }
+
+    /**
+     * close modal
+     */
+    closeModal() {
+        const modalElement = document.getElementById('uploadModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+
+    /**
+     * Insert the given text at the current caret position of the target textarea.
+     * @param {string} textToInsert - The text to insert at the caret.
+     */
+    insertTextAtCaret(textToInsert) {
+        const targetField = document.getElementById(this.targetFieldId);
+        if (!targetField) return;
+
+        const startPos = targetField.selectionStart;
+        const endPos = targetField.selectionEnd;
+        const textBefore = targetField.value.substring(0, startPos);
+        const textAfter = targetField.value.substring(endPos);
+
+        targetField.value = textBefore + textToInsert + textAfter;
+        targetField.selectionStart = targetField.selectionEnd = startPos + textToInsert.length;
+        targetField.focus();
     }
 
     /**

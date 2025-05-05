@@ -113,17 +113,4 @@ trait ListTrait
 
         return '<a href="' . $linkHref . '" target="_blank" aria-label="' . __('downlaod') . '" download class="fa-solid ' . $class . ' display-3 mb-2"><span class="visually-hidden">' . __('downlaod_x', 'Download :name', ['name' => $desc]) . '</span></a>';
     }
-
-    protected function pathToUrl(string $filePath): string
-    {
-        $filePath = realpath($filePath);
-        $uploadDir = realpath(env('PROJECT_PATH', '') . env('UPLOADDIR'));
-        $uploadBaseUrl = rtrim(env('BASEURL'), '/') . rtrim(env('BASEURL_UPLOAD_DIR'), '/');
-
-        if (strpos($filePath, $uploadDir) === 0) {
-            $relativePath = ltrim(str_replace($uploadDir, '', $filePath), '/');
-            return $uploadBaseUrl . '/' . $relativePath;
-        }
-        throw new \InvalidArgumentException('The file path is not inside the upload directory.');
-    }
 }
