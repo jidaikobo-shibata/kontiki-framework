@@ -61,7 +61,7 @@ if (!function_exists('printEditDataLink')) {
         $html = '';
         $html .= '<p class="edit-this-page"><a href="' . $url . '">';
         $html .= __('edit_this_content');
-        $html .= '</a></a>';
+        $html .= '</a></p>';
         echo $html;
     }
 }
