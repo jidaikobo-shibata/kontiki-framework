@@ -213,7 +213,7 @@ class TableRenderer
         string $status
     ): void {
         if (!empty($row[$key])) {
-            $time = Carbon::parse($row[$key]);
+            $time = Carbon::parse($row[$key], env('TIMEZONE', 'UTC'));
             if ($condition($time)) {
                 $values[0] = __($status);
             }
