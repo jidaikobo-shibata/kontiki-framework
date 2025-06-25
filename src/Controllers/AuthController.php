@@ -63,7 +63,11 @@ class AuthController extends BaseController
             return $this->redirectResponse($request, $response, 'dashboard');
         }
 
-        $data = $this->flashManager->getData('data', ['username' => '']);
+        $redirectUrl = $request->getQueryParams()['redirect'] ?? '';
+        $data = $this->flashManager->getData(
+            'data',
+            ['username' => '', 'redirectUrl' => $redirectUrl]
+        );
 
         $content = $this->view->fetch('auth/login.php', $data);
         $content = $this->formService->addMessages(
@@ -84,19 +88,25 @@ class AuthController extends BaseController
         $data = $request->getParsedBody() ?? [];
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
+        $redirectUrl = $data['redirectUrl'] ?? 'dashboard';
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
 
+        // Login successful
         if ($this->auth->login($username, $password)) {
             $this->rateLimitService->resetRateLimit($ip);
             $this->rateLimitService->cleanOldRateLimitData();
-            return $this->redirectResponse($request, $response, 'dashboard');
+            return $this->redirectResponse($request, $response, $redirectUrl);
         }
 
+        // Login Failed
         $this->rateLimitService->recordFailedLogin($ip);
         $this->flashManager->addErrors([
             ['messages' => [__('wrong_username_or_password', 'Incorrect username or password')]],
         ]);
-        $this->flashManager->setData('data', ['username' => $username]); // not keep password
+        $this->flashManager->setData(
+            'data',
+            ['username' => $username, 'redirectUrl' => $redirectUrl]
+        ); // not keep password
         return $this->redirectResponse($request, $response, 'login');
     }
 

@@ -35,6 +35,7 @@
         </div>
 
         <div class="col-4">
+          <input type="hidden" name="redirectUrl" value="<?= e($data['redirectUrl']) ?>">
           <button type="submit" class="btn btn-primary btn-block"><?= __('login', 'Login') ?></button>
         </div>
 

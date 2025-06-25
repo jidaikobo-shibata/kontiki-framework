@@ -6,6 +6,7 @@ use Aura\Session\SessionFactory;
 use Aura\Session\Session;
 use DI\Container;
 use Slim\App;
+use Slim\Routing\RouteParser;
 use Slim\Views\PhpRenderer;
 use Valitron\Validator;
 use Jidaikobo\Kontiki\Services\FileService;
@@ -37,6 +38,7 @@ class Dependencies
         $container->set(PhpRenderer::class, fn() => $this->createPhpRenderer());
         $container->set(FileService::class, fn() => $this->createFileService());
         $container->set(RoutesService::class, fn() => $this->createRoutesService());
+        $container->set(RouteParser::class, fn() => $this->app->getRouteCollector()->getRouteParser());
     }
 
     private function createDatabase(): Database

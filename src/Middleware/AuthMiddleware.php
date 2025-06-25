@@ -8,11 +8,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Views\PhpRenderer;
+use Slim\Routing\RouteParser;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    private PhpRenderer $view;
-    private Auth $auth;
     private array $excludedRoutes = [
         '/favicon.ico',
         '/login',
@@ -20,16 +19,15 @@ class AuthMiddleware implements MiddlewareInterface
     ];
 
     public function __construct(
-        PhpRenderer $view,
-        Auth $auth
-    ) {
-        $this->auth = $auth;
-        $this->view = $view;
-    }
+        private PhpRenderer $view,
+        private Auth $auth,
+        private RouteParser $routeParser,
+    ) {}
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $path = '/' . basename($request->getUri()->getPath());
+        $requestedPath = $request->getUri()->getPath();
+        $path = '/' . basename($requestedPath);
 
         // for guest routes
         if (in_array($path, $this->excludedRoutes, true)) {
@@ -38,12 +36,25 @@ class AuthMiddleware implements MiddlewareInterface
 
         // for login users
         if (!$this->auth->isLoggedIn()) {
+            $redirect = substr($requestedPath, strlen(env('BASEPATH', '')));
+            $loginUrl = $this->routeParser->urlFor('login', [], ['redirect' => $redirect]);
+
+            // Check the referrer and redirect to login as it is an internal transition
+            $referer = $request->getHeaderLine('Referer');
+            if (strpos($referer, $_SERVER['HTTP_HOST']) !== false) {
+                return (new \Slim\Psr7\Response())
+                    ->withHeader('Location', $loginUrl)
+                    ->withStatus(302);
+            }
+
+            // If an external access is suspected, return 404.
             $response = new \Slim\Psr7\Response();
             $content = $this->view->fetch('error/404.php');
             return $this->view->render(
                 $response->withHeader('Content-Type', 'text/html')->withStatus(404),
                 'layout-error.php',
                 [
+                    'lang' => env('APPLANG', 'en'),
                     'pageTitle' => __('404_text'),
                     'content' => $content
                 ]
