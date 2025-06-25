@@ -25,6 +25,15 @@
 レベル2の見出し
 ---------------</code></pre>
 
+<h3>見出しに向かってリンクをしたい場合（フラグメント識別子の設定）</h3>
+
+<pre class="bg-light p-3 border rounded"><code>## リンクしたい見出し {#link-here}</code></pre>
+
+<p>というような表記をすることで、<code>https://example.com/#link-here</code>というようにリンクできるようになります。次のような表記も可能です。</p>
+
+<pre class="bg-light p-3 border rounded"><code>リンク例2 {#linkhere2}
+---------------</code></pre>
+
 <h2>引用</h2>
 <pre class="bg-light p-3 border rounded"><code>&gt; "このテキストは、HTMLのblockquote要素に囲まれます。
 テキストを好きなように改行することができます。

@@ -27,6 +27,15 @@ This is another paragraph. It also has two sentences.
 Level 2 heading
 ---------------</code></pre>
 
+<h3>If you want to link to a heading (setting the fragment identifier)</h3>
+
+<pre class="bg-light p-3 border rounded"><code>## Heading you want to link to {#link-here}</code></pre>
+
+<p>By writing something like this, you can link like this: <code>https://example.com/#link-here</code>. The following notation is also possible. </p>
+
+<pre class="bg-light p-3 border rounded"><code>Link example 2 {#linkhere2}
+---------------</code></pre>
+
 <h2>Quote</h2>
 <pre class="bg-light p-3 border rounded"><code>&gt; "This text will be enclosed in an HTML blockquote element.
 You can break the text as you like.
