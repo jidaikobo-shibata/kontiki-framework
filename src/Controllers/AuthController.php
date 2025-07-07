@@ -88,7 +88,8 @@ class AuthController extends BaseController
         $data = $request->getParsedBody() ?? [];
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
-        $redirectUrl = $data['redirectUrl'] ?? 'dashboard';
+        $redirectRaw = $data['redirectUrl'] ?? '';
+        $redirectUrl = trim($redirectRaw) !== '' ? $redirectRaw : 'dashboard';
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
 
         // Login successful
