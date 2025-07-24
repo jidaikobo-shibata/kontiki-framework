@@ -53,6 +53,7 @@ class PostModel extends BaseModel
             'updated_at' => $this->getUpdatedAtField(),
             'deleted_at' => $this->getDeletedAtField(),
             'created_at' => $this->getCreatedAtField(),
+            'display_updated_at' => $this->getDisplayUpdatedAtField(),
         ];
     }
 
@@ -348,6 +349,20 @@ class PostModel extends BaseModel
             [
                 'save_as_utc' => true,
                 'display_in_list' => 'trash'
+            ]
+        );
+    }
+
+    private function getDisplayUpdatedAtField(): array
+    {
+        return $this->getField(
+            __('display_updated_at', 'Display Updated'),
+            [
+                'type' => 'datetime-local',
+                'description' => __('display_updated_at_exp'),
+                'group' => 'meta',
+                'save_as_utc' => true,
+                'fieldset_template' => 'forms/fieldset/details.php',
             ]
         );
     }

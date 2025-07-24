@@ -35,11 +35,24 @@ trait PreviewTrait
     protected function renderPreview(Response $response, array $data): Response
     {
         if (!isset($data['title']) || !isset($data['content'])) {
-            return $this->renderResponse(
+
+            $pageTitle = __('cannot_preview_title');
+            $content = $this->view->fetch(
+                'error/cannot_preview.php',
+                [
+                    'pageTitle' => $pageTitle,
+                    'content' => __('cannot_preview_desc'),
+                ]
+            );
+
+            return $this->view->render(
                 $response,
-                __('cannot_preview_title'),
-                __('cannot_preview_desc'),
-                'preview/content.php'
+                'layout-error.php',
+                [
+                    'lang' => env('APPLANG', 'en'),
+                    'pageTitle' => $pageTitle,
+                    'content' => $content
+                ]
             );
         } else {
             static::setPreviewPath();
@@ -47,8 +60,8 @@ trait PreviewTrait
                 $response,
                 'preview.php',
                 [
-                    'title' => $data['title'],
-                    'content' => $data['content'],
+                    'lang' => env('APPLANG', 'en'),
+                    'data' => $data,
                 ]
             );
         }
