@@ -29,7 +29,7 @@ trait ListTrait
         $totalItems = $query->count();
 
         $pagination->setTotalItems($totalItems);
-        $paginationHtml = $pagination->render(env('BASEPATH', '') . "/filelist");
+        $paginationHtml = $pagination->render(env('BASEPATH', '') . "/filelist", true);
 
         $items = $query->limit($pagination->getLimit())
                   ->offset($pagination->getOffset())

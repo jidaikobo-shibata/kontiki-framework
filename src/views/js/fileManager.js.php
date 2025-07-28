@@ -41,6 +41,7 @@
         this.setupDeleteFile();
         this.setupFileEdit();
         this.setupInsertFile();
+        this.switchTab();
     }
 
     /**
@@ -67,8 +68,20 @@
     /**
      * prepare modal dialog.
      */
-    prepareModalDialog() {
-        $(document).on('show.bs.modal', '#uploadModal', (event) => {
+prepareModalDialog() {
+        const parentModalId = '#uploadModal';
+        let previousFocusBeforeUploadModal = null;
+        let uploadModalInitialized = false;
+
+        // 親モーダルのときだけ
+        $(document).on('show.bs.modal', parentModalId, (event) => {
+            if (event.target.id === 'uploadModal') {
+                previousFocusBeforeUploadModal = document.activeElement;
+            }
+
+            if (uploadModalInitialized) return;
+            uploadModalInitialized = true;
+
             const button = $(event.relatedTarget);
             const targetTab = button.data('tab-target');
 
@@ -77,6 +90,17 @@
                 this.fetchFiles();
             } else {
                 new bootstrap.Tab($('#upload-tab')[0]).show();
+            }
+        });
+
+        // 親モーダルのときだけ、閉じたら元のフォーカス位置に戻す
+        $(document).on('hidden.bs.modal', parentModalId, (event) => {
+            if (event.target.id !== 'uploadModal') return;
+
+            if (previousFocusBeforeUploadModal && typeof previousFocusBeforeUploadModal.focus === 'function') {
+                setTimeout(() => {
+                    previousFocusBeforeUploadModal.focus();
+                }, 0);
             }
         });
 
@@ -365,6 +389,9 @@
                 });
             $(parentModalId).append(overlay);
 
+            $('#expandedImageModal').css('z-index', 1055);
+            $('#expandedImageModal .modal-dialog').css('z-index', 1056);
+
             // Add custom ESC key listener for the expanded modal
             $(document).on('keydown.expanded-modal', (e) => {
                 if (e.key === 'Escape') {
@@ -390,8 +417,14 @@
             // Return focus to the parent modal
             const parentModalElement = document.getElementById('uploadModal');
             if (parentModalElement) {
-                const focusableElement = parentModalElement.querySelector('[data-bs-dismiss="modal"], button, a, input, textarea, select') || parentModalElement;
-                focusableElement.focus();
+                setTimeout(() => {
+                    const focusableElement = parentModalElement.querySelector(
+                        'button:not([disabled]), a[href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+                    );
+                    if (focusableElement && typeof focusableElement.focus === 'function') {
+                        focusableElement.focus();
+                    }
+                }, 0);
             }
         });
     }
@@ -630,7 +663,7 @@
      * Switch Tab
      * @returns {void}
      */
-    setupPagination() {
+    switchTab() {
         $(document).off('click', '#switchToViewTab'); // ensure reset click event
         $(document).on('click', '#switchToViewTab', (event) => {
             event.preventDefault();
