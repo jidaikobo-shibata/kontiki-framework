@@ -116,6 +116,71 @@
 <pre class="bg-light p-3 border rounded"><code>![Altのテキスト](/path/to/img.jpg)
 ![Altのテキスト](/path/to/img.png "タイトル")</code></pre>
 
+<h3>画像の大きさと配置</h3>
+
+<p>画像は大きさと配置について、いくつかの指定が可能です。画像の指定は次のような形で行います。</p>
+
+<pre class="bg-light p-3 border rounded"><code>![Altのテキスト](/path/to/img.jpg){.class1 .class2 .class3 ...}</code></pre>
+
+<ul>
+	<li>末尾の<code>.class1</code>、<code>.class2</code>が画像に対する指示となります（「指示の一覧」を参照）</li>
+	<li>指示は複数組み合わせて書くことができます</li>
+	<li>幅（<code>.w25〜100</code>）が無指定の場合、600px四方に収まる大きさとして表示されます</li>
+	<li>大きめの幅（<code>.w75〜100</code>）を指定して、回り込み指定をした場合、小さい画面では、テキストの読みやすさの維持のため、自動的に50%幅に改められます</li>
+</ul>
+
+<table class="table table-bordered caption-top">
+<caption>指示の一覧</caption>
+<thead>
+<tr>
+	<th>指示</th>
+	<th>振る舞い</th>
+</tr>
+</thead>
+<tbody class="table-group-divider">
+<tr>
+	<th>.left</th>
+	<td>左寄せ回り込み表示</td>
+</tr>
+<tr>
+	<th>.right</th>
+	<td>右寄せ回り込み表示</td>
+</tr>
+<tr>
+	<th>.center</th>
+	<td>中央表示</td>
+</tr>
+<tr>
+	<th>.clearleft</th>
+	<td>左寄せ回り込み表示解除</td>
+</tr>
+<tr>
+	<th>.clearright</th>
+	<td>右寄せ回り込み表示解除</td>
+</tr>
+<tr>
+	<th>.clear</th>
+	<td>すべての回り込み表示解除</td>
+</tr>
+<tr>
+	<th>.w25</th>
+	<td>本文幅に対して25%幅で表示</td>
+</tr>
+<tr>
+	<th>.w50</th>
+	<td>本文幅に対して50%幅で表示</td>
+</tr>
+<tr>
+	<th>.w75</th>
+	<td>本文幅に対して75%幅で表示</td>
+</tr>
+<tr>
+	<th>.w100</th>
+	<td>本文幅に対して100%幅で表示</td>
+</tr>
+</tbody>
+</table>
+
 <h2>表組み</h2>
 <p>以下のような記法です。</p>
 

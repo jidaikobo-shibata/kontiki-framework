@@ -118,6 +118,71 @@ console.log('Hello world');
 <pre class="bg-light p-3 border rounded"><code>![Alt ​​text](/path/to/img.jpg)
 ![Alt ​​text](/path/to/img.png "Title")</code></pre>
 
+<h3>Image Size and Placement</h3>
+
+<p>You can specify several image size and placement options. Images are specified in the following ways: </p>
+
+<pre class="bg-light p-3 border rounded"><code>![Alt text](/path/to/img.jpg){.class1 .class2 .class3 ...}</code></pre>
+
+<ul>
+<li>The <code>.class1</code> and <code>.class2</code> at the end are image instructions (see "Instructions List").</li>
+<li>Multiple instructions can be combined.</li>
+<li>If the width (<code>.w25-100</code>) is not specified, the image will be displayed within a 600px square.</li>
+<li>If a larger width (<code>.w75-100</code>) is specified and text wrapping is specified, the width will automatically be resized to 50% on smaller screens to maintain readability.</li>
+</ul>
+
+<table class="table table-bordered caption-top">
+<caption>List of Instructions</caption>
+<thead>
+<tr>
+<th>Instructions</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody class="table-group-divider">
+<tr>
+<th>.left</th>
+<td>Left-aligned wraparound</td>
+</tr>
+<tr>
+<th>.right</th>
+<td>Right-aligned wraparound</td>
+</tr>
+<tr>
+<th>.center</th>
+<td>Centered</td>
+</tr>
+<tr>
+<th>.clearleft</th>
+<td>Clear left-aligned wraparound</td>
+</tr>
+<tr>
+<th>.clearright</th>
+<td>Clear right-aligned wraparound</td>
+</tr>
+<tr>
+<th>.clear</th>
+<td>Clear all wraparound</td>
+</tr>
+<tr>
+<th>.w25</th>
+<td>Display at 25% of the text width</td>
+</tr>
+<tr>
+<th>.w50</th>
+<td>Display at 50% of the text width</td>
+</tr>
+<tr>
+<th>.w75</th>
+<td>Display at 75% of the text width</td>
+</tr>
+<tr>
+<th>.w100</th>
+<td>Display at 100% of the text width</td>
+</tr>
+</tbody>
+</table>
+
 <h2>Table</h2>
 <p>The notation is as follows. </p>
 
