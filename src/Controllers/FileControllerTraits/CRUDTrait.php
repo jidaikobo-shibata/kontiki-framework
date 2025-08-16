@@ -216,10 +216,9 @@ trait CRUDTrait
         }
 
         // Delete the file from the server
-        $filePath = $data['path'];
-
-        if ($this->deleteFileFromSystem($filePath)) {
-            Log::write("File deleted: " . $filePath);
+        $fileUrl = $data['path'];
+        if ($this->deletePhysicalFileByUrl($fileUrl)) {
+            Log::write("File deleted: " . $fileUrl);
         } else {
             $message = $this->getMessages()['file_delete_failed'];
             return $this->messageResponse($response, $message, 500);
@@ -237,11 +236,23 @@ trait CRUDTrait
         return $this->messageResponse($response, $message, 200);
     }
 
-    private function deleteFileFromSystem(string $filePath): bool
+    /**
+     * Delete a physical file from the server by its URL.
+     * Idempotent: returns true even if the file does not exist.
+     *
+     * @param string $fileUrl The URL pointing to the file in the upload directory.
+     * @return bool True if deleted successfully or file did not exist, false if deletion failed.
+     */
+    private function deletePhysicalFileByUrl(string $fileUrl): bool
     {
-        if (file_exists($filePath)) {
-            return unlink($filePath);
+        $filePath = $this->urlToPath($fileUrl);
+
+        // If the file does not exist, treat as already deleted (idempotent)
+        if (!file_exists($filePath)) {
+            return true;
         }
-        return false;
+
+        // Try deleting the file; return true on success, false on failure
+        return @unlink($filePath);
     }
 }

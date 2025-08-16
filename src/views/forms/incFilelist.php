@@ -15,7 +15,7 @@
 <?= $pagination; ?>
 <table class="table table-bordered table-hover table-striped">
     <thead class="table-light">
-        <tr class="table-dark">
+        <tr>
             <th class="text-center">ID</th>
             <th class="w-25"><?= __('file') ?></th>
             <th><?= __('value') ?></th>

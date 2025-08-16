@@ -28,12 +28,17 @@
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
   <!-- Scripts -->
-  <script src="<?= $basePath ?>/fileManager.js"></script>
-  <script src="<?= $basePath ?>/fileManagerInstance.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file-csrf.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file-utils.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file-lightbox.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file-uploader.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file-index.js"></script>
+  <script src="<?= $basePath ?>/kontiki-file.js"></script>
   <script src="<?= $basePath ?>/admin.js"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="<?= $basePath ?>/admin.css">
+  <link rel="stylesheet" href="<?= $basePath ?>/kontiki-file.css">
 
   <title><?= e($pageTitle) ?></title>
 </head>
@@ -78,7 +83,7 @@
     </section>
 
     <div class="content pb-5">
-      <div class="container-fluid">
+      <div class="container-fluid" id="kontiki-main">
         <?= $content ?>
       </div>
     </div>

@@ -41,4 +41,5 @@ endif; ?>
 </div>
 
 <?php
-include(__DIR__ . '/incFileManager.php');
+include(__DIR__ . '/incFileUploader.php');
+include(__DIR__ . '/incFileIndex.php');

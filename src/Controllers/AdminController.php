@@ -55,7 +55,6 @@ class AdminController
         )->withStatus(200);
     }
 
-
     /**
      * Serve the requested CSS file.
      *

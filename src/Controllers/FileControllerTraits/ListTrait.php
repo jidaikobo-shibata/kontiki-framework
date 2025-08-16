@@ -65,7 +65,7 @@ trait ListTrait
     }
 
     /**
-     * Determine whether a given URL points to an image file based on its extension.
+     * Determine whether a given URL points to an image file abased on its extension.
      *
      * @param string $url The URL to check.
      * @return bool True if it's an image, false otherwise.
@@ -91,7 +91,16 @@ trait ListTrait
         if ($this->isImageUrl($url)) {
             $descText = e($desc);
             $imgSrc = e($url);
-            return '<img src="' . $imgSrc . '" alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '" class="clickable-image img-thumbnail" tabindex="0">';
+            $imgTag = '<a href="' . $imgSrc . '"'
+                . ' class="img-thumbnail"'
+                . ' data-action="preview"'
+                . ' data-url="' . $imgSrc . '"'
+                . ' data-alt="' . $descText . '">'
+                . '<img src="' . $imgSrc . '"'
+                . ' alt="' . __('enlarge_x', 'Enlarge :name', ['name' => $descText]) . '"'
+                . ' class="img-thumbnail">'
+                . '</a>';
+            return $imgTag;
         }
 
         // Otherwise, return an <a> tag for links
