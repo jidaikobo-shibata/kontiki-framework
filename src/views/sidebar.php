@@ -3,15 +3,15 @@
   * @var array $sidebarItems
   */
 ?>
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <div class="text-center">
-  <a href="<?= env('BASEURL', '#') ?>" class="brand-link" target="homepage"><span class="brand-text font-weight-bold"><?= env('COPYRIGHT', '') ?></span></a>
+<aside id="main-sidebar" class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+  <div class="sidebar-brand">
+    <a href="<?= env('BASEURL', '#') ?>" class="brand-link" target="homepage"><span class="brand-text fw-bold"><?= env('COPYRIGHT', '') ?></span></a>
   </div>
-  <div class="sidebar">
+  <div class="sidebar-wrapper">
     <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
       <li class="nav-item">
-        <a class="nav-link font-weight-bold" href="<?= env('BASEPATH', '') ?>/dashboard">
+        <a class="nav-link fw-bold" href="<?= env('BASEPATH', '') ?>/dashboard">
           <span class="nav-icon fas fa-house"></span>
           <p><?= __('management_portal') ?></p>
         </a>
@@ -21,11 +21,11 @@
             $dataPath = env('BASEPATH') . '/' . $controller;
             ?>
           <li class="nav-item" data-path="<?= e($dataPath) ?>">
-            <a href="#" class="nav-link font-weight-bold" aria-expanded="false">
+            <a href="#" class="nav-link fw-bold" aria-expanded="false">
               <span class="nav-icon fas fa-folder"></span>
               <p>
               <?= e(__("x_management", ':name Management', ['name' => __($controller)])) ?>
-                <i class="right fas fa-angle-left"></i>
+                <i class="nav-arrow fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">

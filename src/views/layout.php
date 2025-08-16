@@ -18,14 +18,14 @@
     ?>
 
   <!-- AdminLTE CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-rc4/dist/css/adminlte.min.css">
 
   <!-- AdminLTE JavaScript -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-rc4/dist/js/adminlte.min.js"></script>
 
   <!-- Scripts -->
   <script src="<?= $basePath ?>/kontiki-file-csrf.js"></script>
@@ -43,14 +43,15 @@
   <title><?= e($pageTitle) ?></title>
 </head>
 
-<body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<body class="layout-fixed sidebar-expand-lg">
+<!-- .app-wrapper -->
+<div class="app-wrapper">
 
-  <!-- .main-header -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+  <!-- .app-header -->
+  <nav class="app-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-controls="main-sidebar">
+        <a class="nav-link" href="#" role="button" data-lte-toggle="sidebar" aria-controls="main-sidebar">
           <span class="fas fa-bars" aria-hidden="true"></span>
         </a>
       </li>
@@ -67,18 +68,16 @@
         <a href="<?= $basePath ?>/logout" class="nav-link"><?= __('logout') ?></a>
       </li>
     </ul>
-  </nav><!-- /.main-header -->
+  </nav><!-- /.app-header -->
 
   <!-- sidebar -->
   <?php require 'sidebar.php'; ?>
 
-  <!-- .content-wrapper -->
-  <main class="content-wrapper">
+  <!-- .app-main -->
+  <main class="app-main">
     <section class="content-header" id="content-header">
       <div class="container-fluid">
-        <div class="d-flex align-items-center gap-3">
-            <h1><?= e($pageTitle) ?></h1>
-        </div>
+        <h1><?= e($pageTitle) ?></h1>
       </div>
     </section>
 
@@ -87,12 +86,13 @@
         <?= $content ?>
       </div>
     </div>
-  </main><!-- /.content-wrapper -->
+  </main><!-- /.app-main -->
 
-  <!-- .main-footer -->
-  <footer class="main-footer">
+  <!-- .app-footer -->
+  <footer class="app-footer">
     <?= env('COPYRIGHT', '') ?>
-  </footer><!-- /.main-footer -->
-</div>
+  </footer><!-- /.app-footer -->
+
+</div><!-- /.app-wrapper -->
 </body>
 </html>
