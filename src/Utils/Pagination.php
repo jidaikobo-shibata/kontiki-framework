@@ -65,6 +65,11 @@ class Pagination
         return $this->itemsPerPage;
     }
 
+    public function getTotalItems(): int
+    {
+        return $this->totalItems;
+    }
+
     /**
      * Check if there is a next page available.
      *

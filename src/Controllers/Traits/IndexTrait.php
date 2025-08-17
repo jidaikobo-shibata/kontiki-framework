@@ -41,13 +41,14 @@ trait IndexTrait
         $content .= $this->model->getPagination()->render(
             env('BASEPATH', '') . "/{$this->adminDirName}/index" . $paginationSuffix
         );
+        $totalItems = $this->model->getPagination()->getTotalItems();
 
         $title = 'x_index_' . $context;
         $title_placeholder = $context . ' index of :name';
 
         return $this->renderResponse(
             $response,
-            __($title, $title_placeholder, ['name' => __($this->label)]),
+            __($title, $title_placeholder, ['name' => __($this->label)]) . ' (' . $totalItems . ')',
             $content
         );
     }
