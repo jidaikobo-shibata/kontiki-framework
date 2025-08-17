@@ -1,8 +1,8 @@
 <?php
 /**
-  * @var string $uploading
-  * @var string $couldnt_upload
-  */
+ * @var string $uploading
+ * @var string $couldnt_upload
+ */
 ?>/**
  * File uploader Class
  */
@@ -26,6 +26,7 @@ class KontikiFileUploader {
         this.setupFileUploadButton();
         this.setupFileUpload();
         this.setupUpdateDescAndInsert();
+        this.bindModalReset();
         this.csrf.refresh();
     }
 
@@ -41,7 +42,7 @@ class KontikiFileUploader {
         // Bind once (remove previous same-namespaced handler)
         $(document)
             .off('change.kfmUploader', '#fileAttachment')
-            .on('change.kfmUploader', '#fileAttachment', function () {
+            .on('change.kfmUploader', '#fileAttachment', function() {
                 const hasFile = this.files && this.files.length > 0;
                 $button.prop('disabled', !hasFile)
                     .toggleClass('btn-light', !hasFile)
@@ -76,13 +77,15 @@ class KontikiFileUploader {
             const formData = new FormData(event.target);
 
             $.ajax({
-                    url: `${this.ajaxUrl}upload`,
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: (response) => {
-                    $status.removeClass('alert-danger').addClass('alert alert-success').html(response.message);
+                url: `${this.ajaxUrl}upload`,
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: (response) => {
+                    $status.removeClass('alert-danger')
+                        .addClass('alert alert-success')
+                        .html(response.message);
 
                     // Clear file input
                     $('#fileAttachment').val('').focus();
@@ -93,14 +96,32 @@ class KontikiFileUploader {
                         .attr('data-file-path', response.data.path)
                         .val('');
 
-                    // Transition to "insert" view
-                    $('#uploadForm').fadeOut(300, () => {
-                        $('#insertUploadedFile').removeClass('d-none').fadeIn(300);
+                    // Transition to "insert" view with soft reveal
+                    const $insert = $('#insertUploadedFile');
+                    const $upload = $('#uploadForm');
+
+                    // Hide the upload form first
+                    $upload.addClass('d-none'); // remove fadeOut to avoid double animations
+
+                    // Prepare target for reveal: ensure it's displayed, then animate
+                    $insert.removeClass('d-none').addClass('kf-reveal');
+
+                    // Let the browser paint the initial state, then trigger the end state
+                    requestAnimationFrame(() => {
+                        $insert.addClass('is-in');
+
+                        // After the transition ends, move focus to the textarea
+                        const onDone = () => {
+                            $insert.off('transitionend', onDone);
+                            const $desc = $('#uploadedDescription');
+                            $desc.trigger('focus');
+                        };
+                        $insert.on('transitionend', onDone);
                     });
 
                     this.csrf.refresh();
                 },
-                    error: (xhr) => {
+                error: (xhr) => {
                     const response = xhr.responseJSON;
                     $status.removeClass('alert-success').addClass('alert alert-danger');
                     if (response && response.message) {
@@ -110,7 +131,7 @@ class KontikiFileUploader {
                     }
                     this.csrf.refresh();
                 },
-                    complete: () => {
+                complete: () => {
                     // Re-enable button after request finishes
                     $fileBtn.prop('disabled', $('#fileAttachment').val().length === 0);
                 }
@@ -180,7 +201,9 @@ class KontikiFileUploader {
                             $('#uploadedDescription').attr('aria-errormessage', 'insertStatusMsg');
                             $('#uploadedDescription').addClass('is-invalid');
                         }
-                        const replacedMessage = response.message.replace('#eachDescription_' + fileId, '#uploadedDescription');
+                        const replacedMessage = response
+                            .message
+                            .replace('#eachDescription_' + fileId, '#uploadedDescription');
                         $('#insertStatusMsg').html(replacedMessage);
                     } else {
                         $('#insertStatusMsg').text('Update failed.');
@@ -188,6 +211,58 @@ class KontikiFileUploader {
                     this.csrf.refresh();
                 }
             });
+        });
+    }
+
+    /** Reset modal to the initial "upload" view whenever it closes/opens */
+    bindModalReset() {
+        const modalId = this.modalSelector; // "kontikiFileUploadModal"
+        const $modal  = $('#' + modalId);
+
+        // Helper to reset UI state
+        const resetUI = () => {
+            const $upload = $('#uploadForm');
+            const $insert = $('#insertUploadedFile');
+            const $status = $('#fileUploadStatus');
+            const $file   = $('#fileAttachment');
+            const $btn    = $('#fileUploadButton');
+            const $desc   = $('#uploadedDescription');
+
+            // Hide insert view and clear its state
+            $insert.addClass('d-none').removeClass('kf-reveal is-in');
+            $('#insertStatusMsg').empty();
+            $desc.val('')
+                .removeAttr('data-file-id data-file-path data-csrf_token aria-invalid aria-errormessage')
+                .removeClass('is-invalid');
+
+            // Show upload form and reset controls
+            $upload.removeClass('d-none');
+            $status.removeClass('alert alert-success alert-danger').empty().removeAttr('role');
+            $file.val('');                 // clear selected file
+            $btn.prop('disabled', true)    // disable until a file is chosen
+                .addClass('btn-light')
+                .removeClass('btn-info');
+        };
+
+        // before aria-hidden=true is set, blur anything inside
+        $modal.on('hide.bs.modal', () => {
+            const active = document.activeElement;
+            if (active && $modal[0].contains(active)) {
+                active.blur(); // remove focus from modal descendants
+            }
+        });
+
+        // When the modal is completely hidden (closed by ×, ESC, backdrop, or JS)
+        $modal.on('hidden.bs.modal', () => {
+            resetUI(); // prepare for the next open
+        });
+
+        // When the modal is shown, ensure initial state and focus the file input
+        $modal.on('shown.bs.modal', () => {
+            // In case it was opened without having been hidden before
+            if ($('#insertUploadedFile').is(':visible')) resetUI();
+            // Focus the file input for quicker flow
+            $('#fileAttachment').trigger('focus');
         });
     }
 }

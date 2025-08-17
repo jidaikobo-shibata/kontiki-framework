@@ -7,8 +7,8 @@
 
 <?php
 $buttonGroupClass = $is_previewable === true
-    ? 'd-flex flex-column align-items-center gap-2'
-    : 'd-flex gap-2';
+    ? 'd-flex flex-column align-items-center gap-2 mt-3'
+    : 'd-flex gap-2 mt-3';
 
 if ($is_previewable === true) :
     ?>

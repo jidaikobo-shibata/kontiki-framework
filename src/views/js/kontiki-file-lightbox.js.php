@@ -18,8 +18,12 @@ class KontikiFileLightbox {
     if (!this.rootEl) throw new Error(`rootSelector not found: ${this.rootSelector}`);
 
     this.lbEl = document.getElementById(this.id);
-    if (!this.lbEl) throw new Error(`#${this.id} not found in DOM`);
-    if (!this.lbEl.hasAttribute('tabindex')) this.lbEl.setAttribute('tabindex', '-1');
+    if (!this.lbEl) {
+        // Lightbox markup not found, disable this instance
+        return;
+    }
+    // if (!this.lbEl) throw new Error(`#${this.id} not found in DOM`);
+    // if (!this.lbEl.hasAttribute('tabindex')) this.lbEl.setAttribute('tabindex', '-1');
 
     this.closeSel = opts.closeSelector || '.kontiki-lightbox-close';
     this.imgEl = this.lbEl.querySelector(opts.imgSelector || 'img');
@@ -60,7 +64,6 @@ class KontikiFileLightbox {
     this.imgEl.setAttribute('alt', alt || '');
     if (this.captionEl) this.captionEl.textContent = alt || '';
 
-    // ★ ここが変更点：root の直下の兄弟を inert（ライトボックスのみ除外）
     this._setInertForSiblingsExcept(this.rootEl, this.lbEl, true);
 
     document.documentElement.classList.add('kontiki-no-scroll');

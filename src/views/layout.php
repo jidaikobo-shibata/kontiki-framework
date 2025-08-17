@@ -34,10 +34,10 @@
   <script src="<?= $basePath ?>/kontiki-file-uploader.js"></script>
   <script src="<?= $basePath ?>/kontiki-file-index.js"></script>
   <script src="<?= $basePath ?>/kontiki-file.js"></script>
-  <script src="<?= $basePath ?>/admin.js"></script>
+  <script src="<?= $basePath ?>/kontiki-admin.js"></script>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="<?= $basePath ?>/admin.css">
+  <link rel="stylesheet" href="<?= $basePath ?>/kontiki-admin.css">
   <link rel="stylesheet" href="<?= $basePath ?>/kontiki-file.css">
 
   <title><?= e($pageTitle) ?></title>
@@ -76,8 +76,8 @@
   <!-- .app-main -->
   <main class="app-main">
     <section class="content-header" id="content-header">
-      <div class="container-fluid">
-        <h1><?= e($pageTitle) ?></h1>
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <h1 class="h4 my-4 lh-sm"><?= e($pageTitle) ?></h1>
       </div>
     </section>
 

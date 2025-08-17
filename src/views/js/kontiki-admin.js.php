@@ -1,6 +1,7 @@
 <?php
-
 /**
+  * @var string $skip_to_main_content
+  * @var string $skip_to_navigation
   * @var string $open_sidebar
   * @var string $close_sidebar
   * @var string $publishing
@@ -13,21 +14,76 @@
   * @var string $banned_url
   * @var string $reserved_url
   * @var string $published_url
+  * @var string $published_at
   * @var string $open_in_new_window
   */
 ?>$(document).ready(function () {
+
+    /**
+     * localize skip link
+     */
+    $(".skip-links a[href='#main']").text("<?= $skip_to_main_content ?>");
+    $(".skip-links a[href='#navigation']").text("<?= $skip_to_navigation ?>");
+
     /**
      * add aria-label to sidebar button
      */
-    const $toggleBtn = $('[data-widget="pushmenu"]');
-    function updateAriaLabel() {
-        const isCollapsed = $('body').hasClass('sidebar-collapse');
-        const label = isCollapsed ? '<?= $open_sidebar ?>' : '<?= $close_sidebar ?>';
-        $toggleBtn.attr('aria-label', label);
+    // i18n: tweak if you prefer different wording
+    const LABEL_OPEN  = '<?= $open_sidebar ?>';
+    const LABEL_CLOSE = '<?= $close_sidebar ?>';
+
+    // Small debounce helper
+    function debounce(fn, wait) {
+        let t; return function () { clearTimeout(t); t = setTimeout(() => fn.apply(this, arguments), wait); };
     }
-    updateAriaLabel();
-    $toggleBtn.on('click', function () {
-        setTimeout(updateAriaLabel, 10);
+
+    $(function () {
+        const $body = $(document.body);
+        const $toggles = $('[data-lte-toggle="sidebar"]');
+
+        if ($toggles.length === 0) return;
+
+        // Determine if sidebar is visually open right now.
+        // AdminLTE v4 toggles classes on <body>. On large screens it may stay open by layout.
+        function isSidebarOpen() {
+            // On small screens AdminLTE adds/removes .sidebar-open
+            if (window.matchMedia('(max-width: 991.98px)').matches) {
+                return $body.hasClass('sidebar-open');
+            }
+            // On lg+ screens, absence of "sidebar-collapse" usually means expanded
+            return !$body.hasClass('sidebar-collapse');
+        }
+
+            // Sync ARIA to current state
+            function syncAria() {
+                const open = isSidebarOpen();
+                $toggles.attr('aria-expanded', String(open));
+                $toggles.attr('aria-label', open ? LABEL_CLOSE : LABEL_OPEN);
+            }
+
+            // Initial sync
+            syncAria();
+
+        // Click updates (AdminLTE toggling happens on click; run after it)
+        $toggles.on('click', function () {
+            // Next tick is enough; if you see race, increase delay slightly
+            setTimeout(syncAria, 0);
+        });
+
+        // Keyboard: make Space work on <a role="button"> for better a11y
+        $toggles.on('keydown', function (e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+                $(this).trigger('click');
+            }
+        });
+
+        // Keep in sync when layout changes (resize / responsive behavior)
+        $(window).on('resize', debounce(syncAria, 100));
+
+        // Also observe <body> class changes from AdminLTE (most reliable)
+        const mo = new MutationObserver(syncAria);
+        mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     });
 
     /**
@@ -63,7 +119,8 @@
     }
 
     /**
-     * open details and forcus input
+     * 1. Click on the label of the collapsed section
+     * 2. Details will open and you can enter them immediately.
      */
     $('details > summary > label').on('click', function (e) {
       e.preventDefault();
@@ -86,6 +143,24 @@
     });
 
     /**
+     * If there is an input or textarea inside <details> and
+     * the value is not empty, the open attribute is automatically added.
+     */
+    $(function () {
+      $('details').each(function () {
+        const $details = $(this);
+
+        const hasValue = $details.find('input, textarea').toArray().some(el => {
+          return $(el).val().trim() !== '';
+        });
+
+        if (hasValue) {
+          $details.prop('open', true);
+        }
+      });
+    });
+
+    /**
      * update status (place bottom of this file)
      */
     let publishedAtInput = $("input[name=published_at]");
@@ -104,6 +179,7 @@
         let expiredAt = expiredAtInput.val();
         let statusOptionPublished = $("select[name=status] option[value=published]");
         let currentStatus = statusSelect.val();
+        let publishedAtLabel = $("label[for='published_at']");
 
         let publishedDate = publishedAt ? new Date(publishedAt) : null;
         let expiredDate = expiredAt ? new Date(expiredAt) : null;
@@ -123,6 +199,7 @@
         } else {
             statusOptionPublished.text("<?= $publishing ?>");
             mainSubmitBtn.text("<?= $do_publish ?>");
+            publishedAtLabel.text("<?= $published_at ?>");
         }
 
         // update URL and its label

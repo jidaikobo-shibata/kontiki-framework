@@ -5,7 +5,7 @@
 ?>
 
 <?php foreach ($dashboardItems as $controller => $links) : ?>
-<div class="card">
+<div class="card mb-4">
     <div class="card-header">
         <h2 class="card-title">
             <span class="nav-icon fas fa-folder"></span>

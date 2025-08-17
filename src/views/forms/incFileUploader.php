@@ -26,7 +26,7 @@
         <!-- save data by ajax and insert to field -->
         <form class="pt-4 px-4 w-100 d-none" id="insertUploadedFile" class="fileEdit">
           <input type="hidden" name="_csrf_value" class="js-csrf-token" value="">
-          <label for="uploadedDescription">画像説明</label>
+          <label class="form-label" for="uploadedDescription">画像説明</label>
           <textarea name="uploadedDescription" id="uploadedDescription" class="form-control" aria-describedby="uploadedDescriptionHelp" data-file-id="" data-file-path="" data-csrf_token=""></textarea>
           <small id="uploadedDescriptionHelp" class="form-text text-muted">画像説明を入力の上、挿入ボタンを押してください。画像に特に意味がない、装飾目的の画像の場合は、空のまま挿入してください。</small>
           <div id="insertStatusMsg"></div>

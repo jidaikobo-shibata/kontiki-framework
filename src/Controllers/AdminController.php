@@ -18,8 +18,8 @@ class AdminController
 
     public static function registerRoutes(App $app): void
     {
-        $app->get('/admin.js', AdminController::class . ':serveJs');
-        $app->get('/admin.css', AdminController::class . ':serveCss');
+        $app->get('/kontiki-admin.js', AdminController::class . ':serveJs');
+        $app->get('/kontiki-admin.css', AdminController::class . ':serveCss');
         $app->get('/favicon.ico', AdminController::class . ':serveFavicon');
     }
 
@@ -31,8 +31,10 @@ class AdminController
     public function serveJs(Request $request, Response $response): Response
     {
         $content = $this->view->fetch(
-            'js/admin.js.php',
+            'js/kontiki-admin.js.php',
             [
+                'skip_to_main_content' => __('skip_to_main_content'),
+                'skip_to_navigation' => __('skip_to_navigation'),
                 'publishing' => __('publishing'),
                 'reserved' => __('reserved'),
                 'expired' => __('expired'),
@@ -40,6 +42,7 @@ class AdminController
                 'do_reserve' => __('do_reserve', 'reserve'),
                 'do_save_as_pending' => __('do_save_as_pending', 'save as pending'),
                 'do_save_as_draft' => __('do_save_as_draft', 'save as draft'),
+                'published_at' => __('published_at'),
                 'published_url' => __('published_url'),
                 'reserved_url' => __('reserved_url'),
                 'banned_url' => __('banned_url'),
@@ -63,7 +66,7 @@ class AdminController
     public function serveCss(Request $request, Response $response): Response
     {
         $content = $this->view->fetch(
-            'css/admin.css.php',
+            'css/kontiki-admin.css.php',
             [
                 'color' => env('ADMIN_THEME_COLOR', '#ffffff'),
                 'bgcolor' => env('ADMIN_THEME_BGCOLOR', '#343a40')

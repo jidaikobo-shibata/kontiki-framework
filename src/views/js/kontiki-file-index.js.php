@@ -39,6 +39,7 @@ class KontikiFileIndex {
         this.setupDeleteFile();
         this.setupFileEdit();
         this.setupInsertFile();
+        this.bindModalA11y();
         this.csrf.refresh();
     }
 
@@ -274,6 +275,9 @@ class KontikiFileIndex {
             const fileRow = $(e.target).closest('tr'); // The row containing the button
             const codeContent = fileRow.find('td.text-break code').text().trim();
             const caret = this.utils.insertAtCaret(this.targetFieldId, codeContent);
+
+            this._closingByInsert = true;
+
             this.utils.closeModal(this.modalSelector, () => {
                 const target = document.getElementById(this.targetFieldId);
                 if (target) {
@@ -284,6 +288,46 @@ class KontikiFileIndex {
                     }
                 }
             });
+        });
+    }
+
+    // Keep ARIA clean by blurring focus before aria-hidden is set, and restore focus after.
+    bindModalA11y() {
+        const $modal = $('#' + this.modalSelector); // "kontikiFileIndexModal"
+        let openerEl = null;
+
+        // Remember who opened the modal (to restore focus later)
+        $modal.on('show.bs.modal', () => {
+            openerEl = document.activeElement;
+        });
+
+        // Before Bootstrap applies aria-hidden="true", ensure no focus remains inside the modal
+        $modal.on('hide.bs.modal', () => {
+            const active = document.activeElement;
+            if (active && $modal[0].contains(active)) {
+                active.blur();
+            }
+        });
+
+        // After fully hidden: optionally restore focus to the opener, unless insert flow handled it
+        $modal.on('hidden.bs.modal', () => {
+            // If insert flow already focused the target textarea, skip restoring opener
+            if (this._closingByInsert) {
+                this._closingByInsert = false;
+                return;
+            }
+            if (openerEl && document.contains(openerEl)) {
+                openerEl.focus();
+            }
+        });
+
+        // When shown: move focus to the first meaningful control in the modal
+        $modal.on('shown.bs.modal', () => {
+            const $first = $('#file-list')
+                .find('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+                .filter(':visible')
+                .first();
+            ($first[0] || $modal[0]).focus({ preventScroll: true });
         });
     }
 }

@@ -8,6 +8,8 @@ return [
     'password' => 'パスワード',
     'account' => 'アカウント',
 
+    'skip_to_main_content'    => 'メインコンテンツへ移動',
+    'skip_to_navigation'   => 'ナビゲーションへ移動',
     'open_sidebar' => 'サイドバーを開く',
     'close_sidebar' => 'サイドバーを閉じる',
     'account_settings' => 'アカウント設定',

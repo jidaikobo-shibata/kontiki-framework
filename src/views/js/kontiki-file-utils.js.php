@@ -30,27 +30,45 @@ class KontikiFileUtils {
     }
 
     /**
-     * Insert the given text at the current caret position of the target textarea.
-     * Returns the new caret position.
-     * @param {string} targetFieldIdStr
-     * @param {string} textToInsert
-     * @returns {number|undefined} caret position after insertion
+     * Insert text into a textarea at caret/selection, preserving native undo.
+     * Returns new caret position (number) or null if not found.
      */
-    insertAtCaret(targetFieldIdStr, textToInsert) {
-        const targetField = document.getElementById(targetFieldIdStr);
-        if (!targetField) return;
+    insertAtCaret(textareaId, text) {
+        const el = document.getElementById(textareaId);
+        if (!el) return null;
 
-        const startPos = targetField.selectionStart ?? targetField.value.length;
-        const endPos = targetField.selectionEnd ?? targetField.value.length;
-        const textBefore = targetField.value.substring(0, startPos);
-        const textAfter = targetField.value.substring(endPos);
+        // Ensure focus & a valid selection (needed for undo)
+        if (document.activeElement !== el) el.focus({ preventScroll: true });
+        let s = el.selectionStart, e = el.selectionEnd;
+        if (typeof s !== 'number' || typeof e !== 'number') {
+            s = e = el.value.length;
+            el.setSelectionRange(s, e);
+        }
 
-        targetField.value = textBefore + textToInsert + textAfter;
+        // 1) Prefer execCommand('insertText') → best undo integration on Chromium
+        try {
+            if (document.execCommand && document.queryCommandSupported?.('insertText')) {
+                if (document.execCommand('insertText', false, text)) {
+                    // notify listeners without rewriting .value
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    return el.selectionStart;
+                }
+            }
+        } catch { /* fallback */ }
 
-        const newCaret = startPos + textToInsert.length;
-        targetField.selectionStart = targetField.selectionEnd = newCaret;
+        // 2) Fallback to setRangeText() (undo-friendly in modern browsers)
+        if (typeof el.setRangeText === 'function') {
+            el.setRangeText(text, s, e, 'end');
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            return s + text.length;
+        }
 
-        // Do not focus here; focus after modal fully hides.
-        return newCaret;
+        // 3) Last resort (not undo-friendly)
+        const before = el.value.slice(0, s), after = el.value.slice(e);
+        el.value = before + text + after;
+        const pos = s + text.length;
+        el.setSelectionRange(pos, pos);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        return pos;
     }
 }
