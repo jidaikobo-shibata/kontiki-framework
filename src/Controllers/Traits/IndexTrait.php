@@ -37,7 +37,10 @@ trait IndexTrait
         );
 
         // pagination
-        $content .= $this->model->getPagination()->render(env('BASEPATH', '') . "/{$this->adminDirName}/index");
+        $paginationSuffix = $context == 'all' ? '' : '/' . $context;
+        $content .= $this->model->getPagination()->render(
+            env('BASEPATH', '') . "/{$this->adminDirName}/index" . $paginationSuffix
+        );
 
         $title = 'x_index_' . $context;
         $title_placeholder = $context . ' index of :name';
