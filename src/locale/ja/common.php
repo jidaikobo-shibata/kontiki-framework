@@ -101,6 +101,7 @@ return [
     "x_restore_success" => ":nameを復元しました",
     "x_restore_failed" => ":nameの復元に失敗しました",
     'error_at_x' => '「:name」にエラーがあります',
+    'x_page' => ':nameページ',
 
     // messages
     'found_the_problem' => '問題が見つかりました',

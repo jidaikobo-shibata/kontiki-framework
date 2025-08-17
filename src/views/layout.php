@@ -2,6 +2,8 @@
 /**
   * @var string $lang
   * @var string $pageTitle
+  * @var string $title
+  * @var string $h1
   * @var string $content
   */
 ?><!DOCTYPE html>
@@ -40,7 +42,7 @@
   <link rel="stylesheet" href="<?= $basePath ?>/kontiki-admin.css">
   <link rel="stylesheet" href="<?= $basePath ?>/kontiki-file.css">
 
-  <title><?= e($pageTitle) ?></title>
+  <title><?= e($title) ?></title>
 </head>
 
 <body class="layout-fixed sidebar-expand-lg">
@@ -77,7 +79,7 @@
   <main class="app-main">
     <section class="content-header" id="content-header">
       <div class="container-fluid d-flex justify-content-between align-items-center">
-        <h1 class="h4 my-4 lh-sm"><?= e($pageTitle) ?></h1>
+        <h1 class="h4 my-4 lh-sm"><?= e($h1) ?></h1>
       </div>
     </section>
 

@@ -214,10 +214,16 @@ abstract class BaseController
         string $template = 'layout.php',
         array $additionalData = []
     ): Response {
+        // Derive title/h1 with sane defaults (BC-friendly)
+        $title = $additionalData['title'] ?? $pageTitle;
+        $h1    = $additionalData['h1']    ?? $pageTitle;
+
         // Combine standard and additional data for the view
         $data = array_merge(
             [
                 'pageTitle' => $pageTitle,
+                'title'     => $title,
+                'h1'        => $h1,
                 'content' => $content,
             ],
             $additionalData

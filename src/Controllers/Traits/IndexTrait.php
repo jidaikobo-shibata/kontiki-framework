@@ -42,14 +42,32 @@ trait IndexTrait
             env('BASEPATH', '') . "/{$this->adminDirName}/index" . $paginationSuffix
         );
         $totalItems = $this->model->getPagination()->getTotalItems();
+        $currentPage = $this->model->getPagination()->getCurrentPage();
 
         $title = 'x_index_' . $context;
         $title_placeholder = $context . ' index of :name';
 
+        $pageTitle = __(
+            $title,
+            $title_placeholder,
+            ['name' => __($this->label)]
+        );
+
+        $pageNum = __(
+            'x_page',
+            ' index of :name',
+            ['name' => $currentPage]
+        );
+
         return $this->renderResponse(
             $response,
-            __($title, $title_placeholder, ['name' => __($this->label)]) . ' (' . $totalItems . ')',
-            $content
+            $pageTitle,
+            $content,
+            'layout.php',
+            [
+                'title' => $pageTitle . ' (' . $pageNum . ')',
+                'h1' => $pageTitle . ' (' . count($data) . '/'  . $totalItems . ')',
+            ]
         );
     }
 }
